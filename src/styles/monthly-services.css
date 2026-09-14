@@ -1,0 +1,435 @@
+/* Monthly Services Section */
+.monthly-services-section {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    padding: 6rem 0;
+}
+
+.monthly-services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.service-card {
+    background: white;
+    border-radius: 1.5rem;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    border: 2px solid transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+    .service-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+        border-color: #e08526;
+    }
+
+    .service-card.featured {
+        background: linear-gradient(135deg, #fef9f3 0%, #fdf3e7 100%);
+        border-color: #e08526;
+        transform: scale(1.02);
+    }
+
+        .service-card.featured:hover {
+            transform: scale(1.02) translateY(-8px);
+        }
+
+/* Date Badge */
+.service-day-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+    padding: 0.6rem 1.25rem;
+    border-radius: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.day-number {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #e08526;
+    line-height: 1;
+}
+
+.day-name {
+    font-size: 0.85rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+/* Icon & Title */
+.service-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.service-card h3 {
+    font-size: 1.35rem;
+    color: #111827;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+}
+
+.service-description {
+    color: #6b7280;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    min-height: 42px;
+}
+
+/* Date & Time Container (Single Line, No Wrap) */
+.service-datetime {
+    width: 100%;
+    margin: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.datetime-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 0.65rem 1rem;
+    background: #f9fafb;
+    border-radius: 0.75rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #374151;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: background 0.2s;
+}
+
+    .datetime-item:hover {
+        background: #f3f4f6;
+    }
+
+.datetime-icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+/* Countdown Badge */
+.countdown-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.75rem auto;
+    padding: 0.5rem 1.25rem;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    color: #92400e;
+    border-radius: 2rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
+}
+
+.pulse-dot {
+    width: 8px;
+    height: 8px;
+    background: #f59e0b;
+    border-radius: 50%;
+    animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.5;
+        transform: scale(1.2);
+    }
+}
+
+/* Calendar Link */
+.calendar-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.5rem auto 1rem;
+    padding: 0.5rem 1.25rem;
+    background: #eff6ff;
+    color: #2563eb;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+}
+
+    .calendar-link:hover {
+        background: #dbeafe;
+        color: #1d4ed8;
+        border-color: #93c5fd;
+        transform: translateY(-2px);
+    }
+
+/* Buttons */
+.btn-small {
+    padding: 0.75rem 2rem;
+    font-size: 0.9rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid #e08526;
+    margin-top: auto;
+}
+
+.btn-primary.btn-small {
+    background: linear-gradient(135deg, #e08526, #ba6a1e);
+    color: white;
+    box-shadow: 0 4px 12px rgba(224, 133, 38, 0.3);
+}
+
+    .btn-primary.btn-small:hover {
+        background: linear-gradient(135deg, #ba6a1e, #95531d);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(224, 133, 38, 0.4);
+    }
+
+.btn-outline.btn-small {
+    background: transparent;
+    color: #e08526;
+}
+
+    .btn-outline.btn-small:hover {
+        background: #e08526;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+/* Featured Badge */
+.featured-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #e08526, #ba6a1e);
+    color: white;
+    padding: 0.4rem 1.25rem;
+    border-radius: 2rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    box-shadow: 0 4px 12px rgba(224, 133, 38, 0.4);
+    z-index: 2;
+}
+
+/* Note Box */
+.monthly-services-note {
+    margin-top: 3rem;
+    padding: 1.5rem 2rem;
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    border-radius: 1rem;
+    text-align: center;
+}
+
+    .monthly-services-note p {
+        color: #1e40af;
+        margin: 0;
+        font-size: 1rem;
+    }
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .monthly-services-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .monthly-services-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .service-card {
+        padding: 1.75rem 1.25rem;
+    }
+
+        .service-card.featured {
+            transform: none;
+        }
+
+            .service-card.featured:hover {
+                transform: translateY(-8px);
+            }
+
+    .day-number {
+        font-size: 1.25rem;
+    }
+
+    .datetime-item {
+        font-size: 0.85rem;
+        padding: 0.5rem 0.75rem;
+    }
+}
+
+
+
+/* YouTube Preview Link - Unified Card Style */
+.youtube-preview-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    margin: 1rem 0;
+    /* The parent handles the rounding for the whole card */
+    border-radius: 0.75rem;
+    overflow: hidden; /* Clips children to the rounded corners */
+    background: #1a1a1a; /* Ensures no white gaps behind the video */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Optional: adds a subtle depth */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .youtube-preview-link:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+    }
+
+/* Image container - Remove individual rounding */
+.video-thumbnail-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 0; /* Fixed: Remove border radius here */
+}
+
+.video-thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.youtube-preview-link:hover .video-thumbnail {
+    transform: scale(1.05);
+}
+
+/* Live Badge */
+.live-badge {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    background: #dc2626;
+    color: white;
+    padding: 0.35rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    z-index: 2;
+    animation: pulse-live 2s infinite;
+}
+
+.live-dot {
+    width: 6px;
+    height: 6px;
+    background: white;
+    border-radius: 50%;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
+}
+
+@keyframes pulse-live {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7);
+    }
+
+    50% {
+        box-shadow: 0 0 0 8px rgba(220, 38, 38, 0);
+    }
+}
+
+/* Play Overlay */
+.play-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.youtube-preview-link:hover .play-overlay {
+    opacity: 1;
+}
+
+.play-button {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    color: #000;
+    transition: transform 0.3s ease;
+}
+
+.youtube-preview-link:hover .play-button {
+    transform: scale(1.1);
+}
+
+/* Video Info / Title Bar - Remove individual rounding */
+.video-info {
+    padding: 1rem;
+    background: #1a1a1a; /* Matches the card background */
+    border-radius: 0; /* Fixed: Remove border radius here */
+}
+
+.video-title {
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.video-meta {
+    color: #aaa;
+    font-size: 0.8rem;
+    display: flex;
+    gap: 0.4rem;
+}

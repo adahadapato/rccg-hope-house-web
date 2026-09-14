@@ -1,0 +1,182 @@
+/* Vision & Mission Section */
+.vision-mission-section {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    padding: 6rem 0;
+}
+
+.vision-mission-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4rem;
+    align-items: center;
+    margin-bottom: 6rem;
+}
+
+.vision-content {
+    max-width: 600px;
+}
+
+.vision-list {
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.vision-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .vision-item:hover {
+        transform: translateX(8px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+
+.vision-bullet {
+    width: 12px;
+    height: 12px;
+    background: linear-gradient(135deg, #e08526, #ba6a1e);
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 0.5rem;
+}
+
+.vision-text {
+    color: #4b5563;
+    line-height: 1.7;
+    font-size: 1rem;
+}
+
+.vision-image {
+    border-radius: 1.5rem;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.vision-photo {
+    width: 100%;
+    height: 450px;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.vision-image:hover .vision-photo {
+    transform: scale(1.05);
+}
+
+/* Mission Section */
+.mission-section {
+    margin-top: 4rem;
+}
+
+.mission-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.mission-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 1.25rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    border-left: 4px solid transparent;
+    /* Ensures all cards stretch to the same height in a row */
+    display: flex;
+    flex-direction: column;
+}
+
+    .mission-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(180deg, #e08526, #ba6a1e);
+        transform: scaleY(0);
+        transition: transform 0.3s ease;
+    }
+
+    .mission-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+        border-left-color: #e08526;
+    }
+
+        .mission-card:hover::before {
+            transform: scaleY(1);
+        }
+
+.mission-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #e08526;
+    opacity: 0.2;
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    line-height: 1;
+}
+
+.mission-title {
+    font-size: 1.25rem;
+    color: #111827;
+    margin-bottom: 0.75rem;
+    padding-right: 3rem;
+}
+
+.mission-description {
+    color: #6b7280;
+    line-height: 1.6;
+    font-size: 0.95rem;
+    flex-grow: 1; /* Pushes content to fill space evenly */
+}
+
+/* Responsive */
+@media (min-width: 1024px) {
+    .vision-mission-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .mission-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* Removed the nth-child spanning rules so all cards stay the same size */
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+    .mission-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Removed the nth-child spanning rules so all cards stay the same size */
+}
+
+@media (max-width: 767px) {
+    .vision-mission-grid {
+        gap: 3rem;
+    }
+
+    .vision-item {
+        padding: 1rem;
+    }
+
+    .mission-card {
+        padding: 1.5rem;
+    }
+}

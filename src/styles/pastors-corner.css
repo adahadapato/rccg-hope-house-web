@@ -1,0 +1,658 @@
+﻿/* =========================================
+   PASTOR'S CORNER - BASE SECTION & HEADER
+   ========================================= */
+.pastors-corner-section {
+    padding: 0;
+    background: linear-gradient(135deg, rgba(248, 250, 252, 0.8), rgba(248, 250, 252, 0.8)), url('https://images.unsplash.com/photo-1491841550275-ad7854e35ca6?w=1920&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+}
+
+.pastors-header {
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%);
+    padding: 4rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.pastors-header-content {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.pastors-title {
+    font-size: 3.5rem;
+    color: white;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    margin: 0 0 1rem 0;
+    text-transform: uppercase;
+    text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.pastors-subtitle {
+    font-size: 1.25rem;
+    color: #e0e7ff;
+    letter-spacing: 0.2em;
+    margin: 0;
+    font-weight: 300;
+}
+
+/* =========================================
+   PREVIEW CARD (TEASER)
+   ========================================= */
+.article-card {
+    max-width: 900px;
+    margin: -4rem auto 4rem;
+    position: relative;
+    z-index: 2;
+}
+
+.article-preview {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 1.5rem;
+    padding: 3rem;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+    position: relative;
+    backdrop-filter: blur(10px);
+}
+
+    .article-preview::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 20% 50%, rgba(224, 133, 38, 0.03) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(30, 64, 175, 0.03) 0%, transparent 50%);
+        border-radius: 1.5rem;
+        pointer-events: none;
+    }
+
+    .article-preview:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 25px 70px rgba(0,0,0,0.2);
+    }
+
+.preview-header {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid #f3f4f6;
+    position: relative;
+    z-index: 1;
+}
+
+.article-category {
+    display: inline-block;
+    background: linear-gradient(135deg, #e08526, #ba6a1e);
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 2rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    margin-bottom: 1.5rem;
+}
+
+.article-title {
+    font-size: 2.5rem;
+    color: #111827;
+    margin: 0 0 1rem 0;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.article-scripture {
+    font-size: 1.125rem;
+    color: #6b7280;
+    font-weight: 600;
+    margin: 0;
+}
+
+.preview-content {
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.preview-excerpt {
+    color: #4b5563;
+    font-size: 1.125rem;
+    line-height: 1.8;
+    margin: 0;
+}
+
+.btn-read-full {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.25rem 2.5rem;
+    background: linear-gradient(135deg, #e08526, #ba6a1e);
+    color: white;
+    border: none;
+    border-radius: 1rem;
+    font-size: 1.125rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(224, 133, 38, 0.3);
+    position: relative;
+    z-index: 1;
+}
+
+    .btn-read-full:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 28px rgba(224, 133, 38, 0.4);
+    }
+
+.btn-arrow {
+    font-size: 1.25rem;
+    transition: transform 0.3s ease;
+}
+
+.btn-read-full:hover .btn-arrow {
+    transform: translateX(6px);
+}
+
+/* =========================================
+   MODAL LAYOUT
+   ========================================= */
+.article-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 1rem;
+}
+
+.article-modal {
+    background: white;
+    width: 100%;
+    max-width: 900px;
+    max-height: 90vh;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: rgba(255,255,255,0.95);
+    border: none;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    color: #111827;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: transform 0.2s;
+}
+
+    .modal-close-btn:hover {
+        transform: rotate(90deg) scale(1.1);
+    }
+
+.modal-article-header {
+    padding: 3rem 3rem 2rem;
+    background: linear-gradient(135deg, #fef9f3 0%, #fff 100%);
+    border-bottom: 3px solid #e5e7eb;
+}
+
+    .modal-article-header .article-title {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+.article-divider {
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, #e08526, #f6d6a9);
+    border-radius: 2px;
+    margin-bottom: 1rem;
+}
+
+/* =========================================
+   MODAL BODY
+   ========================================= */
+.modal-article-body {
+    padding: 3rem;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+}
+
+.content-block {
+    width: 100%;
+}
+
+/* =========================================
+   PREVIEW INTRODUCTION HEADING
+   ========================================= */
+.preview-intro-heading {
+    font-size: 1.1rem;
+    color: #e08526;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+    .preview-intro-heading::before {
+        content: '';
+        display: inline-block;
+        width: 30px;
+        height: 3px;
+        background: linear-gradient(90deg, #e08526, #f6d6a9);
+    }
+
+.preview-excerpt {
+    color: #4b5563;
+    font-size: 1.125rem;
+    line-height: 1.8;
+    margin: 0;
+}
+
+/* =========================================
+   INTRODUCTION SECTION (With Heading)
+   ========================================= */
+.intro-section {
+    background: linear-gradient(135deg, #fef9f3 0%, #fff 100%);
+    padding: 2.5rem;
+    border-radius: 1rem;
+    border-left: 5px solid #e08526;
+    margin-bottom: 3rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.intro-heading {
+    font-size: 1.25rem;
+    color: #e08526;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+    .intro-heading::before {
+        content: '';
+        display: inline-block;
+        width: 30px;
+        height: 3px;
+        background: linear-gradient(90deg, #e08526, #f6d6a9);
+    }
+
+.intro-text {
+    color: #4b5563;
+    font-size: 1.15rem;
+    line-height: 1.9;
+    margin: 0;
+}
+
+/* Hide old heading classes */
+.block-heading {
+    display: none !important;
+}
+
+/* =========================================
+   POINT CARDS WITH AUTOMATIC NUMBERING
+   ========================================= */
+.point-card {
+    background: white;
+    border-radius: 1.25rem;
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    border-left: 5px solid #e08526;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+    .point-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #e08526, #f6d6a9, #e08526);
+        background-size: 200% 100%;
+        animation: shimmer 3s infinite;
+    }
+
+    .point-card:hover {
+        transform: translateY(-5px) translateX(5px);
+        box-shadow: 0 12px 30px rgba(224, 133, 38, 0.2);
+        border-left-color: #f6d6a9;
+    }
+
+.point-title {
+    font-size: 1.35rem;
+    color: #111827;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    line-height: 1.4;
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+    position: relative;
+}
+
+    .point-title::before {
+        flex-shrink: 0;
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #e08526, #ba6a1e);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: 900;
+        box-shadow: 0 4px 12px rgba(224, 133, 38, 0.4);
+        position: relative;
+        z-index: 1;
+    }
+
+.point-text {
+    color: #4b5563;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin: 0 0 1.5rem 0;
+    padding-left: 4.5rem;
+}
+
+.point-bullets {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 0 4.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+    .point-bullets li {
+        color: #4b5563;
+        font-size: 1.05rem;
+        line-height: 1.7;
+        padding-left: 2rem;
+        position: relative;
+        transition: all 0.2s ease;
+    }
+
+        .point-bullets li::before {
+            content: '✦';
+            position: absolute;
+            left: 0;
+            top: 2px;
+            color: #e08526;
+            font-size: 1.2rem;
+            font-weight: 700;
+            transition: transform 0.2s ease;
+        }
+
+        .point-bullets li:hover {
+            color: #111827;
+            padding-left: 2.25rem;
+        }
+
+            .point-bullets li:hover::before {
+                transform: scale(1.3) rotate(15deg);
+                color: #ba6a1e;
+            }
+
+/* =========================================
+   FIRST POINTS SECTION
+   ========================================= */
+.first-points-block {
+    counter-reset: first-point-counter;
+}
+
+    .first-points-block .point-card {
+        background: #f9fafb;
+    }
+
+    .first-points-block .point-title::before {
+        counter-increment: first-point-counter;
+        content: counter(first-point-counter);
+    }
+
+/* =========================================
+   DETAILED POINTS SECTION
+   ========================================= */
+.detailed-lessons-block {
+    counter-reset: detailed-point-counter;
+}
+
+.detailed-point {
+    background: linear-gradient(135deg, #ffffff 0%, #fef9f3 100%);
+    border: 2px solid #f3f4f6;
+    border-left: 5px solid #e08526;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+    .detailed-point:hover {
+        background: linear-gradient(135deg, #fef9f3 0%, #fff 100%);
+        border-color: #fde68a;
+        box-shadow: 0 12px 35px rgba(224, 133, 38, 0.25);
+    }
+
+    .detailed-point .point-title {
+        font-size: 1.4rem;
+        font-weight: 800;
+    }
+
+        .detailed-point .point-title::before {
+            counter-increment: detailed-point-counter;
+            content: counter(detailed-point-counter);
+        }
+
+    .detailed-point .point-bullets li {
+        font-size: 1.05rem;
+        padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+        background: rgba(249, 250, 251, 0.5);
+        border-radius: 0.75rem;
+        margin-bottom: 0.5rem;
+        border-left: 3px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+        .detailed-point .point-bullets li:hover {
+            background: rgba(254, 249, 243, 0.8);
+            border-left-color: #e08526;
+            padding-left: 2.75rem;
+        }
+
+/* =========================================
+   PREFACE / BADGE SECTION
+   ========================================= */
+.preface-main-heading {
+    font-size: 1.75rem;
+    color: #111827;
+    margin: 0 0 2rem 0;
+    font-weight: 700;
+    text-align: center;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #fef9f3, #fff);
+    border-radius: 1rem;
+    border: 2px solid #f3f4f6;
+}
+
+.preface-content-wrapper {
+    background: linear-gradient(135deg, #fef9f3, #fff);
+    padding: 2.5rem;
+    border-radius: 1rem;
+    border-left: 4px solid #e08526;
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.preface-badge {
+    position: absolute;
+    top: -1rem;
+    right: 2rem;
+    background: linear-gradient(135deg, #e08526, #ba6a1e);
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 2rem;
+    font-size: 1.25rem;
+    font-weight: 800;
+    box-shadow: 0 4px 12px rgba(224, 133, 38, 0.3);
+}
+
+.preface-preamble {
+    color: #4b5563;
+    font-size: 1.125rem;
+    line-height: 1.8;
+    margin: 0;
+    font-style: italic;
+}
+
+.preface-sub-heading {
+    color: #111827;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    text-align: center;
+}
+
+/* =========================================
+   CLOSING
+   ========================================= */
+.closing-block {
+    text-align: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    border-radius: 1rem;
+    border: 2px solid #bfdbfe;
+}
+
+.closing-text {
+    color: #1e40af;
+    font-size: 1.25rem;
+    line-height: 1.8;
+    margin: 0;
+    font-style: italic;
+    font-weight: 500;
+}
+
+/* =========================================
+   ANIMATIONS
+   ========================================= */
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+@media (max-width: 768px) {
+    .pastors-title {
+        font-size: 2rem;
+    }
+
+    .article-preview, .modal-article-header, .modal-article-body {
+        padding: 2rem 1.5rem;
+    }
+
+        .article-title, .modal-article-header .article-title {
+            font-size: 1.75rem;
+        }
+
+    .intro-section {
+        padding: 2rem 1.5rem;
+    }
+
+    .intro-text {
+        font-size: 1.05rem;
+        text-align: left;
+    }
+
+    .point-card {
+        padding: 2rem 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .point-title {
+        font-size: 1.2rem;
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+        .point-title::before {
+            width: 40px;
+            height: 40px;
+            font-size: 1.25rem;
+        }
+
+    .point-text, .point-bullets {
+        padding-left: 0;
+        margin-left: 0;
+    }
+
+        .point-bullets li {
+            padding-left: 1.75rem;
+            font-size: 1rem;
+        }
+
+    .detailed-point .point-bullets li {
+        padding: 0.6rem 0.6rem 0.6rem 2rem;
+    }
+
+    .preface-badge {
+        position: static;
+        display: inline-block;
+        margin-bottom: 1rem;
+    }
+
+    .preface-content-wrapper {
+        text-align: center;
+    }
+
+    .preface-main-heading {
+        font-size: 1.5rem;
+    }
+
+    .closing-text {
+        font-size: 1.125rem;
+    }
+}

@@ -1,0 +1,25 @@
+/* src/styles/index.css */
+@import './base.css';
+@import './navigation.css';
+@import './hero.css';
+@import './about.css';
+@import './beliefs.css';
+@import './welcome.css';
+@import './sermons.css';
+@import './events.css';
+@import './prayer.css';
+@import './contact.css';
+@import './footer.css';
+@import './monthly-services.css';
+@import './prayer-form.css';
+@import './vision-mission.css';
+@import './regular-services.css';
+@import './prophecies.css';
+@import './pastors-corner.css';
+@import './annual-prayer-points.css';
+@import './theme-of-the-year.css';
+@import './photo-gallery.css';
+@import './devotional.css';
+@import './daily-devotional.css';
+@import './mission.css';
+@import './vision.css';

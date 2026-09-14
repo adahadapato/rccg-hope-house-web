@@ -1,0 +1,144 @@
+.about-modern {
+    background: linear-gradient(135deg, #ffffff 0%, #fef9f3 100%);
+    padding: 6rem 0;
+}
+
+.about-grid-modern {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4rem;
+    align-items: center;
+}
+
+.about-visual-modern {
+    position: relative;
+}
+
+.est-badge {
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+    background: linear-gradient(135deg, #e08526, #ba6a1e);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 2rem;
+    font-weight: 700;
+    font-size: 0.875rem;
+    letter-spacing: 0.1em;
+    box-shadow: 0 10px 25px rgba(224, 133, 38, 0.3);
+    z-index: 2;
+}
+
+.about-image-modern {
+    width: 100%;
+    height: 450px;
+    object-fit: cover;
+    border-radius: 1.5rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.about-accent-card {
+    position: absolute;
+    bottom: -1.5rem;
+    right: -1.5rem;
+    background: white;
+    padding: 1.5rem 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    animation: float 3s ease-in-out infinite;
+    z-index: 2;
+}
+
+.accent-icon {
+    font-size: 2rem;
+}
+
+.about-accent-card p {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+}
+
+.about-content-modern {
+    max-width: 600px;
+}
+
+.about-lead {
+    font-size: 1.25rem;
+    color: #374151;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.about-text {
+    color: #6b7280;
+    line-height: 1.8;
+    margin-bottom: 2.5rem;
+}
+
+.about-stats-modern {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.stat-item {
+    text-align: center;
+    flex: 1;
+}
+
+.stat-value {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #e08526;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.stat-divider {
+    width: 1px;
+    height: 40px;
+    background: #e5e7eb;
+}
+
+@media (min-width: 1024px) {
+    .about-grid-modern {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .about-stats-modern {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .stat-divider {
+        width: 40px;
+        height: 1px;
+    }
+
+    .about-accent-card {
+        position: relative;
+        bottom: auto;
+        right: auto;
+        margin-top: 1.5rem;
+    }
+}

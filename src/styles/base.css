@@ -1,0 +1,278 @@
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+
+/* Reset & Base */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: #1f2937;
+    line-height: 1.6;
+    background: white;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+button {
+    font: inherit;
+}
+
+/* Layout Utilities */
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.section {
+    padding: 4rem 0;
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* Colors */
+.bg-white {
+    background: white;
+}
+
+.bg-gray-50 {
+    background: #f9fafb;
+}
+
+.bg-gray-900 {
+    background: #111827;
+}
+
+.bg-gradient {
+    background: linear-gradient(135deg, #f9fafb 0%, #fef9f3 100%);
+}
+
+.text-white {
+    color: white;
+}
+
+.text-primary {
+    color: #e08526;
+}
+
+.text-gray-600 {
+    color: #4b5563;
+}
+
+.text-gray-400 {
+    color: #9ca3af;
+}
+
+.text-gold {
+    color: #f6d6a9;
+}
+
+/* Typography */
+.font-medium {
+    font-weight: 500;
+}
+
+.font-bold {
+    font-weight: 700;
+}
+
+.text-xl {
+    font-size: 1.25rem;
+}
+
+.text-2xl {
+    font-size: 1.5rem;
+}
+
+.text-3xl {
+    font-size: 1.875rem;
+}
+
+.text-4xl {
+    font-size: 2.25rem;
+}
+
+/* Spacing */
+.mb-4 {
+    margin-bottom: 1rem;
+}
+
+.mb-6 {
+    margin-bottom: 1.5rem;
+}
+
+.mb-8 {
+    margin-bottom: 2rem;
+}
+
+.mt-8 {
+    margin-top: 2rem;
+}
+
+/* Section Tags & Titles */
+.section-tag {
+    display: inline-block;
+    color: #e08526;
+    font-weight: 600;
+    font-size: 0.875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    color: #111827;
+    margin-bottom: 1rem;
+}
+
+.title-divider,
+.title-divider-center,
+.title-divider-left {
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, #e08526, #f6d6a9);
+    border-radius: 2px;
+}
+
+.title-divider-center {
+    margin: 1rem auto;
+}
+
+.section-header-center {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.section-description {
+    color: #6b7280;
+    font-size: 1.125rem;
+    max-width: 600px;
+    margin: 1rem auto 0;
+}
+
+/* Buttons */
+.btn-primary {
+    background: #e08526;
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+    .btn-primary:hover {
+        background: #ba6a1e;
+    }
+
+.btn-secondary {
+    background: white;
+    color: #e08526;
+    padding: 0.75rem 2rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    border: 2px solid #e08526;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+    .btn-secondary:hover {
+        background: #fef9f3;
+    }
+
+.btn-large {
+    padding: 1rem 2.5rem;
+    font-size: 1.125rem;
+}
+
+.btn-white {
+    background: white;
+    color: #e08526;
+    border: 2px solid white;
+}
+
+    .btn-white:hover {
+        background: transparent;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+.btn-outline {
+    background: transparent;
+    color: #e08526;
+    border: 2px solid #e08526;
+}
+
+    .btn-outline:hover {
+        background: #e08526;
+        color: white;
+    }
+
+.btn-outline-white {
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+}
+
+    .btn-outline-white:hover {
+        background: white;
+        color: #4d618d;
+    }
+
+.btn-full {
+    width: 100%;
+    justify-content: center;
+}
+
+/* Animations */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

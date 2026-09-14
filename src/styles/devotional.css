@@ -1,0 +1,455 @@
+/* =========================================
+   DEVOTIONAL PAGE STYLES
+   ========================================= */
+
+/* Hero Section */
+.devotional-hero {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #e08526 100%);
+    padding: 5rem 0 4rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+    .devotional-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.3;
+    }
+
+.devotional-header-content {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.devotional-badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: 2rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    margin-bottom: 1.5rem;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.devotional-title {
+    font-size: 4rem;
+    color: white;
+    font-weight: 900;
+    margin-bottom: 1rem;
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    letter-spacing: 0.05em;
+}
+
+.devotional-subtitle {
+    font-size: 1.5rem;
+    color: #fef3c7;
+    margin-bottom: 2rem;
+    font-weight: 300;
+}
+
+.devotional-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 1rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+}
+
+.date-icon {
+    font-size: 1.5rem;
+}
+
+/* Content Section */
+.devotional-content-section {
+    padding: 4rem 0;
+}
+
+.devotional-grid {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 3rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Devotional Cards */
+.devotional-card {
+    background: white;
+    border-radius: 1.5rem;
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 2px solid #f3f4f6;
+    transition: all 0.3s ease;
+}
+
+    .devotional-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 3px solid #e5e7eb;
+}
+
+.card-icon {
+    font-size: 2rem;
+}
+
+.card-header h2 {
+    font-size: 1.5rem;
+    color: #1e3a8a;
+    margin: 0;
+    font-weight: 700;
+}
+
+/* Theme Card */
+.theme-card {
+    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+    color: white;
+    border: none;
+}
+
+    .theme-card .card-header {
+        border-bottom-color: rgba(255, 255, 255, 0.3);
+    }
+
+        .theme-card .card-header h2 {
+            color: white;
+        }
+
+.theme-text {
+    font-size: 2rem;
+    font-weight: 800;
+    text-align: center;
+    margin: 0;
+    line-height: 1.2;
+}
+
+/* Scripture Card */
+.scripture-card {
+    border-left: 6px solid #e08526;
+}
+
+.scripture-text {
+    background: #fef9f3;
+    padding: 2rem;
+    border-radius: 1rem;
+    font-size: 1.25rem;
+    line-height: 1.8;
+    color: #1e3a8a;
+    font-weight: 600;
+    font-style: italic;
+    margin-bottom: 1rem;
+}
+
+.bible-reading {
+    color: #6b7280;
+    font-size: 1rem;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 0.5rem;
+}
+
+/* Open Heavens Text */
+.oh-text-card {
+    border-left: 6px solid #3b82f6;
+}
+
+.oh-text {
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    padding: 2rem;
+    border-radius: 1rem;
+    font-size: 1.125rem;
+    line-height: 2;
+    color: #1e40af;
+    font-style: italic;
+}
+
+/* Commentary Card */
+.commentary-card {
+    border-left: 6px solid #10b981;
+}
+
+.commentary-text {
+    font-size: 1.125rem;
+    line-height: 1.9;
+    color: #374151;
+}
+
+    .commentary-text p {
+        margin-bottom: 1.5rem;
+    }
+
+        .commentary-text p:last-child {
+            margin-bottom: 0;
+        }
+
+/* Prayer Points Card */
+.prayer-card {
+    border-left: 6px solid #e08526;
+}
+
+.prayer-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.prayer-item {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 1.25rem;
+    background: #fef9f3;
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+    .prayer-item:hover {
+        background: #fef3c7;
+        transform: translateX(8px);
+    }
+
+.prayer-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: #e08526;
+    color: white;
+    border-radius: 50%;
+    font-weight: 700;
+    flex-shrink: 0;
+    font-size: 0.875rem;
+}
+
+.prayer-text {
+    color: #374151;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    flex: 1;
+}
+
+/* Declaration Card */
+.declaration-card {
+    background: linear-gradient(135deg, #fef9f3, #fff);
+    border: 3px solid #e08526;
+    text-align: center;
+}
+
+.declaration-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e3a8a;
+    line-height: 1.6;
+    margin: 0;
+    font-style: italic;
+}
+
+/* Author Section */
+.devotional-author {
+    text-align: center;
+    padding: 2rem;
+    background: white;
+    border-radius: 1rem;
+    color: #6b7280;
+    margin-top: 2rem;
+}
+
+    .devotional-author strong {
+        color: #1e3a8a;
+    }
+
+.church-tag {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: #9ca3af;
+}
+
+/* Sidebar */
+.devotional-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.sidebar-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border: 2px solid #f3f4f6;
+}
+
+    .sidebar-card h3 {
+        font-size: 1.25rem;
+        color: #1e3a8a;
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+
+    .sidebar-card p {
+        color: #6b7280;
+        line-height: 1.7;
+        margin-bottom: 1rem;
+    }
+
+        .sidebar-card p:last-child {
+            margin-bottom: 0;
+        }
+
+/* Date Input */
+.date-input {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.75rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+    .date-input:hover,
+    .date-input:focus {
+        border-color: #3b82f6;
+        outline: none;
+    }
+
+/* Share Buttons */
+.share-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.share-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+    .share-btn.facebook {
+        background: #1877f2;
+        color: white;
+    }
+
+    .share-btn.twitter {
+        background: #1da1f2;
+        color: white;
+    }
+
+    .share-btn.whatsapp {
+        background: #25d366;
+        color: white;
+    }
+
+    .share-btn.copy {
+        background: #6b7280;
+        color: white;
+    }
+
+    .share-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    }
+
+/* Archive Button */
+.btn-archive {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #e08526, #ba6a1e);
+    color: white;
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+    .btn-archive:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(224, 133, 38, 0.3);
+    }
+
+.archive-notice {
+    background: linear-gradient(135deg, #fef3c7, #fff);
+    border: 2px solid #fde68a;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .devotional-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .devotional-sidebar {
+        order: 2;
+    }
+
+    .devotional-title {
+        font-size: 3rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .devotional-title {
+        font-size: 2.5rem;
+    }
+
+    .devotional-subtitle {
+        font-size: 1.25rem;
+    }
+
+    .devotional-card {
+        padding: 2rem 1.5rem;
+    }
+
+    .theme-text {
+        font-size: 1.75rem;
+    }
+
+    .declaration-text {
+        font-size: 1.25rem;
+    }
+
+    .scripture-text,
+    .oh-text {
+        font-size: 1rem;
+        padding: 1.5rem;
+    }
+}

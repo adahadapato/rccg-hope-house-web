@@ -1,0 +1,69 @@
+.prayer-cta-modern {
+    position: relative;
+    background: linear-gradient(135deg, #4d618d, #2d3748);
+    color: white;
+    text-align: center;
+    overflow: hidden;
+}
+
+.prayer-bg-pattern {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.1) 1px, transparent 0);
+    background-size: 40px 40px;
+    opacity: 0.3;
+}
+
+.prayer-content-modern {
+    position: relative;
+    z-index: 2;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.prayer-icon-modern {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    animation: pulse 2s infinite;
+}
+
+.prayer-title {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.prayer-description {
+    font-size: 1.125rem;
+    opacity: 0.95;
+    margin-bottom: 2.5rem;
+    line-height: 1.8;
+}
+
+.prayer-buttons-modern {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+@media (max-width: 640px) {
+    .prayer-buttons-modern {
+        flex-direction: column;
+    }
+
+        .prayer-buttons-modern button {
+            width: 100%;
+        }
+}

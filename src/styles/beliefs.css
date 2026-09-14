@@ -1,0 +1,165 @@
+.beliefs-modern {
+    background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+    padding: 6rem 0;
+}
+
+.beliefs-grid-modern {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.belief-card-modern {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+    .belief-card-modern::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(180deg, #e08526, #ba6a1e);
+        transform: scaleY(0);
+        transition: transform 0.3s ease;
+    }
+
+    .belief-card-modern:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+
+    .belief-card-modern.active {
+        border-color: #e08526;
+        box-shadow: 0 20px 40px rgba(224, 133, 38, 0.15);
+    }
+
+        .belief-card-modern.active::before {
+            transform: scaleY(1);
+        }
+
+.belief-header {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.belief-icon {
+    font-size: 2.5rem;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #fef9f3, #fdf3e7);
+    border-radius: 1rem;
+    flex-shrink: 0;
+}
+
+.belief-title {
+    font-size: 1.5rem;
+    color: #111827;
+    flex: 1;
+}
+
+.belief-toggle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #f3f4f6;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #6b7280;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.belief-card-modern.active .belief-toggle {
+    background: #e08526;
+    color: white;
+    transform: rotate(45deg);
+}
+
+.belief-excerpt {
+    color: #4b5563;
+    line-height: 1.6;
+    font-size: 1.05rem;
+}
+
+.belief-detail {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #f3f4f6;
+    animation: fadeInUp 0.4s ease;
+}
+
+    .belief-detail p {
+        color: #374151;
+        line-height: 1.8;
+        font-size: 1.05rem;
+    }
+
+@media (min-width: 1024px) {
+    .beliefs-grid-modern {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Add to beliefs.css */
+
+.belief-icon {
+    font-size: 2.5rem;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #fef9f3, #fdf3e7);
+    border-radius: 1rem;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+    /* Image variant for Holy Spirit */
+    .belief-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+/* Special styling for Holy Spirit card */
+.belief-card-modern[data-belief="holy-spirit"] {
+    background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+}
+
+    .belief-card-modern[data-belief="holy-spirit"] .belief-icon {
+        background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+        box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.3);
+    }
+
+    .belief-card-modern[data-belief="holy-spirit"]::before {
+        background: linear-gradient(180deg, #38bdf8, #0ea5e9);
+    }
+
+.belief-icon-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0.75rem;
+    display: block;
+}

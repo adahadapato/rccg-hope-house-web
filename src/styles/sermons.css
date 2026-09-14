@@ -1,0 +1,126 @@
+.sermons-grid-modern {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+}
+
+.sermon-card-modern {
+    background: white;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+    .sermon-card-modern:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+
+.sermon-thumbnail-modern {
+    position: relative;
+    overflow: hidden;
+}
+
+    .sermon-thumbnail-modern img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+.sermon-card-modern:hover .sermon-thumbnail-modern img {
+    transform: scale(1.1);
+}
+
+.sermon-play-modern {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.sermon-card-modern:hover .sermon-play-modern {
+    opacity: 1;
+}
+
+.play-button {
+    width: 70px;
+    height: 70px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #e08526;
+    font-size: 1.5rem;
+    transition: transform 0.3s ease;
+}
+
+    .play-button:hover {
+        transform: scale(1.1);
+    }
+
+.sermon-duration {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.sermon-content-modern {
+    padding: 2rem;
+}
+
+.sermon-series {
+    color: #e08526;
+    font-weight: 600;
+    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.sermon-title {
+    font-size: 1.5rem;
+    color: #111827;
+    margin-bottom: 1rem;
+}
+
+.sermon-meta-modern {
+    display: flex;
+    gap: 1.5rem;
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+}
+
+.sermon-link-modern {
+    color: #e08526;
+    font-weight: 600;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: gap 0.3s ease;
+}
+
+    .sermon-link-modern:hover {
+        gap: 1rem;
+    }
+
+@media (min-width: 1024px) {
+    .sermons-grid-modern {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}

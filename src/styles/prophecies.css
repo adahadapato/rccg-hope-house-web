@@ -1,0 +1,530 @@
+/* Prophecies Section */
+.prophecies-section {
+    background: linear-gradient(135deg, #ffffff 0%, #fef9f3 50%, #fff 100%);
+    padding: 6rem 0;
+    position: relative;
+}
+
+/* Header */
+.prophecy-header {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 4rem;
+}
+
+.prophecy-tag {
+    display: inline-block;
+    color: #e08526;
+    font-weight: 700;
+    font-size: 0.875rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    padding: 0.5rem 1.5rem;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-radius: 2rem;
+}
+
+.prophecy-title {
+    font-size: 3rem;
+    color: #111827;
+    margin-bottom: 1rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.prophecy-subtitle {
+    color: #6b7280;
+    font-size: 1.125rem;
+    line-height: 1.6;
+    margin-top: 1rem;
+}
+
+/* Three Cards Grid */
+.prophecy-cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Individual Card */
+.prophecy-card {
+    background: white;
+    border-radius: 1.5rem;
+    padding: 2.5rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    border: 2px solid transparent;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+    .prophecy-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+        border-color: #fde68a;
+    }
+
+/* Card Header */
+.card-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.card-icon-wrapper {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    margin: 0 auto 1.5rem;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+    .card-icon-wrapper.bg-amber-50 {
+        background: #fffbeb;
+    }
+
+    .card-icon-wrapper.bg-green-50 {
+        background: #f0fdf4;
+    }
+
+    .card-icon-wrapper.bg-blue-50 {
+        background: #eff6ff;
+    }
+
+.card-icon {
+    font-size: 3rem;
+    line-height: 1;
+    margin: 0;
+    padding: 0;
+    display: block;
+    /* Nudge slightly left to counteract emoji font spacing */
+    transform: translateX(-4px);
+}
+
+
+
+.card-title {
+    font-size: 1.75rem;
+    color: #111827;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.card-subtitle {
+    color: #6b7280;
+    font-size: 1rem;
+    margin: 0;
+}
+
+/* Preview List */
+.card-preview {
+    flex: 1;
+    margin-bottom: 2rem;
+}
+
+.preview-item {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 0.75rem;
+    margin-bottom: 0.75rem;
+    transition: background 0.2s;
+}
+
+    .preview-item:hover {
+        background: #f3f4f6;
+    }
+
+.preview-number {
+    font-size: 1.25rem;
+    font-weight: 800;
+    flex-shrink: 0;
+    line-height: 1;
+    font-family: 'Playfair Display', serif;
+}
+
+.preview-text {
+    color: #4b5563;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.preview-more {
+    text-align: center;
+    padding: 0.75rem;
+    color: #9ca3af;
+    font-size: 0.875rem;
+    font-weight: 500;
+    font-style: italic;
+}
+
+/* View Full Button - NOW VISIBLE AND PROMINENT */
+.view-full-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1.25rem 2rem;
+    color: white;
+    border: none;
+    border-radius: 1rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+    /* Category-specific button colors */
+    .view-full-btn.general {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+
+    .view-full-btn.nigeria {
+        background: linear-gradient(135deg, #10b981, #059669);
+    }
+
+    .view-full-btn.international {
+        background: linear-gradient(135deg, #3b82f6, #4f46e5);
+    }
+
+    .view-full-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 28px rgba(0,0,0,0.3);
+    }
+
+    .view-full-btn.general:hover {
+        box-shadow: 0 12px 28px rgba(245, 158, 11, 0.4);
+    }
+
+    .view-full-btn.nigeria:hover {
+        box-shadow: 0 12px 28px rgba(16, 185, 129, 0.4);
+    }
+
+    .view-full-btn.international:hover {
+        box-shadow: 0 12px 28px rgba(59, 130, 246, 0.4);
+    }
+
+.btn-arrow {
+    font-size: 1.25rem;
+    transition: transform 0.3s ease;
+}
+
+.view-full-btn:hover .btn-arrow {
+    transform: translateX(4px);
+}
+
+/* ============ MODAL ============ */
+.prophecy-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 1rem;
+    animation: fadeIn 0.3s ease;
+}
+
+.prophecy-modal {
+    background: white;
+    width: 100%;
+    max-width: 700px;
+    max-height: 90vh;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+/* Close Icon - Top Left */
+/*.modal-close-icon {
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    background: rgba(255,255,255,0.9);
+    border: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    color: #111827;
+    font-size: 1.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+    .modal-close-icon:hover {
+        background: white;
+        transform: rotate(90deg) scale(1.1);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    }*/
+
+/* Close Icon - Top Right */
+.modal-close-icon {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem; /* Moved to the right */
+    left: auto; /* Reset left */
+    background: rgba(255,255,255,0.9);
+    border: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    color: #111827;
+    font-size: 1.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+    .modal-close-icon:hover {
+        background: white;
+        transform: rotate(90deg) scale(1.1);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    }
+
+/* Modal Header Content - Reset margin so it aligns left */
+.modal-header-content {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-left: 0; /* Removed the 3rem offset */
+}
+
+/* Update mobile responsive for the close button */
+@media (max-width: 767px) {
+    .modal-close-icon {
+        top: 1rem;
+        right: 1rem;
+        left: auto;
+    }
+}
+
+/* Modal Header */
+.modal-header {
+    padding: 2.5rem 2rem 2rem;
+    color: white;
+}
+
+    .modal-header.general {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+
+    .modal-header.nigeria {
+        background: linear-gradient(135deg, #10b981, #059669);
+    }
+
+    .modal-header.international {
+        background: linear-gradient(135deg, #3b82f6, #4f46e5);
+    }
+
+/*.modal-header-content {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-left: 3rem;
+}*/
+
+.modal-icon {
+    font-size: 3rem;
+    flex-shrink: 0;
+}
+
+.modal-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin: 0 0 0.25rem 0;
+    color: white;
+}
+
+.modal-subtitle {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 1rem;
+}
+
+/* Modal Body */
+.modal-body {
+    padding: 2rem;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.modal-intro {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #f3f4f6;
+}
+
+    .modal-intro p {
+        color: #4b5563;
+        font-size: 1.05rem;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+/* Full Prophecy List - FIXED NUMBERING */
+.full-prophecy-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.full-prophecy-item {
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+    padding: 1.5rem;
+    background: #f9fafb;
+    border-radius: 1rem;
+    border-left: 4px solid transparent;
+    transition: all 0.3s ease;
+}
+
+    .full-prophecy-item:hover {
+        background: #fef9f3;
+        border-left-color: #e08526;
+        transform: translateX(4px);
+    }
+
+/* Numbered items with proper visibility */
+.item-number {
+    width: 50px;
+    height: 50px;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 800;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+    .item-number.general {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+
+    .item-number.nigeria {
+        background: linear-gradient(135deg, #10b981, #059669);
+    }
+
+    .item-number.international {
+        background: linear-gradient(135deg, #3b82f6, #4f46e5);
+    }
+
+.item-content {
+    flex: 1;
+    padding-top: 0.5rem;
+}
+
+    .item-content p {
+        color: #1f2937;
+        font-size: 1.05rem;
+        line-height: 1.7;
+        margin: 0;
+        font-weight: 500;
+    }
+
+/* Modal Footer */
+.modal-footer {
+    padding: 1.5rem 2rem;
+    background: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+}
+
+.footer-note {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Responsive */
+@media (min-width: 768px) {
+    .prophecy-cards {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .prophecy-title {
+        font-size: 3.5rem;
+    }
+}
+
+@media (max-width: 767px) {
+    .prophecy-title {
+        font-size: 2rem;
+    }
+
+    .prophecy-card {
+        padding: 2rem 1.5rem;
+    }
+
+    .modal-header-content {
+        flex-direction: column;
+        text-align: center;
+        margin-left: 0;
+    }
+
+    .modal-close-icon {
+        top: 1rem;
+        left: 1rem;
+    }
+
+    .full-prophecy-item {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+}
