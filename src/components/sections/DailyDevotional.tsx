@@ -1,9 +1,10 @@
-﻿import { useState, useEffect } from 'react';
+﻿import { useState } from 'react';
 
+type BibleTranslation = 'KJV' | 'NKJV' | 'NIV' | 'NLT';
 export default function DailyDevotional() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('devotional'); // 'devotional' or 'bible'
-  const [activeTranslation, setActiveTranslation] = useState('KJV');
+  const [activeTranslation, setActiveTranslation] = useState<BibleTranslation>('KJV');
   const [bibleText, setBibleText] = useState('');
   const [isLoadingBible, setIsLoadingBible] = useState(false);
 
@@ -29,7 +30,7 @@ export default function DailyDevotional() {
   };
 
   // Smart Bible Text Fetcher
-  const fetchBibleText = async (translation) => {
+    const fetchBibleText = async (translation: BibleTranslation) => {
     setIsLoadingBible(true);
     setActiveTranslation(translation);
     
@@ -44,7 +45,7 @@ export default function DailyDevotional() {
       // We use high-quality text for this specific verse for the demo. 
       // In production, connect your API.Bible key here).
       else {
-        const mockTexts = {
+        const mockTexts: Record<'NKJV' | 'NIV' | 'NLT', string> = {
           'NKJV': "Now the LORD spoke to Moses, saying: \"Speak to the children of Israel, that they turn and camp before Pi Hahiroth, between Migdol and the sea, opposite Baal Zephon. You shall camp before it by the sea. And Pharaoh will say of the children of Israel, 'They are bewildered by the land; the wilderness has closed them in.' Then I will harden Pharaoh's heart, so that he will pursue them; and I will gain honor over Pharaoh and over all his army, that the Egyptians may know that I am the LORD.\" And they did so.",
           'NIV': "Then the LORD said to Moses, \"Tell the Israelites to turn back and encamp near Pi Hahiroth, between Migdol and the sea. They are to encamp by the sea, directly opposite Baal Zephon. Pharaoh will think, 'The Israelites are wandering around the land in confusion, hemmed in by the desert.' And I will harden Pharaoh's heart, and he will pursue them. But I will gain glory for myself through Pharaoh and all his army, and the Egyptians will know that I am the LORD.\" So the Israelites did this.",
           'NLT': "Then the LORD gave these instructions to Moses: \"Tell the people of Israel to turn back and camp by Pi-hahiroth between Migdol and the sea. Camp there along the shore, across from Baal-zephon. Then Pharaoh will think, 'The people of Israel are confused. They are trapped in the wilderness.' And once again I will harden Pharaoh's heart, and he will chase after you. I have planned this in order to display my glory through Pharaoh and his whole army. After this the Egyptians will know that I am the LORD!\" So the people of Israel camped there as they were told."
@@ -53,7 +54,7 @@ export default function DailyDevotional() {
         await new Promise(resolve => setTimeout(resolve, 600));
         setBibleText(mockTexts[translation]);
       }
-    } catch (error) {
+    } catch{
       setBibleText("Unable to load scripture. Please check your connection.");
     } finally {
       setIsLoadingBible(false);
@@ -61,11 +62,11 @@ export default function DailyDevotional() {
   };
 
   // Load KJV by default when modal opens
-  useEffect(() => {
+  /*useEffect(() => {
     if (isModalOpen && activeTab === 'bible' && !bibleText) {
       fetchBibleText('KJV');
     }
-  }, [isModalOpen, activeTab]);
+  }, [isModalOpen, activeTab]);*/
 
   return (
     <>
@@ -95,7 +96,15 @@ export default function DailyDevotional() {
               </div>
 
               {/* Clickable Scripture */}
-              <div className="highlight-scripture clickable" onClick={() => { setIsModalOpen(true); setActiveTab('bible'); }}>
+                          <div className="highlight-scripture clickable" onClick={() =>
+                          {
+                              setIsModalOpen(true);
+                              setActiveTab('bible');
+
+                              if (!bibleText) {
+                                  void fetchBibleText('KJV');
+                              }
+                          }}>
                 <span className="scripture-label">📜 Click to Read Scripture</span>
                 <p className="scripture-text">{devotional.scripture}</p>
               </div>
@@ -141,8 +150,13 @@ export default function DailyDevotional() {
               </button>
               <button 
                 className={`tab-btn ${activeTab === 'bible' ? 'active' : ''}`}
-                onClick={() => { setActiveTab('bible'); fetchBibleText(activeTranslation); }}
-              >
+                              onClick={() => {
+                                  setActiveTab('bible');
+                                  //fetchBibleText(activeTranslation);
+                                  if (!bibleText) {
+                                      void fetchBibleText(activeTranslation);
+                                  }
+                              }}>
                  Bible Reading
               </button>
             </div>
@@ -155,9 +169,18 @@ export default function DailyDevotional() {
                 <div className="tab-content devotional-tab">
                   <div className="modal-section">
                     <h3>📜 Scripture Reading</h3>
-                    <p className="modal-scripture-ref" onClick={() => setActiveTab('bible')}>
-                      {devotional.scripture} <span className="click-hint">(Click to read)</span>
-                    </p>
+                                     <p
+                                          className="modal-scripture-ref"
+                                          onClick={() => {
+                                              setActiveTab('bible');
+
+                                              if (!bibleText) {
+                                                  void fetchBibleText(activeTranslation);
+                                              }
+                                          }}>
+                                          {devotional.scripture}
+                                          <span className="click-hint"> (Click to read)</span>
+                                      </p>
                   </div>
 
                   <div className="modal-section">
@@ -188,7 +211,7 @@ export default function DailyDevotional() {
               {activeTab === 'bible' && (
                 <div className="tab-content bible-tab">
                   <div className="translation-selector">
-                    {['KJV', 'NKJV', 'NIV', 'NLT'].map((trans) => (
+                         {(['KJV', 'NKJV', 'NIV', 'NLT'] as BibleTranslation[]).map((trans) => (
                       <button 
                         key={trans}
                         className={`trans-btn ${activeTranslation === trans ? 'active' : ''}`}

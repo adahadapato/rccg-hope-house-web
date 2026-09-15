@@ -1,6 +1,6 @@
 ﻿import { useState } from 'react';
-import Navigation from '../components/Navigation';
-import Footer from '../components/Footer';
+import Navigation from '../components/sections/Navigation';
+import Footer from '../components/sections/Footer';
 
 export default function Devotional() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);

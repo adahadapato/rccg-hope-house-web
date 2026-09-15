@@ -6,7 +6,7 @@ interface PrayerFormProps {
 }
 
 export default function PrayerForm({ isOpen, onClose }: PrayerFormProps) {
-    if (!isOpen) return null;
+    //if (!isOpen) return null;
 
     const [formData, setFormData] = useState({
         name: '',
@@ -17,6 +17,9 @@ export default function PrayerForm({ isOpen, onClose }: PrayerFormProps) {
     });
 
     const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+
+    // Hooks must always run before any conditional return
+    if (!isOpen) return null;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -97,7 +100,7 @@ export default function PrayerForm({ isOpen, onClose }: PrayerFormProps) {
                             <div className="form-group">
                                 <label>Phone (Optional)</label>
                                 <input
-                                    type="phone"
+                                    type="tel"
                                     placeholder="+44 9999999999"
                                     value={formData.phone}
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}

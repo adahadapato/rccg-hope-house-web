@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useMemo } from 'react';
+﻿import { useState, useEffect} from 'react';
 
 export default function MonthlyServices() {
     const [now, setNow] = useState(new Date());
@@ -93,7 +93,7 @@ export default function MonthlyServices() {
         return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${format(startDT)}/${format(endDT)}&details=${encodeURIComponent(desc)}&location=${encodeURIComponent("RCCG Hope House Parish, Burnt Oak, Edgware, London")}`;
     };
 
-    const services = useMemo(() => {
+    const services = (() => {
         const base = [
             /*{ 
                 id: 0, 
@@ -151,7 +151,7 @@ export default function MonthlyServices() {
                 calendarLink: getCalendarLink(s.title, s.desc, s.time, next.date)
             };
         });
-    }, [now]);
+    })();
 
     return (
         <section id="monthly-services" className="section monthly-services-section">

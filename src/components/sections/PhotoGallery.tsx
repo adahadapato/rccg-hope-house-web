@@ -168,17 +168,19 @@ export default function PhotoGallery() {
                         <button
                             className="lightbox-nav prev"
                             onClick={() => setSelectedImage((prev) =>
-                                prev === 0 ? galleryImages.length - 1 : prev - 1
-                            )}
-                        >
+                            {
+                                if (prev === null) return null;
+                                return prev === 0 ? galleryImages.length - 1 : prev - 1;
+                            })}>
                             ‹
                         </button>
                         <button
                             className="lightbox-nav next"
                             onClick={() => setSelectedImage((prev) =>
-                                prev === galleryImages.length - 1 ? 0 : prev + 1
-                            )}
-                        >
+                            {
+                                if (prev === null) return null;
+                                return prev === galleryImages.length - 1 ? 0 : prev + 1;
+                            })}>
                             ›
                         </button>
                     </div>

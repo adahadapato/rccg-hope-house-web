@@ -1,7 +1,8 @@
 ﻿import { useState, useEffect } from 'react';
 
+type CategoryKey = 'general' | 'nigeria' | 'international';
 export default function Prophecies() {
-    const [activeModal, setActiveModal] = useState<string | null>(null);
+    const [activeModal, setActiveModal] = useState<CategoryKey | null>(null);
 
     useEffect(() => {
         const handleEscape = (e: KeyboardEvent) => {
@@ -65,7 +66,7 @@ export default function Prophecies() {
         }
     };
 
-    type CategoryKey = keyof typeof propheciesData;
+    //type CategoryKey = keyof typeof propheciesData;
 
     const openModal = (category: CategoryKey) => setActiveModal(category);
     const closeModal = () => setActiveModal(null);
