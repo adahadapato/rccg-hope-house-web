@@ -1,4 +1,44 @@
 /* src/styles/index.css */
+
+/* =========================================
+   GLOBAL MOBILE SAFETY NET
+   (Loads first, applies to all imported files)
+   ========================================= */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; /* Prevents horizontal scrolling on mobile */
+    width: 100%;
+    max-width: 100vw;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-text-size-adjust: 100%; /* Stops iOS from randomly resizing text */
+}
+
+/* Crucial: Stops images from breaking the mobile layout */
+img, video, svg, canvas {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Ensure all clickable elements are large enough for fingers */
+button, a, input, select, textarea {
+    min-height: 44px; /* Apple/Google recommended tap size */
+}
+
+/* Fix inputs so they don't look tiny or cause zooming on mobile */
+input, textarea, select {
+    font-size: 16px;
+}
+
+/* =========================================
+   COMPONENT STYLES IMPORTS
+   ========================================= */
 @import './base.css';
 @import './navigation.css';
 @import './hero.css';

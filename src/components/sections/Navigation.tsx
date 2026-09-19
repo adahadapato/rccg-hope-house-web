@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+﻿import { useState, useEffect } from 'react'; // Added useEffect
 import AdminLoginModal from '../AdminLoginModal';
 
 // 1. Define a proper TypeScript interface for your menu items
@@ -59,8 +59,59 @@ export default function Navigation() {
     const [mobileOpenDropdown, setMobileOpenDropdown] = useState<string | null>(null);
     const [isAdminLoginOpen, setIsAdminLoginOpen] = useState(false);
 
+    // ==========================================
+    // PRO-LEVEL MOBILE UX & ACCESSIBILITY FIXES
+    // ==========================================
+
+    // 1. Prevent background scrolling when mobile menu is open
+    useEffect(() => {
+        if (isMenuOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        // Cleanup on unmount
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isMenuOpen]);
+
+    // 2. Close menu on Escape key press (Accessibility)
+    useEffect(() => {
+        const handleEscape = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                setIsMenuOpen(false);
+                setActiveDropdown(null);
+                setMobileOpenDropdown(null);
+            }
+        };
+        window.addEventListener('keydown', handleEscape);
+        return () => window.removeEventListener('keydown', handleEscape);
+    }, []);
+
+    // 3. Close mobile menu if window resizes to desktop size (> 1024px)
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth > 1024 && isMenuOpen) {
+                setIsMenuOpen(false);
+            }
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, [isMenuOpen]);
+
+    // Helper to handle link clicks and close mobile menu
+    const handleMobileLinkClick = (e: React.MouseEvent, child?: MenuItem) => {
+        setIsMenuOpen(false);
+        setMobileOpenDropdown(null);
+        if (child?.isAdminLogin) {
+            e.preventDefault();
+            setIsAdminLoginOpen(true);
+        }
+    };
+
     return (
-        <nav className="nav-modern">
+        <nav className="nav-modern" aria-label="Main Navigation">
             <div className="nav-content">
                 <a href="#home" className="logo">
                     <img src="/rccg-logo.png" alt="RCCG Logo" className="logo-img" />
@@ -80,7 +131,12 @@ export default function Navigation() {
                                 onMouseEnter={() => setActiveDropdown(item.label)}
                                 onMouseLeave={() => setActiveDropdown(null)}
                             >
-                                <a href={item.href} className="dropdown-trigger">
+                                <a
+                                    href={item.href}
+                                    className="dropdown-trigger"
+                                    aria-haspopup="true"
+                                    aria-expanded={activeDropdown === item.label}
+                                >
                                     {item.label}
                                     <svg
                                         className={`dropdown-arrow ${activeDropdown === item.label ? 'rotated' : ''}`}
@@ -100,7 +156,6 @@ export default function Navigation() {
                                     className={`dropdown-content ${activeDropdown === item.label ? 'open' : ''}`}
                                 >
                                     {item.children.map((child) => (
-                                        // ✅ FIX 1: Added missing <a> tag
                                         <a
                                             key={child.label}
                                             href={child.href}
@@ -132,6 +187,8 @@ export default function Navigation() {
                     className={`mobile-menu-btn ${isMenuOpen ? 'open' : ''}`}
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                     aria-label="Toggle menu"
+                    aria-expanded={isMenuOpen}
+                    aria-controls="mobile-menu"
                 >
                     <div className="hamburger-line"></div>
                     <div className="hamburger-line"></div>
@@ -141,7 +198,7 @@ export default function Navigation() {
 
             {/* Mobile Navigation */}
             {isMenuOpen && (
-                <div className="mobile-menu">
+                <div className="mobile-menu" id="mobile-menu" role="menu">
                     {menuItems.map((item) =>
                         item.children ? (
                             <div key={item.label} className="mobile-dropdown">
@@ -152,6 +209,8 @@ export default function Navigation() {
                                             mobileOpenDropdown === item.label ? null : item.label
                                         )
                                     }
+                                    aria-expanded={mobileOpenDropdown === item.label}
+                                    aria-controls={`mobile-dropdown-${item.label}`}
                                 >
                                     {item.label}
                                     <svg
@@ -169,22 +228,17 @@ export default function Navigation() {
                                     </svg>
                                 </button>
                                 <div
+                                    id={`mobile-dropdown-${item.label}`}
                                     className={`mobile-dropdown-content ${mobileOpenDropdown === item.label ? 'open' : ''}`}
+                                    role="menu"
                                 >
                                     {item.children.map((child) => (
-                                        // ✅ FIX 2: Added missing <a> tag
                                         <a
                                             key={child.label}
                                             href={child.href}
                                             className="mobile-dropdown-item"
-                                            onClick={(e) => {
-                                                setIsMenuOpen(false);
-                                                setMobileOpenDropdown(null);
-                                                if (child.isAdminLogin) {
-                                                    e.preventDefault();
-                                                    setIsAdminLoginOpen(true);
-                                                }
-                                            }}
+                                            onClick={(e) => handleMobileLinkClick(e, child)}
+                                            role="menuitem"
                                         >
                                             {child.label}
                                         </a>
@@ -192,12 +246,12 @@ export default function Navigation() {
                                 </div>
                             </div>
                         ) : (
-                            // ✅ FIX 3: Added missing <a> tag
                             <a
                                 key={item.label}
                                 href={item.href}
                                 className="mobile-link"
                                 onClick={() => setIsMenuOpen(false)}
+                                role="menuitem"
                             >
                                 {item.label}
                             </a>

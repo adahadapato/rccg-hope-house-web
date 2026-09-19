@@ -327,7 +327,9 @@
     cursor: pointer;
 }
 
-/* --- Responsive Breakpoints --- */
+/* =========================================
+   MOBILE OPTIMIZATIONS FOR NAVIGATION
+   ========================================= */
 @media (max-width: 1024px) {
     .nav-links {
         display: none;
@@ -338,6 +340,26 @@
     }
 
     .nav-content {
+        padding: 1rem 5%;
+    }
+
+    /* Shrink logo slightly on mobile to prevent text wrapping */
+    .logo-img {
+        height: 2.5rem;
+    }
+
+    .logo-text h1 {
+        font-size: 1.1rem;
+    }
+
+    .logo-text p {
+        font-size: 0.7rem;
+    }
+
+    /* Ensure mobile menu is scrollable if it gets too long */
+    .mobile-menu {
+        max-height: calc(100vh - 70px);
+        overflow-y: auto;
         padding: 1rem 5%;
     }
 }
