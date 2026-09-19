@@ -1,5 +1,4 @@
-﻿
-import { apiFetch } from '@/api/api';
+﻿import { apiFetch } from '@/api/api';
 import { useEffect, useState } from 'react';
 
 interface AdminLoginModalProps {
@@ -196,21 +195,14 @@ export default function AdminLoginModal({
                         />
                     </div>
 
-                    {status === 'error' && (
-                        <p className="error-msg">
-                            {errorMessage}
+                    {status === 'error' && errorMessage && (
+                        <p className="app-message app-message-error">
+                            ✕ {errorMessage}
                         </p>
                     )}
 
                     {status === 'success' && (
-                        <p
-                            style={{
-                                textAlign: 'center',
-                                color: '#15803d',
-                                fontWeight: 600,
-                                margin: 0,
-                            }}
-                        >
+                        <p className="app-message app-message-success">
                             ✓ Logged in successfully.
                         </p>
                     )}

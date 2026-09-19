@@ -416,8 +416,8 @@ export default function GiveOnlineModal({
                     {/* GIVING TYPE ERROR */}
 
                     {givingTypesError && (
-                        <p className="give-form-message">
-                            {givingTypesError}
+                        <p className="app-message app-message-error">
+                            ✕ {givingTypesError}
                         </p>
                     )}
 
@@ -655,10 +655,19 @@ export default function GiveOnlineModal({
                     </div>
 
 
-                    {/* MESSAGE */}
+                    {/* SUCCESS / ERROR MESSAGE */}
 
                     {errorMessage && (
-                        <p className="give-form-message">
+                        <p
+                            className={
+                                status === 'success'
+                                    ? 'app-message app-message-success'
+                                    : 'app-message app-message-error'
+                            }
+                        >
+                            {status === 'success'
+                                ? '✓ '
+                                : '✕ '}
                             {errorMessage}
                         </p>
                     )}
