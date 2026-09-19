@@ -1,4 +1,4 @@
-name: Frontend CI
+name: Frontend CI/CD
 
 on:
   push:
@@ -33,4 +33,27 @@ jobs:
         run: npm run lint
 
       - name: Build application
+        env:
+          VITE_API_BASE_URL: https://adahadapato-003-site2.dtempurl.com
         run: npm run build
+
+  deploy:
+    name: Deploy Frontend
+    needs: build
+    runs-on: ubuntu-latest
+
+    # Deploy only for pushes to main.
+    # Pull requests will build and lint but will never deploy.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Trigger SmarterASP.NET deployment
+        env:
+          DEPLOY_HOOK: ${{ secrets.SMARTERASP_DEPLOY_HOOK }}
+        run: |
+          curl --fail --show-error --silent \
+            --request POST \
+            "$DEPLOY_HOOK"
+
+      - name: Deployment triggered
+        run: echo "SmarterASP.NET deployment successfully triggered."
