@@ -1,4 +1,4 @@
-/* Monthly Services Section */
+﻿/* Monthly Services Section */
 .monthly-services-section {
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
     padding: 6rem 0;
@@ -234,6 +234,10 @@
     text-transform: uppercase;
     box-shadow: 0 4px 12px rgba(224, 133, 38, 0.4);
     z-index: 2;
+    white-space: nowrap; /* ✅ Forces the text onto a single line */
+    overflow: hidden; /* ✅ Hides any text that overflows the badge */
+    text-overflow: ellipsis; /* ✅ Adds "..." if the text is too long */
+    max-width: 90%; /* ✅ Ensures it doesn't spill outside the card */
 }
 
 /* Note Box */

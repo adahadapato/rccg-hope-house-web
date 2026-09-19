@@ -1,9 +1,21 @@
-﻿export default function Hero() {
+﻿import { useChurchServices, formatTimeRange } from '../../hooks/useChurchServices';
+
+export default function Hero() {
+    const { services } = useChurchServices(true);
+
+    // Mapped by real service name. See conversation note: Hero previously
+    // advertised a weekly "Prayer Meeting" (Fri 10PM-12AM) that does not
+    // exist in the backend as a weekly service — only "End of Month Vigil"
+    // exists on Fridays, and it's monthly (Last Friday), not weekly. Using
+    // that here, relabeled accurately, until confirmed otherwise.
+    const worship = services.find(s => s.name === 'Worship Service');
+    const fasting = services.find(s => s.name === 'Fasting and Prayer Day');
+    const vigil = services.find(s => s.name === 'End of Month Vigil');
+
     return (
         <section id="home" className="hero-modern">
             <div className="hero-overlay"></div>
             <div className="hero-content-modern">
-                
                 <h1 className="hero-title">
                     <span className="text-gold">RCCG Hope House Parish</span>
                 </h1>
@@ -20,17 +32,26 @@
                 <div className="service-times-modern">
                     <div className="service-time-item">
                         <span className="service-icon">☀️</span>
-                        <div><strong>Sunday Service</strong><p>10:00 AM - 12:450 PM</p></div>
+                        <div>
+                            <strong>Sunday Service</strong>
+                            <p>{worship ? formatTimeRange(worship.startTime, worship.endTime) : '11:00 AM - 12:40 PM'}</p>
+                        </div>
                     </div>
                     <div className="service-time-divider"></div>
                     <div className="service-time-item">
                         <span className="service-icon">📖</span>
-                        <div><strong>Wednesday Fasting</strong><p> 7:00 PM - 7:30 PM</p></div>
+                        <div>
+                            <strong>Wednesday Fasting</strong>
+                            <p>{fasting ? formatTimeRange(fasting.startTime, fasting.endTime) : '7:00 PM - 7:40 PM'}</p>
+                        </div>
                     </div>
                     <div className="service-time-divider"></div>
                     <div className="service-time-item">
                         <span className="service-icon">🙏</span>
-                        <div><strong>Prayer Meeting</strong><p>Friday 10:00 PM - 12:00 AM</p></div>
+                        <div>
+                            <strong>End of Month Vigil</strong>
+                            <p>Last {vigil ? vigil.dayOfWeek : 'Friday'} {vigil ? formatTimeRange(vigil.startTime, vigil.endTime) : '10:00 PM - 1:00 AM'}</p>
+                        </div>
                     </div>
                 </div>
             </div>

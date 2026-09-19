@@ -6,8 +6,6 @@ interface PrayerFormProps {
 }
 
 export default function PrayerForm({ isOpen, onClose }: PrayerFormProps) {
-    //if (!isOpen) return null;
-
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -18,7 +16,6 @@ export default function PrayerForm({ isOpen, onClose }: PrayerFormProps) {
 
     const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
 
-    // Hooks must always run before any conditional return
     if (!isOpen) return null;
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -26,16 +23,14 @@ export default function PrayerForm({ isOpen, onClose }: PrayerFormProps) {
         setStatus('submitting');
 
         try {
-            // 1. Map data to match backend DTO
             const payload = {
-                name: formData.isAnonymous ? 'Anonymous' : formData.name,
-                email: formData.email,
-                phone: formData.phone,
-                request: formData.message,
-                isAnonymous: formData.isAnonymous
+                content: formData.message,
+                isAnonymous: formData.isAnonymous,
+                requesterName: formData.isAnonymous ? null : formData.name,
+                requesterEmail: formData.isAnonymous ? null : (formData.email || null),
+                requesterPhone: formData.isAnonymous ? null : (formData.phone || null)
             };
 
-            // 2. Send to API
             const response = await fetch('/api/prayer-requests', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -45,7 +40,7 @@ export default function PrayerForm({ isOpen, onClose }: PrayerFormProps) {
             if (response.ok) {
                 setStatus('success');
                 setFormData({ name: '', email: '', phone: '', message: '', isAnonymous: false });
-                setTimeout(onClose, 3000); // Close after 3 seconds
+                setTimeout(onClose, 3000);
             } else {
                 setStatus('error');
             }
@@ -59,7 +54,6 @@ export default function PrayerForm({ isOpen, onClose }: PrayerFormProps) {
         <div className="prayer-modal-overlay" onClick={onClose}>
             <div className="prayer-modal-content" onClick={(e) => e.stopPropagation()}>
 
-                {/* Success State */}
                 {status === 'success' ? (
                     <div className="prayer-success">
                         <div className="success-icon">🙏</div>
@@ -68,7 +62,6 @@ export default function PrayerForm({ isOpen, onClose }: PrayerFormProps) {
                         <button className="btn-primary btn-small" onClick={onClose}>Close</button>
                     </div>
                 ) : (
-                    /* Form State */
                     <>
                         <div className="prayer-modal-header">
                             <h3>Submit a Prayer Request</h3>
@@ -95,6 +88,7 @@ export default function PrayerForm({ isOpen, onClose }: PrayerFormProps) {
                                     placeholder="email@example.com"
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                    disabled={formData.isAnonymous}
                                 />
                             </div>
                             <div className="form-group">
@@ -104,6 +98,7 @@ export default function PrayerForm({ isOpen, onClose }: PrayerFormProps) {
                                     placeholder="+44 9999999999"
                                     value={formData.phone}
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                    disabled={formData.isAnonymous}
                                 />
                             </div>
 
