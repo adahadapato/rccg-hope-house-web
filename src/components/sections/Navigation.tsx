@@ -1,17 +1,14 @@
-﻿import { useState, useEffect } from 'react'; // Added useEffect
+﻿import { useEffect, useState } from 'react';
 import AdminLoginModal from './AdminLoginModal';
+import GiveOnlineModal from './GiveOnlineModal';
 
-// 1. Define a proper TypeScript interface for your menu items
 interface MenuItem {
     label: string;
     href: string;
-    isAdminLogin?: boolean;
     children?: MenuItem[];
 }
 
-// 2. Move menuItems outside the component to prevent re-creation on every render
 const menuItems: MenuItem[] = [
-    { label: 'Home', href: '#home' },
     {
         label: 'About',
         href: '#about',
@@ -36,113 +33,323 @@ const menuItems: MenuItem[] = [
         label: 'Events',
         href: '#events',
         children: [
-            { label: 'Special Services', href: '#monthly-services' },
-            { label: 'Theme of the Year', href: '#theme-of-year' },
-            { label: 'Prophecy of the Year', href: '#prophecy-of-the-year' },
-            { label: 'Prayer for the year', href: '#prayer-for-the-year' },
+            {
+                label: 'Special Services',
+                href: '#monthly-services',
+            },
+            {
+                label: 'Theme of the Year',
+                href: '#theme-of-year',
+            },
+            {
+                label: 'Prophecy of the Year',
+                href: '#prophecy-of-the-year',
+            },
+            {
+                label: 'Prayer for the year',
+                href: '#prayer-for-the-year',
+            },
         ],
     },
     {
         label: 'Connect',
         href: '#connect',
         children: [
-            { label: 'Prayer Request', href: '#prayer' },
-            { label: 'Contact Us', href: '#contact' },
-            { label: 'Admin Login', href: '#', isAdminLogin: true },
+            {
+                label: 'Prayer Request',
+                href: '#prayer',
+            },
+            {
+                label: 'Contact Us',
+                href: '#contact',
+            },
         ],
     },
 ];
 
 export default function Navigation() {
-    const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-    const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-    const [mobileOpenDropdown, setMobileOpenDropdown] = useState<string | null>(null);
-    const [isAdminLoginOpen, setIsAdminLoginOpen] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] =
+        useState(false);
 
-    // ==========================================
-    // PRO-LEVEL MOBILE UX & ACCESSIBILITY FIXES
-    // ==========================================
+    const [activeDropdown, setActiveDropdown] =
+        useState<string | null>(null);
 
-    // 1. Prevent background scrolling when mobile menu is open
+    const [
+        mobileOpenDropdown,
+        setMobileOpenDropdown,
+    ] = useState<string | null>(null);
+
+    const [
+        isAdminLoginOpen,
+        setIsAdminLoginOpen,
+    ] = useState(false);
+
+    const [
+        isGiveOnlineOpen,
+        setIsGiveOnlineOpen,
+    ] = useState(false);
+
+    /*
+     * Authentication state.
+     *
+     * If adminAccessToken exists in localStorage,
+     * the navigation displays Logout.
+     */
+    const [isLoggedIn, setIsLoggedIn] =
+        useState(() => {
+            return Boolean(
+                localStorage.getItem(
+                    'adminAccessToken'
+                )
+            );
+        });
+
+
+    /* =========================================
+       PREVENT BACKGROUND SCROLL
+       ========================================= */
+
     useEffect(() => {
         if (isMenuOpen) {
-            document.body.style.overflow = 'hidden';
+            document.body.style.overflow =
+                'hidden';
         } else {
-            document.body.style.overflow = 'unset';
+            document.body.style.overflow = '';
         }
-        // Cleanup on unmount
+
         return () => {
-            document.body.style.overflow = 'unset';
+            document.body.style.overflow = '';
         };
     }, [isMenuOpen]);
 
-    // 2. Close menu on Escape key press (Accessibility)
+
+    /* =========================================
+       ESCAPE KEY
+       ========================================= */
+
     useEffect(() => {
-        const handleEscape = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') {
+        const handleEscape = (
+            event: KeyboardEvent
+        ) => {
+            if (event.key === 'Escape') {
                 setIsMenuOpen(false);
                 setActiveDropdown(null);
                 setMobileOpenDropdown(null);
             }
         };
-        window.addEventListener('keydown', handleEscape);
-        return () => window.removeEventListener('keydown', handleEscape);
+
+        window.addEventListener(
+            'keydown',
+            handleEscape
+        );
+
+        return () => {
+            window.removeEventListener(
+                'keydown',
+                handleEscape
+            );
+        };
     }, []);
 
-    // 3. Close mobile menu if window resizes to desktop size (> 1024px)
+
+    /* =========================================
+       CLOSE MOBILE MENU WHEN RETURNING
+       TO DESKTOP
+       ========================================= */
+
     useEffect(() => {
         const handleResize = () => {
-            if (window.innerWidth > 1024 && isMenuOpen) {
+            if (window.innerWidth > 1100) {
                 setIsMenuOpen(false);
+                setMobileOpenDropdown(null);
             }
         };
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, [isMenuOpen]);
 
-    // Helper to handle link clicks and close mobile menu
-    const handleMobileLinkClick = (e: React.MouseEvent, child?: MenuItem) => {
-        setIsMenuOpen(false);
-        setMobileOpenDropdown(null);
-        if (child?.isAdminLogin) {
-            e.preventDefault();
-            setIsAdminLoginOpen(true);
-        }
+        window.addEventListener(
+            'resize',
+            handleResize
+        );
+
+        return () => {
+            window.removeEventListener(
+                'resize',
+                handleResize
+            );
+        };
+    }, []);
+
+
+    /* =========================================
+       CHECK LOGIN STATE
+       ========================================= */
+
+    const checkLoginState = () => {
+        setIsLoggedIn(
+            Boolean(
+                localStorage.getItem(
+                    'adminAccessToken'
+                )
+            )
+        );
     };
 
+
+    /* =========================================
+       OPEN LOGIN
+       ========================================= */
+
+    const handleLogin = () => {
+        setIsMenuOpen(false);
+        setMobileOpenDropdown(null);
+        setIsAdminLoginOpen(true);
+    };
+
+
+    /* =========================================
+       CLOSE LOGIN
+       ========================================= */
+
+    const handleLoginModalClose = () => {
+        setIsAdminLoginOpen(false);
+
+        /*
+         * AdminLoginModal stores the access token
+         * after a successful login.
+         *
+         * Check localStorage again when the modal
+         * closes so Login immediately becomes Logout.
+         */
+        checkLoginState();
+    };
+
+
+    /* =========================================
+       LOGOUT
+       ========================================= */
+
+    const handleLogout = () => {
+        localStorage.removeItem(
+            'adminAccessToken'
+        );
+
+        localStorage.removeItem(
+            'adminRefreshToken'
+        );
+
+        localStorage.removeItem(
+            'adminRole'
+        );
+
+        setIsLoggedIn(false);
+
+        setIsMenuOpen(false);
+        setMobileOpenDropdown(null);
+        setActiveDropdown(null);
+    };
+
+
+    /* =========================================
+       OPEN GIVE ONLINE
+       ========================================= */
+
+    const handleGiveOnline = () => {
+        setIsMenuOpen(false);
+        setMobileOpenDropdown(null);
+        setActiveDropdown(null);
+
+        setIsGiveOnlineOpen(true);
+    };
+
+
+    /* =========================================
+       CLOSE GIVE ONLINE
+       ========================================= */
+
+    const handleGiveOnlineClose = () => {
+        setIsGiveOnlineOpen(false);
+    };
+
+
     return (
-        <nav className="nav-modern" aria-label="Main Navigation">
+        <nav
+            className="nav-modern"
+            aria-label="Main Navigation"
+        >
             <div className="nav-content">
-                <a href="#home" className="logo">
-                    <img src="/rccg-logo.png" alt="RCCG Logo" className="logo-img" />
+
+                {/* =================================
+                    LEFT: LOGO
+                    ================================= */}
+
+                <a
+                    href="#home"
+                    className="logo"
+                    aria-label="RCCG Hope House home"
+                >
+                    <img
+                        src="/rccg-logo.png"
+                        alt="RCCG Logo"
+                        className="logo-img"
+                    />
+
                     <div className="logo-text">
-                        <h1>RCCG Hope House</h1>
-                        <p>Redeemed Christian Church of God</p>
+                        <h1>
+                            RCCG Hope House
+                        </h1>
+
+                        <p>
+                            Redeemed Christian
+                            Church of God
+                        </p>
                     </div>
                 </a>
 
-                {/* Desktop Navigation */}
+
+                {/* =================================
+                    DESKTOP NAVIGATION
+                    ================================= */}
+
                 <div className="nav-links">
+
                     {menuItems.map((item) =>
                         item.children ? (
+
                             <div
                                 key={item.label}
                                 className="dropdown"
-                                onMouseEnter={() => setActiveDropdown(item.label)}
-                                onMouseLeave={() => setActiveDropdown(null)}
+                                onMouseEnter={() =>
+                                    setActiveDropdown(
+                                        item.label
+                                    )
+                                }
+                                onMouseLeave={() =>
+                                    setActiveDropdown(
+                                        null
+                                    )
+                                }
                             >
+
                                 <a
                                     href={item.href}
                                     className="dropdown-trigger"
                                     aria-haspopup="true"
-                                    aria-expanded={activeDropdown === item.label}
+                                    aria-expanded={
+                                        activeDropdown ===
+                                        item.label
+                                    }
                                 >
                                     {item.label}
+
                                     <svg
-                                        className={`dropdown-arrow ${activeDropdown === item.label ? 'rotated' : ''}`}
+                                        className={`dropdown-arrow ${activeDropdown ===
+                                                item.label
+                                                ? 'rotated'
+                                                : ''
+                                            }`}
                                         width="10"
                                         height="10"
                                         viewBox="0 0 10 10"
+                                        aria-hidden="true"
                                     >
                                         <path
                                             d="M2 3.5L5 6.5L8 3.5"
@@ -152,72 +359,174 @@ export default function Navigation() {
                                         />
                                     </svg>
                                 </a>
-                                <div
-                                    className={`dropdown-content ${activeDropdown === item.label ? 'open' : ''}`}
-                                >
-                                    {item.children.map((child) => (
-                                        <a
-                                            key={child.label}
-                                            href={child.href}
-                                            className="dropdown-item"
-                                            onClick={(e) => {
-                                                setActiveDropdown(null);
-                                                if (child.isAdminLogin) {
-                                                    e.preventDefault();
-                                                    setIsAdminLoginOpen(true);
+
+
+                                <div className="dropdown-content">
+
+                                    {item.children.map(
+                                        (child) => (
+
+                                            <a
+                                                key={
+                                                    child.label
                                                 }
-                                            }}
-                                        >
-                                            {child.label}
-                                        </a>
-                                    ))}
+                                                href={
+                                                    child.href
+                                                }
+                                                className="dropdown-item"
+                                                onClick={() =>
+                                                    setActiveDropdown(
+                                                        null
+                                                    )
+                                                }
+                                            >
+                                                {
+                                                    child.label
+                                                }
+                                            </a>
+
+                                        )
+                                    )}
+
                                 </div>
+
                             </div>
+
                         ) : (
-                            <a key={item.label} href={item.href} className="nav-link">
+
+                            <a
+                                key={item.label}
+                                href={item.href}
+                                className="nav-link"
+                            >
                                 {item.label}
                             </a>
+
                         )
                     )}
-                    <button className="btn-primary">Give Online</button>
+
                 </div>
 
-                {/* Mobile Menu Button */}
+
+                {/* =================================
+                    GIVE ONLINE
+                    ================================= */}
+
                 <button
-                    className={`mobile-menu-btn ${isMenuOpen ? 'open' : ''}`}
-                    onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    aria-label="Toggle menu"
+                    type="button"
+                    className="btn-primary desktop-give-btn"
+                    onClick={handleGiveOnline}
+                >
+                    Give Online
+                </button>
+
+
+                {/* =================================
+                    LOGIN / LOGOUT
+                    ================================= */}
+
+                <button
+                    type="button"
+                    className={`desktop-auth-btn ${isLoggedIn
+                            ? 'logged-in'
+                            : ''
+                        }`}
+                    onClick={
+                        isLoggedIn
+                            ? handleLogout
+                            : handleLogin
+                    }
+                >
+                    {isLoggedIn
+                        ? 'Logout'
+                        : 'Login'}
+                </button>
+
+
+                {/* =================================
+                    MOBILE HAMBURGER
+                    ================================= */}
+
+                <button
+                    type="button"
+                    className={`mobile-menu-btn ${isMenuOpen
+                            ? 'open'
+                            : ''
+                        }`}
+                    onClick={() =>
+                        setIsMenuOpen(
+                            (previous) =>
+                                !previous
+                        )
+                    }
+                    aria-label={
+                        isMenuOpen
+                            ? 'Close navigation menu'
+                            : 'Open navigation menu'
+                    }
                     aria-expanded={isMenuOpen}
                     aria-controls="mobile-menu"
                 >
-                    <div className="hamburger-line"></div>
-                    <div className="hamburger-line"></div>
-                    <div className="hamburger-line"></div>
+                    <span className="hamburger-line" />
+                    <span className="hamburger-line" />
+                    <span className="hamburger-line" />
                 </button>
+
             </div>
 
-            {/* Mobile Navigation */}
+
+            {/* =====================================
+                MOBILE NAVIGATION
+                ===================================== */}
+
             {isMenuOpen && (
-                <div className="mobile-menu" id="mobile-menu" role="menu">
+
+                <div
+                    className="mobile-menu"
+                    id="mobile-menu"
+                >
+
                     {menuItems.map((item) =>
                         item.children ? (
-                            <div key={item.label} className="mobile-dropdown">
+
+                            <div
+                                key={item.label}
+                                className="mobile-dropdown"
+                            >
+
                                 <button
+                                    type="button"
                                     className="mobile-dropdown-toggle"
                                     onClick={() =>
                                         setMobileOpenDropdown(
-                                            mobileOpenDropdown === item.label ? null : item.label
+                                            mobileOpenDropdown ===
+                                                item.label
+                                                ? null
+                                                : item.label
                                         )
                                     }
-                                    aria-expanded={mobileOpenDropdown === item.label}
+                                    aria-expanded={
+                                        mobileOpenDropdown ===
+                                        item.label
+                                    }
                                     aria-controls={`mobile-dropdown-${item.label}`}
                                 >
-                                    {item.label}
+                                    <span>
+                                        {
+                                            item.label
+                                        }
+                                    </span>
+
                                     <svg
-                                        className={`mobile-arrow ${mobileOpenDropdown === item.label ? 'rotated' : ''}`}
+                                        className={`mobile-arrow ${mobileOpenDropdown ===
+                                                item.label
+                                                ? 'rotated'
+                                                : ''
+                                            }`}
                                         width="12"
                                         height="12"
                                         viewBox="0 0 10 10"
+                                        aria-hidden="true"
                                     >
                                         <path
                                             d="M2 3.5L5 6.5L8 3.5"
@@ -227,43 +536,134 @@ export default function Navigation() {
                                         />
                                     </svg>
                                 </button>
+
+
                                 <div
                                     id={`mobile-dropdown-${item.label}`}
-                                    className={`mobile-dropdown-content ${mobileOpenDropdown === item.label ? 'open' : ''}`}
-                                    role="menu"
+                                    className={`mobile-dropdown-content ${mobileOpenDropdown ===
+                                            item.label
+                                            ? 'open'
+                                            : ''
+                                        }`}
                                 >
-                                    {item.children.map((child) => (
-                                        <a
-                                            key={child.label}
-                                            href={child.href}
-                                            className="mobile-dropdown-item"
-                                            onClick={(e) => handleMobileLinkClick(e, child)}
-                                            role="menuitem"
-                                        >
-                                            {child.label}
-                                        </a>
-                                    ))}
+
+                                    {item.children.map(
+                                        (child) => (
+
+                                            <a
+                                                key={
+                                                    child.label
+                                                }
+                                                href={
+                                                    child.href
+                                                }
+                                                className="mobile-dropdown-item"
+                                                onClick={() => {
+                                                    setIsMenuOpen(
+                                                        false
+                                                    );
+
+                                                    setMobileOpenDropdown(
+                                                        null
+                                                    );
+                                                }}
+                                            >
+                                                {
+                                                    child.label
+                                                }
+                                            </a>
+
+                                        )
+                                    )}
+
                                 </div>
+
                             </div>
+
                         ) : (
+
                             <a
                                 key={item.label}
                                 href={item.href}
                                 className="mobile-link"
-                                onClick={() => setIsMenuOpen(false)}
-                                role="menuitem"
+                                onClick={() => {
+                                    setIsMenuOpen(
+                                        false
+                                    );
+
+                                    setMobileOpenDropdown(
+                                        null
+                                    );
+                                }}
                             >
                                 {item.label}
                             </a>
+
                         )
                     )}
-                    <button className="mobile-give-btn" onClick={() => setIsMenuOpen(false)}>
+
+
+                    {/* MOBILE GIVE */}
+
+                    <button
+                        type="button"
+                        className="mobile-give-btn"
+                        onClick={
+                            handleGiveOnline
+                        }
+                    >
                         Give Online
                     </button>
+
+
+                    {/* MOBILE LOGIN / LOGOUT */}
+
+                    <button
+                        type="button"
+                        className="mobile-auth-btn"
+                        onClick={
+                            isLoggedIn
+                                ? handleLogout
+                                : handleLogin
+                        }
+                    >
+                        {isLoggedIn
+                            ? 'Logout'
+                            : 'Login'}
+                    </button>
+
                 </div>
+
             )}
 
-            <AdminLoginModal isOpen={isAdminLoginOpen} onClose={() => setIsAdminLoginOpen(false)} />
+
+            {/* =====================================
+                ADMIN LOGIN MODAL
+                ===================================== */}
+
+            <AdminLoginModal
+                isOpen={
+                    isAdminLoginOpen
+                }
+                onClose={
+                    handleLoginModalClose
+                }
+            />
+
+
+            {/* =====================================
+                GIVE ONLINE MODAL
+                ===================================== */}
+
+            <GiveOnlineModal
+                isOpen={
+                    isGiveOnlineOpen
+                }
+                onClose={
+                    handleGiveOnlineClose
+                }
+            />
+
         </nav>
     );
 }

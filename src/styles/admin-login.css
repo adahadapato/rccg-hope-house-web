@@ -1,0 +1,217 @@
+/* =========================================
+   ADMIN LOGIN OVERLAY
+   ========================================= */
+
+.admin-modal-overlay {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    z-index: 9999;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+
+/* =========================================
+   LOGIN BOX
+   ========================================= */
+
+.admin-login-modal {
+    position: relative;
+    width: 100%;
+    max-width: 540px;
+    margin: auto;
+    padding: 2.5rem;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+    box-sizing: border-box;
+}
+
+
+/* =========================================
+   CLOSE BUTTON
+   ========================================= */
+
+.admin-modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    min-height: 42px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: #f3f4f6;
+    color: #374151;
+    font-size: 1.8rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+    .admin-modal-close:hover {
+        color: #ffffff;
+        background: #e08526;
+        transform: rotate(90deg);
+    }
+
+
+/* =========================================
+   MODAL HEADING
+   ========================================= */
+
+.admin-modal-header {
+    padding-right: 3rem;
+    margin-bottom: 2rem;
+}
+
+    .admin-modal-header h2 {
+        margin: 0 0 0.4rem;
+        color: #111827;
+        font-size: 1.8rem;
+        line-height: 1.2;
+    }
+
+    .admin-modal-header p {
+        margin: 0;
+        color: #6b7280;
+        font-size: 0.95rem;
+    }
+
+
+/* =========================================
+   FORM
+   ========================================= */
+
+.admin-login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.admin-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+    .admin-form-group label {
+        color: #374151;
+        font-weight: 600;
+    }
+
+    .admin-form-group input {
+        width: 100%;
+        min-height: 54px;
+        padding: 0.85rem 1rem;
+        border: 1px solid #d1d5db;
+        border-radius: 10px;
+        background: #ffffff;
+        color: #111827;
+        font: inherit;
+        outline: none;
+        box-sizing: border-box;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .admin-form-group input:focus {
+            border-color: #e08526;
+            box-shadow: 0 0 0 3px rgba(224, 133, 38, 0.15);
+        }
+
+
+/* =========================================
+   SIGN IN
+   ========================================= */
+
+.admin-sign-in-btn {
+    width: 100%;
+    min-height: 54px;
+    margin-top: 0.25rem;
+    padding: 0.8rem 1rem;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient( 135deg, #e08526, #ba6a1e );
+    color: #ffffff;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(224, 133, 38, 0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .admin-sign-in-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 7px 18px rgba(224, 133, 38, 0.35);
+    }
+
+
+/* =========================================
+   CANCEL
+   ========================================= */
+
+.admin-cancel-btn {
+    width: 100%;
+    min-height: 50px;
+    padding: 0.7rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #4b5563;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+    .admin-cancel-btn:hover {
+        background: #f9fafb;
+        border-color: #9ca3af;
+    }
+
+
+/* =========================================
+   MOBILE
+   ========================================= */
+
+@media (max-width: 600px) {
+
+    .admin-modal-overlay {
+        padding: 1rem;
+    }
+
+    .admin-login-modal {
+        max-width: 100%;
+        padding: 2rem 1.25rem 1.5rem;
+        border-radius: 16px;
+    }
+
+    .admin-modal-header {
+        padding-right: 2.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+        .admin-modal-header h2 {
+            font-size: 1.5rem;
+        }
+
+    .admin-modal-close {
+        top: 0.75rem;
+        right: 0.75rem;
+        width: 40px;
+        height: 40px;
+    }
+}

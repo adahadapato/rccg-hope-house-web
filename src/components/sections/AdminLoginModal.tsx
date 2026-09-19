@@ -1,110 +1,241 @@
-﻿import { apiFetch } from '@/api/api';
-import { useState } from 'react';
+﻿
+import { apiFetch } from '@/api/api';
+import { useEffect, useState } from 'react';
 
 interface AdminLoginModalProps {
     isOpen: boolean;
     onClose: () => void;
 }
 
-export default function AdminLoginModal({ isOpen, onClose }: AdminLoginModalProps) {
+export default function AdminLoginModal({
+    isOpen,
+    onClose,
+}: AdminLoginModalProps) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    if (!isOpen) return null;
+    const [status, setStatus] = useState<
+        'idle' | 'submitting' | 'success' | 'error'
+    >('idle');
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const [errorMessage, setErrorMessage] =
+        useState<string | null>(null);
+
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const handleEscape = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                onClose();
+            }
+        };
+
+        window.addEventListener('keydown', handleEscape);
+
+        return () => {
+            window.removeEventListener(
+                'keydown',
+                handleEscape
+            );
+        };
+    }, [isOpen, onClose]);
+
+    if (!isOpen) {
+        return null;
+    }
+
+    /* =========================================
+       LOGIN / API CONNECTION
+       ========================================= */
+
+    const handleSubmit = async (
+        event: React.FormEvent<HTMLFormElement>
+    ) => {
+        event.preventDefault();
+
         setStatus('submitting');
         setErrorMessage(null);
 
         try {
             const res = await apiFetch('/api/auth/login', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email,
+                    password,
+                }),
             });
 
             if (!res.ok) {
                 setStatus('error');
-                setErrorMessage(res.status === 401 ? 'Invalid email or password.' : 'Something went wrong. Please try again.');
+
+                setErrorMessage(
+                    res.status === 401
+                        ? 'Invalid email or password.'
+                        : 'Something went wrong. Please try again.'
+                );
+
                 return;
             }
 
             const data = await res.json();
-            // Stored for future admin pages to read — no admin dashboard
-            // exists yet, so this just persists the session for later.
-            localStorage.setItem('adminAccessToken', data.accessToken);
-            localStorage.setItem('adminRefreshToken', data.refreshToken);
-            localStorage.setItem('adminRole', data.role);
+
+            /*
+             * Store authentication details for
+             * future admin functionality.
+             */
+            localStorage.setItem(
+                'adminAccessToken',
+                data.accessToken
+            );
+
+            localStorage.setItem(
+                'adminRefreshToken',
+                data.refreshToken
+            );
+
+            localStorage.setItem(
+                'adminRole',
+                data.role
+            );
 
             setStatus('success');
+
             setTimeout(() => {
                 setStatus('idle');
                 setEmail('');
                 setPassword('');
                 onClose();
             }, 1500);
+
         } catch {
             setStatus('error');
-            setErrorMessage('Could not reach the server. Please check your connection.');
+
+            setErrorMessage(
+                'Could not reach the server. Please check your connection.'
+            );
         }
     };
 
     return (
-        <div className="prayer-modal-overlay" onClick={onClose}>
-            <div className="prayer-modal-content" onClick={(e) => e.stopPropagation()}>
-                {status === 'success' ? (
-                    <div className="prayer-success">
-                        <div className="success-icon">✅</div>
-                        <h3>Logged In</h3>
-                        <p>Welcome back.</p>
+        <div
+            className="admin-modal-overlay"
+            onMouseDown={(event) => {
+                /*
+                 * Only close when the dark background
+                 * itself is clicked.
+                 */
+                if (event.target === event.currentTarget) {
+                    onClose();
+                }
+            }}
+        >
+            <div
+                className="admin-login-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="admin-login-title"
+            >
+                <button
+                    type="button"
+                    className="admin-modal-close"
+                    onClick={onClose}
+                    aria-label="Close admin login"
+                    title="Close"
+                >
+                    ×
+                </button>
+
+                <div className="admin-modal-header">
+                    <h2 id="admin-login-title">
+                        Admin Login
+                    </h2>
+
+                    <p>
+                        Sign in to manage Hope House content
+                    </p>
+                </div>
+
+                <form
+                    className="admin-login-form"
+                    onSubmit={handleSubmit}
+                >
+                    <div className="admin-form-group">
+                        <label htmlFor="admin-email">
+                            Email
+                        </label>
+
+                        <input
+                            id="admin-email"
+                            type="email"
+                            value={email}
+                            onChange={(event) =>
+                                setEmail(event.target.value)
+                            }
+                            autoComplete="username"
+                            required
+                        />
                     </div>
-                ) : (
-                    <>
-                        <div className="prayer-modal-header">
-                            <h3>Admin Login</h3>
-                            <button className="close-btn" onClick={onClose}>✕</button>
-                        </div>
 
-                        <form onSubmit={handleSubmit} className="prayer-form-fields">
-                            <div className="form-group">
-                                <label>Email</label>
-                                <input
-                                    type="email"
-                                    placeholder="admin@rccghopehouse.org.uk"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    required
-                                />
-                            </div>
+                    <div className="admin-form-group">
+                        <label htmlFor="admin-password">
+                            Password
+                        </label>
 
-                            <div className="form-group">
-                                <label>Password</label>
-                                <input
-                                    type="password"
-                                    placeholder="••••••••"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                />
-                            </div>
+                        <input
+                            id="admin-password"
+                            type="password"
+                            value={password}
+                            onChange={(event) =>
+                                setPassword(event.target.value)
+                            }
+                            autoComplete="current-password"
+                            required
+                        />
+                    </div>
 
-                            {status === 'error' && (
-                                <p className="error-msg">{errorMessage}</p>
-                            )}
+                    {status === 'error' && (
+                        <p className="error-msg">
+                            {errorMessage}
+                        </p>
+                    )}
 
-                            <button
-                                type="submit"
-                                className="btn-primary btn-full"
-                                disabled={status === 'submitting'}
-                            >
-                                {status === 'submitting' ? 'Signing in...' : 'Sign In'}
-                            </button>
-                        </form>
-                    </>
-                )}
+                    {status === 'success' && (
+                        <p
+                            style={{
+                                textAlign: 'center',
+                                color: '#15803d',
+                                fontWeight: 600,
+                                margin: 0,
+                            }}
+                        >
+                            ✓ Logged in successfully.
+                        </p>
+                    )}
+
+                    <button
+                        type="submit"
+                        className="admin-sign-in-btn"
+                        disabled={status === 'submitting'}
+                    >
+                        {status === 'submitting'
+                            ? 'Signing in...'
+                            : status === 'success'
+                                ? 'Logged In'
+                                : 'Sign In'}
+                    </button>
+
+                    <button
+                        type="button"
+                        className="admin-cancel-btn"
+                        onClick={onClose}
+                        disabled={status === 'submitting'}
+                    >
+                        Cancel
+                    </button>
+                </form>
             </div>
         </div>
     );
