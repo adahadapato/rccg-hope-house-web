@@ -42,20 +42,20 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
 
-    # Deploy only for pushes to main.
-    # Pull requests will build and lint but will never deploy.
+    # Production deployment happens only after a successful push to main.
+    # Pull requests are built and checked but are not deployed.
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
       - name: Trigger SmarterASP.NET deployment
-  	env:
+        env:
           DEPLOY_HOOK: ${{ secrets.SMARTERASP_DEPLOY_HOOK }}
-          run: |
-    	    curl --fail --show-error --silent \
+        run: |
+          curl --fail --show-error --silent \
             --request POST \
             --header "Content-Type: application/json" \
             --data '{}' \
-           "$DEPLOY_HOOK"
+            "$DEPLOY_HOOK"
 
       - name: Deployment triggered
         run: echo "SmarterASP.NET deployment successfully triggered."
