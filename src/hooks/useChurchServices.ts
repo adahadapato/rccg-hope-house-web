@@ -1,4 +1,5 @@
-﻿import { useState, useEffect } from 'react';
+﻿import { apiFetch } from '@/api/api';
+import { useState, useEffect } from 'react';
 
 export interface ChurchServiceFeed {
     id: string;
@@ -27,7 +28,7 @@ export function useChurchServices(isLocal?: boolean) {
                 setLoading(true);
                 setError(null);
                 const params = isLocal !== undefined ? `?isLocal=${isLocal}` : '';
-                const res = await fetch(`/api/services${params}`, { signal: controller.signal });
+                const res = await apiFetch(`/api/services${params}`, { signal: controller.signal });
                 if (!res.ok) throw new Error(`Failed to load services (${res.status})`);
                 const data: ChurchServiceFeed[] = await res.json();
                 setServices(data);

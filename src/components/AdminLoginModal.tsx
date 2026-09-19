@@ -1,4 +1,5 @@
-﻿import { useState } from 'react';
+﻿import { apiFetch } from '@/api/api';
+import { useState } from 'react';
 
 interface AdminLoginModalProps {
     isOpen: boolean;
@@ -19,7 +20,7 @@ export default function AdminLoginModal({ isOpen, onClose }: AdminLoginModalProp
         setErrorMessage(null);
 
         try {
-            const res = await fetch('/api/auth/login', {
+            const res = await apiFetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })

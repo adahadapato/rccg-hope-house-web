@@ -1,4 +1,5 @@
-﻿import { useState } from 'react';
+﻿import { apiFetch } from '@/api/api';
+import { useState } from 'react';
 import { useChurchInfo } from '../../hooks/useChurchInfo';
 import { useChurchServices, formatTimeRange } from '../../hooks/useChurchServices';
 
@@ -34,7 +35,7 @@ export default function Contact() {
         setStatus('submitting');
         setErrorMessage(null);
         try {
-            const response = await fetch('/api/contact', {
+            const response = await apiFetch('/api/contact', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)

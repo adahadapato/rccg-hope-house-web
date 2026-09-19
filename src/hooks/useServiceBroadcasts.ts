@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-
+import { apiFetch } from '@/api/api';
 export interface ServiceBroadcast {
     id: string;
     category: string;
@@ -25,7 +25,7 @@ export function useServiceBroadcasts() {
             try {
                 setLoading(true);
                 setError(null);
-                const res = await fetch('/api/service-broadcasts/latest', { signal: controller.signal });
+                const res = await apiFetch('/api/service-broadcasts/latest', { signal: controller.signal });
                 if (!res.ok) throw new Error(`Failed to load broadcasts (${res.status})`);
                 const data: ServiceBroadcast[] = await res.json();
                 setBroadcasts(data);

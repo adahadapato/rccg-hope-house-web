@@ -1,4 +1,5 @@
-﻿import { useState } from 'react';
+﻿import { apiFetch } from '@/api/api';
+import { useState } from 'react';
 
 interface PrayerFormProps {
     isOpen: boolean;
@@ -31,7 +32,7 @@ export default function PrayerForm({ isOpen, onClose }: PrayerFormProps) {
                 requesterPhone: formData.isAnonymous ? null : (formData.phone || null)
             };
 
-            const response = await fetch('/api/prayer-requests', {
+            const response = await apiFetch('/api/prayer-requests', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)

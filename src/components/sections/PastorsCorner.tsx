@@ -1,4 +1,5 @@
-﻿import { useState, useEffect, useRef, useCallback } from 'react';
+﻿import { apiFetch } from '@/api/api';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 // ==================== Types matching the backend DTOs ====================
 
@@ -84,7 +85,7 @@ export default function PastorsCorner() {
             try {
                 setFeedLoading(true);
                 setFeedError(null);
-                const res = await fetch('/api/pastor-posts?skip=0&take=10', { signal: controller.signal });
+                const res = await apiFetch('/api/pastor-posts?skip=0&take=10', { signal: controller.signal });
                 if (!res.ok) throw new Error(`Failed to load articles (${res.status})`);
                 const data: PastorPostFeedDto[] = await res.json();
                 setFeed(data);
@@ -105,13 +106,13 @@ export default function PastorsCorner() {
         setArticleLoading(true);
         setPopupOpen(false);
         try {
-            const res = await fetch(`/api/pastor-posts/${postId}`);
+            const res = await apiFetch(`/api/pastor-posts/${postId}`);
             if (!res.ok) throw new Error(`Failed to load article (${res.status})`);
             const post: PastorPostDto = await res.json();
             setActivePost(post);
 
             setSiblingsLoading(true);
-            const sibRes = await fetch(`/api/pastor-posts/${postId}/siblings`);
+            const sibRes = await apiFetch(`/api/pastor-posts/${postId}/siblings`);
             if (sibRes.ok) {
                 const sibs: PastorPostFeedDto[] = await sibRes.json();
                 setSiblings(sibs);
