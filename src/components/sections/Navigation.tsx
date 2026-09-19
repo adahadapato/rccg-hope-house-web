@@ -1,5 +1,5 @@
 ﻿import { useState, useEffect } from 'react'; // Added useEffect
-import AdminLoginModal from '../AdminLoginModal';
+import AdminLoginModal from './AdminLoginModal';
 
 // 1. Define a proper TypeScript interface for your menu items
 interface MenuItem {

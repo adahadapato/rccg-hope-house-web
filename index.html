@@ -1,36 +1,27 @@
-<!--<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/rccg-logo.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RCCG Hope House Parish</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>-->
-
-
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
     <link rel="icon" type="image/png" href="/rccg-logo.png" />
 
-    <!-- 1. Base Viewport (You already had this, added viewport-fit for edge-to-edge) -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-
-    <!-- 2. Mobile Browser UI Theme Color (Change #ffffff to your church's primary color) -->
+    <!-- Browser theme -->
     <meta name="theme-color" content="#ffffff" />
 
-    <!-- 3. iOS Safari specific tweaks -->
+    <!-- Mobile web-app support -->
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- iOS Safari support -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-status-bar-style"
+          content="default" />
 
     <title>RCCG Hope House Parish</title>
 </head>
+
 <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
