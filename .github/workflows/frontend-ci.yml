@@ -48,12 +48,14 @@ jobs:
 
     steps:
       - name: Trigger SmarterASP.NET deployment
-        env:
+  	env:
           DEPLOY_HOOK: ${{ secrets.SMARTERASP_DEPLOY_HOOK }}
-        run: |
-          curl --fail --show-error --silent \
+          run: |
+    	    curl --fail --show-error --silent \
             --request POST \
-            "$DEPLOY_HOOK"
+            --header "Content-Type: application/json" \
+            --data '{}' \
+           "$DEPLOY_HOOK"
 
       - name: Deployment triggered
         run: echo "SmarterASP.NET deployment successfully triggered."
