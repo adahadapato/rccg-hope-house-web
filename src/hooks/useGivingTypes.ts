@@ -19,24 +19,29 @@ export interface GivingType {
 let givingTypesCache: GivingType[] | null = null;
 
 export function useGivingTypes() {
+    /*
+     * Initialise directly from the cache.
+     *
+     * This avoids calling setState synchronously inside useEffect,
+     * which is prohibited by the React hooks lint rule.
+     */
     const [givingTypes, setGivingTypes] = useState<GivingType[]>(
-        givingTypesCache ?? []
+        () => givingTypesCache ?? []
     );
 
     const [loading, setLoading] = useState(
-        givingTypesCache === null
+        () => givingTypesCache === null
     );
 
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         /*
-         * We already have the data for this application session,
-         * so there is no reason to request it again.
+         * If the cache already existed when this hook was created,
+         * the state was initialised from it above, so there is
+         * nothing else to do.
          */
         if (givingTypesCache !== null) {
-            setGivingTypes(givingTypesCache);
-            setLoading(false);
             return;
         }
 
@@ -44,9 +49,6 @@ export function useGivingTypes() {
 
         (async () => {
             try {
-                setLoading(true);
-                setError(null);
-
                 const response = await apiFetch(
                     '/api/giving-types/active',
                     {
@@ -60,12 +62,16 @@ export function useGivingTypes() {
                     );
                 }
 
-                const data: GivingType[] = await response.json();
+                const data: GivingType[] =
+                    await response.json();
 
                 givingTypesCache = data;
                 setGivingTypes(data);
             } catch (err) {
-                if ((err as Error).name !== 'AbortError') {
+                if (
+                    (err as Error).name !==
+                    'AbortError'
+                ) {
                     setError(
                         'Unable to load giving types. Please try again.'
                     );
@@ -77,7 +83,9 @@ export function useGivingTypes() {
             }
         })();
 
-        return () => controller.abort();
+        return () => {
+            controller.abort();
+        };
     }, []);
 
     return {
