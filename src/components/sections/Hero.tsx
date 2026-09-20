@@ -23,7 +23,7 @@ export default function Hero() {
                 </p>
 
                 <p className="hero-description">
-                    It's with great joy that we welcome you to this information platform of Hope House Church,
+                    It's with big, big and great joy that we welcome you to this information platform of Hope House Church,
                     a parish of The Redeemed Christian Church of God. We are a bible believing Christian church
                     promoting the unconditional love of God and gospel of our Lord Jesus Christ to all.
                 </p>

@@ -11,10 +11,13 @@ on:
 
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Build React Frontend
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - name: Checkout repository
@@ -37,25 +40,68 @@ jobs:
           VITE_API_BASE_URL: https://adahadapato-003-site2.dtempurl.com
         run: npm run build
 
-  deploy:
-    name: Deploy Frontend
-    needs: build
-    runs-on: ubuntu-latest
+      - name: Upload frontend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rccg-hope-house-web
+          path: dist
+          if-no-files-found: error
 
-    # Production deployment happens only after a successful push to main.
-    # Pull requests are built and checked but are not deployed.
+  deploy:
+    name: Deploy Frontend to SmarterASP
+    needs: build
+    runs-on: windows-latest
+
+    # Deploy only after a successful push to main.
+    # Pull requests are built and checked but never deployed.
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
-      - name: Trigger SmarterASP.NET deployment
-        env:
-          DEPLOY_HOOK: ${{ secrets.SMARTERASP_DEPLOY_HOOK }}
-        run: |
-          curl --fail --show-error --silent \
-            --request POST \
-            --header "Content-Type: application/json" \
-            --data '{}' \
-            "$DEPLOY_HOOK"
+      - name: Download frontend artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: rccg-hope-house-web
+          path: dist
 
-      - name: Deployment triggered
-        run: echo "SmarterASP.NET deployment successfully triggered."
+      - name: Locate MSDeploy
+        id: msdeploy
+        shell: powershell
+        run: |
+          $possiblePaths = @(
+            "${env:ProgramFiles}\IIS\Microsoft Web Deploy V3\msdeploy.exe",
+            "${env:ProgramFiles(x86)}\IIS\Microsoft Web Deploy V3\msdeploy.exe"
+          )
+
+          $msdeploy = $possiblePaths |
+            Where-Object { Test-Path $_ } |
+            Select-Object -First 1
+
+          if (-not $msdeploy) {
+            throw "MSDeploy.exe was not found on the GitHub Actions runner."
+          }
+
+          "path=$msdeploy" >> $env:GITHUB_OUTPUT
+
+      - name: Deploy Vite dist to SmarterASP
+        shell: powershell
+        env:
+          MSDEPLOY_PATH: ${{ steps.msdeploy.outputs.path }}
+          WEBSITE_NAME: ${{ secrets.WEBSITE_NAME }}
+          SERVER_COMPUTER_NAME: ${{ secrets.SERVER_COMPUTER_NAME }}
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+        run: |
+          & "$env:MSDEPLOY_PATH" `
+            -verb:sync `
+            -source:contentPath="$env:GITHUB_WORKSPACE\dist" `
+            -dest:contentPath="$env:WEBSITE_NAME",computerName="$env:SERVER_COMPUTER_NAME",userName="$env:SERVER_USERNAME",password="$env:SERVER_PASSWORD",authType="Basic" `
+            -allowUntrusted
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "MSDeploy failed with exit code $LASTEXITCODE"
+          }
+
+      - name: Deployment completed
+        shell: powershell
+        run: |
+          Write-Host "Frontend successfully deployed to SmarterASP."
