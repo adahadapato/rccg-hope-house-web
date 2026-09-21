@@ -1,7 +1,8 @@
-﻿.hero-modern {
+﻿
+/*.hero-modern {
     position: relative;
     min-height: 100vh;
-    background: linear-gradient(135deg, rgba(224, 133, 38, 0.9), rgba(121, 67, 26, 0.85)), url('https://images.unsplash.com/photo-1519491050282-cf00c82424ae?w=1920&auto=format&fit=crop') center/cover;
+    background: linear-gradient( 135deg, rgba(224, 133, 38, 0.9), rgba(121, 67, 26, 0.85) ), url('https://images.unsplash.com/photo-1519491050282-cf00c82424ae?w=1920&auto=format&fit=crop') center/cover;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -14,13 +15,18 @@
 .hero-overlay {
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.3) 100%);
+    background: radial-gradient( circle at center, transparent 0%, rgba(0, 0, 0, 0.3) 100% );
 }
 
 .hero-content-modern {
     position: relative;
-    z-index: 2;
-    max-width: 900px;
+    z-index: 2;*/
+    /*
+       Wider than before so the service panel has enough room
+       for four sections on desktop.
+    */
+    /*width: 100%;
+    max-width: 1400px;
     animation: fadeInUp 1s ease;
     padding: 0 1rem;
 }
@@ -39,7 +45,7 @@
     font-weight: 700;
     margin-bottom: 1.5rem;
     line-height: 1.2;
-    text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .hero-description {
@@ -47,7 +53,7 @@
     line-height: 1.8;
     margin-bottom: 2.5rem;
     opacity: 0.95;
-    max-width: 800px;
+    max-width: 900px;
     margin-left: auto;
     margin-right: auto;
 }
@@ -58,48 +64,203 @@
     justify-content: center;
     flex-wrap: wrap;
     margin-bottom: 3rem;
-}
+}*/
 
-.service-times-modern {
+
+/* =========================================
+   SERVICE PANEL
+   ========================================= */
+
+/*.service-times-modern {
+    width: 100%;
     background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(10px);
-    padding: 2rem;
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: 1rem;
-    display: inline-flex;
+    padding: 2rem 2.25rem;
+    display: grid;*/
+    /*
+       Service | divider | Service | divider |
+       Service | divider | Zoom
+    */
+    /*grid-template-columns: minmax(190px, 1fr) 1px minmax(190px, 1fr) 1px minmax(220px, 1.15fr) 1px minmax(240px, 1.2fr);
+    gap: 1.5rem;
     align-items: center;
-    gap: 2rem;
-    border: 1px solid rgba(255,255,255,0.2);
-}
+}*/
 
-.service-time-item {
+
+/* =========================================
+   INDIVIDUAL SERVICE
+   ========================================= */
+
+/*.service-time-item {
+    min-width: 0;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.65rem;
+    text-align: center;
 }
 
 .service-icon {
-    font-size: 1.5rem;
+    display: block;
+    font-size: 2.5rem;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+}
+
+.service-time-content {
+    width: 100%;
 }
 
 .service-time-item strong {
     display: block;
-    font-size: 0.875rem;
-    margin-bottom: 0.25rem;
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    font-weight: 700;
 }
 
-.service-time-item p {
-    font-size: 0.875rem;
-    opacity: 0.9;
+.service-mode,
+.service-vigil-day {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin-bottom: 0.65rem;
+    opacity: 0.95;
+}
+
+.service-time {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    font-size: 0.9rem;
+    line-height: 1.4;
     margin: 0;
+    opacity: 0.95;
+}*/
+
+/*
+   This is the important fix for the original problem.
+   It prevents:
+       12:40
+       PM
+   from being split across lines.
+*/
+/*.time-nowrap {
+    white-space: nowrap;
 }
 
-.service-time-divider {
+.service-clock {
+    font-size: 1.25rem;
+    line-height: 1;
+}*/
+
+
+/* =========================================
+   DIVIDERS
+   ========================================= */
+
+/*.service-time-divider {
     width: 1px;
-    height: 3rem;
-    background: rgba(255,255,255,0.4);
+    height: 8rem;
+    background: rgba(255, 255, 255, 0.35);
+    justify-self: center;
+}*/
+
+
+/* =========================================
+   ZOOM PANEL
+   ========================================= */
+
+/*.zoom-service-card {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 0 0.25rem;
 }
 
-.scroll-indicator {
+.zoom-heading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 0.8rem;
+}
+
+    .zoom-heading strong {
+        font-size: 1rem;
+        letter-spacing: 0.03em;
+    }
+
+.zoom-camera {
+    font-size: 1.5rem;
+}
+
+.zoom-detail {
+    margin: 0.2rem 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+    .zoom-detail strong {
+        font-weight: 700;
+    }
+
+.zoom-join-button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.85rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    border-radius: 0.65rem;
+    background: #4169e1;
+    color: white;
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+    .zoom-join-button:hover {
+        transform: translateY(-2px);
+        background: #3157cc;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    }
+
+    .zoom-join-button:focus-visible {
+        outline: 3px solid rgba(255, 255, 255, 0.8);
+        outline-offset: 3px;
+    }
+
+.zoom-note {
+    width: 100%;
+    margin: 0.75rem 0 0;
+    padding-top: 0.65rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.35);
+    font-size: 0.78rem;
+    line-height: 1.4;
+    font-style: italic;
+    opacity: 0.9;
+}*/
+
+
+/* =========================================
+   SCROLL INDICATOR
+   ========================================= */
+
+/*.scroll-indicator {
     position: absolute;
     bottom: 2rem;
     left: 50%;
@@ -111,7 +272,7 @@
         display: block;
         width: 30px;
         height: 50px;
-        border: 2px solid rgba(255,255,255,0.5);
+        border: 2px solid rgba(255, 255, 255, 0.5);
         border-radius: 20px;
         position: relative;
     }
@@ -127,7 +288,572 @@
             background: white;
             border-radius: 50%;
             animation: scroll 2s infinite;
+        }*/
+
+
+/* =========================================
+   ANIMATIONS
+   ========================================= */
+
+/*@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateX(-50%) translateY(0);
+    }
+
+    40% {
+        transform: translateX(-50%) translateY(-10px);
+    }
+
+    60% {
+        transform: translateX(-50%) translateY(-5px);
+    }
+}
+
+@keyframes scroll {
+    0% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+    }
+}*/
+
+
+/* =========================================
+   TABLET
+   ========================================= */
+
+/*@media (max-width: 1100px) {
+    .service-times-modern {
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+        padding: 1rem;
+    }
+
+    .service-time-item,
+    .zoom-service-card {
+        padding: 1.5rem;
+    }
+
+    .service-time-divider {
+        display: none;
+    }
+
+    .service-time-item:nth-of-type(1),
+    .service-time-item:nth-of-type(3) {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .zoom-service-card {
+        border-top: 1px solid rgba(255, 255, 255, 0.3);
+    }
+}*/
+
+
+/* =========================================
+   MOBILE
+   ========================================= */
+
+/*@media (max-width: 768px) {
+    .hero-modern {
+        padding: 6rem 1rem 3rem;
+        min-height: auto;
+    }
+
+    .hero-content-modern {
+        padding: 0;
+    }
+
+    .hero-title {
+        font-size: 2.25rem;
+        margin-bottom: 1rem;
+    }
+
+    .hero-description {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        margin-left: auto;
+        margin-right: auto;
+        width: 100%;
+        max-width: 300px;
+    }
+
+        .hero-buttons .btn-primary,
+        .hero-buttons button {
+            width: 100%;
+            text-align: center;
+            justify-content: center;
         }
+
+    .service-times-modern {
+        width: 100%;
+        max-width: 430px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        padding: 0 1.25rem;
+        gap: 0;
+    }
+
+    .service-time-item,
+    .zoom-service-card {
+        width: 100%;
+        padding: 1.5rem 0;
+    }
+
+    .service-time-item {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .service-time-divider {
+        display: none;
+    }
+
+    .zoom-service-card {
+        border-top: 0;
+    }
+
+    .service-icon {
+        font-size: 2.25rem;
+    }
+
+    .service-time-item strong,
+    .zoom-heading strong {
+        font-size: 1rem;
+    }
+
+    .service-mode,
+    .service-vigil-day,
+    .service-time,
+    .zoom-detail {
+        font-size: 0.9rem;
+    }
+
+    .scroll-indicator {
+        display: none;
+    }
+}*/
+
+
+/* =========================================
+   VERY SMALL MOBILE
+   ========================================= */
+
+/*@media (max-width: 400px) {
+    .hero-title {
+        font-size: 1.75rem;
+    }
+
+    .time-nowrap {
+        font-size: 0.85rem;
+    }
+}*/
+
+
+/* =========================================
+   LARGE DESKTOP
+   ========================================= */
+
+/*@media (min-width: 1024px) {
+    .hero-title {
+        font-size: 4.5rem;
+    }
+}
+
+@media (min-width: 1400px) {
+    .service-times-modern {
+        padding: 2.25rem 3rem;
+    }
+
+    .service-time-item strong,
+    .zoom-heading strong {
+        font-size: 1.05rem;
+    }
+
+    .service-mode,
+    .service-vigil-day,
+    .service-time,
+    .zoom-detail {
+        font-size: 0.95rem;
+    }
+}*/
+
+.hero-modern {
+    position: relative;
+    min-height: 100vh;
+    background: linear-gradient( 135deg, rgba(224, 133, 38, 0.9), rgba(121, 67, 26, 0.85) ), url('https://images.unsplash.com/photo-1519491050282-cf00c82424ae?w=1920&auto=format&fit=crop') center/cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    padding: 8rem 1.5rem 4rem;
+    overflow: hidden;
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient( circle at center, transparent 0%, rgba(0, 0, 0, 0.3) 100% );
+}
+
+.hero-content-modern {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 1400px;
+    animation: fadeInUp 1s ease;
+    padding: 0 1rem;
+}
+
+
+/* =========================================
+   HERO TEXT
+   ========================================= */
+
+.hero-tagline {
+    font-size: 0.875rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    opacity: 0.95;
+    font-weight: 500;
+}
+
+.hero-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.hero-description {
+    font-size: 1.125rem;
+    line-height: 1.8;
+    margin-bottom: 2.5rem;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 900px;
+    opacity: 0.95;
+}
+
+
+/* =========================================
+   HERO BUTTONS
+   ========================================= */
+
+.hero-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+    .hero-buttons button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+    }
+
+.hero-button-icon {
+    width: 22px;
+    height: 22px;
+    display: block;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+
+/* =========================================
+   SERVICE PANEL
+   ========================================= */
+
+.service-times-modern {
+    width: 100%;
+    display: grid;
+    /*
+        Sunday | divider | Wednesday | divider |
+        Vigil  | divider | Zoom
+    */
+    grid-template-columns: minmax(190px, 1fr) 1px minmax(190px, 1fr) 1px minmax(220px, 1.15fr) 1px minmax(240px, 1.2fr);
+    align-items: center;
+    gap: 1.5rem;
+    padding: 2rem 2.25rem;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 1rem;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+}
+
+
+/* =========================================
+   INDIVIDUAL SERVICE
+   ========================================= */
+
+.service-time-item {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    text-align: center;
+}
+
+.service-time-content {
+    width: 100%;
+}
+
+.service-time-item strong {
+    display: block;
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+
+/* =========================================
+   LARGE SERVICE ICONS
+   ========================================= */
+
+.service-main-icon {
+    width: 52px;
+    height: 52px;
+    display: block;
+    margin: 0 auto 0.45rem;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+
+/* =========================================
+   SMALL DETAIL ICONS
+   ========================================= */
+
+.service-detail-icon {
+    width: 21px;
+    height: 21px;
+    display: block;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+
+/* =========================================
+   SERVICE MODE / LOCATION
+   ========================================= */
+
+.service-mode,
+.service-vigil-day {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 0.65rem;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    opacity: 0.95;
+}
+
+    .service-vigil-day span {
+        white-space: nowrap;
+    }
+
+
+/* =========================================
+   SERVICE TIME
+   ========================================= */
+
+.service-time {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    opacity: 0.95;
+}
+
+/*
+   Prevents:
+       12:40
+       PM
+
+   The complete time range stays together.
+*/
+.time-nowrap {
+    white-space: nowrap;
+}
+
+
+/* =========================================
+   DIVIDERS
+   ========================================= */
+
+.service-time-divider {
+    width: 1px;
+    height: 8rem;
+    justify-self: center;
+    background: rgba(255, 255, 255, 0.35);
+}
+
+
+/* =========================================
+   ZOOM PANEL
+   ========================================= */
+
+.zoom-service-card {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 0.25rem;
+}
+
+.zoom-heading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-bottom: 0.8rem;
+}
+
+    .zoom-heading strong {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+    }
+
+.zoom-heading-icon {
+    width: 34px;
+    height: 34px;
+    display: block;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.zoom-detail {
+    margin: 0.2rem 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+    .zoom-detail strong {
+        font-weight: 700;
+    }
+
+
+/* =========================================
+   ZOOM BUTTON
+   ========================================= */
+
+.zoom-join-button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    margin-top: 0.85rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    border-radius: 0.65rem;
+    background: #4169e1;
+    color: white;
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+    .zoom-join-button:hover {
+        transform: translateY(-2px);
+        background: #3157cc;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    }
+
+    .zoom-join-button:focus-visible {
+        outline: 3px solid rgba(255, 255, 255, 0.8);
+        outline-offset: 3px;
+    }
+
+.zoom-button-icon {
+    width: 22px;
+    height: 22px;
+    display: block;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.zoom-note {
+    width: 100%;
+    margin: 0.75rem 0 0;
+    padding-top: 0.65rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.35);
+    font-size: 0.78rem;
+    line-height: 1.4;
+    font-style: italic;
+    opacity: 0.9;
+}
+
+
+/* =========================================
+   SCROLL INDICATOR
+   ========================================= */
+
+.scroll-indicator {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: bounce 2s infinite;
+}
+
+    .scroll-indicator span {
+        position: relative;
+        display: block;
+        width: 30px;
+        height: 50px;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        border-radius: 20px;
+    }
+
+        .scroll-indicator span::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            width: 6px;
+            height: 6px;
+            transform: translateX(-50%);
+            background: white;
+            border-radius: 50%;
+            animation: scroll 2s infinite;
+        }
+
+
+/* =========================================
+   ANIMATIONS
+   ========================================= */
 
 @keyframes bounce {
     0%, 20%, 50%, 80%, 100% {
@@ -155,36 +881,80 @@
     }
 }
 
+
 /* =========================================
-   MOBILE OPTIMIZATIONS FOR HERO
+   TABLET / SMALL DESKTOP
    ========================================= */
+
+@media (max-width: 1100px) {
+
+    .service-times-modern {
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+        padding: 1rem;
+    }
+
+    .service-time-item,
+    .zoom-service-card {
+        padding: 1.5rem;
+    }
+
+    .service-time-divider {
+        display: none;
+    }
+
+    /*
+       Gives the 2 x 2 tablet layout subtle separation.
+    */
+    .service-time-item:nth-of-type(1),
+    .service-time-item:nth-of-type(3) {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .zoom-service-card {
+        border-top: 1px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+
+/* =========================================
+   MOBILE
+   ========================================= */
+
 @media (max-width: 768px) {
+
     .hero-modern {
-        padding: 6rem 1rem 3rem; /* Reduce top padding to account for fixed nav */
-        min-height: auto; /* Allow content to dictate height on small screens */
+        min-height: auto;
+        padding: 6rem 1rem 3rem;
+    }
+
+    .hero-content-modern {
+        padding: 0;
     }
 
     .hero-title {
-        font-size: 2.25rem; /* More readable on mobile */
         margin-bottom: 1rem;
+        font-size: 2.25rem;
     }
 
     .hero-description {
-        font-size: 1rem;
         margin-bottom: 2rem;
+        font-size: 1rem;
     }
+
+
+    /* HERO BUTTONS */
 
     .hero-buttons {
-        flex-direction: column;
-        gap: 1rem;
-        margin-bottom: 2rem;
         width: 100%;
         max-width: 300px;
+        flex-direction: column;
+        gap: 1rem;
         margin-left: auto;
         margin-right: auto;
+        margin-bottom: 2rem;
     }
 
-        /* Make buttons full-width on mobile for easy tapping */
         .hero-buttons .btn-primary,
         .hero-buttons button {
             width: 100%;
@@ -192,33 +962,142 @@
             justify-content: center;
         }
 
+
+    /* SERVICE PANEL */
+
     .service-times-modern {
-        flex-direction: column; /* Stack service times vertically */
-        gap: 1.5rem;
-        padding: 1.5rem;
-        width: 90%;
-        max-width: 400px;
+        width: 100%;
+        max-width: 430px;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        margin: 0 auto;
+        padding: 0 1.25rem;
+    }
+
+    .service-time-item,
+    .zoom-service-card {
+        width: 100%;
+        padding: 1.5rem 0;
+    }
+
+    .service-time-item {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
     }
 
     .service-time-divider {
-        width: 80%; /* Change to horizontal divider */
-        height: 1px;
-        background: rgba(255,255,255,0.4);
+        display: none;
+    }
+
+    .zoom-service-card {
+        border-top: 0;
+    }
+
+
+    /* ICONS */
+
+    .service-main-icon {
+        width: 48px;
+        height: 48px;
+    }
+
+    .service-detail-icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    .zoom-heading-icon {
+        width: 30px;
+        height: 30px;
+    }
+
+    .hero-button-icon,
+    .zoom-button-icon {
+        width: 20px;
+        height: 20px;
+    }
+
+
+    /* TEXT */
+
+    .service-time-item strong,
+    .zoom-heading strong {
+        font-size: 1rem;
+    }
+
+    .service-mode,
+    .service-vigil-day,
+    .service-time,
+    .zoom-detail {
+        font-size: 0.9rem;
+    }
+
+    .scroll-indicator {
+        display: none;
     }
 }
+
+
+/* =========================================
+   VERY SMALL MOBILE
+   ========================================= */
 
 @media (max-width: 400px) {
-    .hero-title {
-        font-size: 1.75rem; /* Extra small screens (e.g., iPhone SE) */
-    }
-}
 
-@media (min-width: 1024px) {
     .hero-title {
-        font-size: 4.5rem;
+        font-size: 1.75rem;
     }
 
     .service-times-modern {
-        padding: 2.5rem 3rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .time-nowrap {
+        font-size: 0.85rem;
+    }
+
+    /*
+       Keep the vigil description usable even on
+       very narrow screens.
+    */
+    .service-vigil-day span {
+        white-space: normal;
+    }
+}
+
+
+/* =========================================
+   LARGE DESKTOP
+   ========================================= */
+
+@media (min-width: 1024px) {
+
+    .hero-title {
+        font-size: 4.5rem;
+    }
+}
+
+@media (min-width: 1400px) {
+
+    .service-times-modern {
+        padding: 2.25rem 3rem;
+    }
+
+    .service-main-icon {
+        width: 56px;
+        height: 56px;
+    }
+
+    .service-time-item strong,
+    .zoom-heading strong {
+        font-size: 1.05rem;
+    }
+
+    .service-mode,
+    .service-vigil-day,
+    .service-time,
+    .zoom-detail {
+        font-size: 0.95rem;
     }
 }

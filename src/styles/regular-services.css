@@ -1,5 +1,5 @@
 /* Regular Services Section */
-.regular-services-section {
+/*.regular-services-section {
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
     padding: 6rem 0;
     color: white;
@@ -34,10 +34,10 @@
     background: linear-gradient(90deg, #e08526, #f6d6a9);
     border-radius: 2px;
     margin: 1rem 0;
-}
+}*/
 
 /* Services Grid */
-.services-grid {
+/*.services-grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: 2.5rem;
@@ -104,10 +104,10 @@
     color: #94a3b8;
     font-size: 0.9rem;
     margin-top: 0.5rem;
-}
+}*/
 
 /* Additional Info Section */
-.services-additional {
+/*.services-additional {
     display: grid;
     grid-template-columns: 1fr;
     gap: 2rem;
@@ -146,10 +146,10 @@
     color: #cbd5e1;
     line-height: 1.6;
     margin: 0;
-}
+}*/
 
 /* Responsive */
-@media (min-width: 768px) {
+/*@media (min-width: 768px) {
     .services-grid {
         grid-template-columns: repeat(3, 1fr);
     }
@@ -176,4 +176,457 @@
     .additional-icon {
         margin: 0 auto;
     }
+}*/
+
+/* =========================================
+   REGULAR SERVICES SECTION
+   ========================================= */
+
+.regular-services-section {
+    background: linear-gradient( 135deg, #0f172a 0%, #1e293b 100% );
+    padding: 6rem 0;
+    color: white;
+}
+
+
+/* =========================================
+   HEADER
+   ========================================= */
+
+.services-header {
+    margin-bottom: 4rem;
+}
+
+.services-title-block {
+    max-width: 600px;
+}
+
+    .services-title-block .section-tag {
+        color: #f6d6a9;
+    }
+
+    .services-title-block .section-title {
+        color: white;
+        font-size: 2.5rem;
+    }
+
+.services-subtitle {
+    color: #94a3b8;
+    font-size: 1.125rem;
+    margin-top: 1rem;
+}
+
+.title-divider-left {
+    width: 60px;
+    height: 4px;
+    background: linear-gradient( 90deg, #e08526, #f6d6a9 );
+    border-radius: 2px;
+    margin: 1rem 0;
+}
+
+
+/* =========================================
+   SERVICES GRID
+   ========================================= */
+
+.services-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    margin-bottom: 3rem;
+}
+
+
+/* =========================================
+   SERVICE CATEGORY CARDS
+   ========================================= */
+
+.service-category {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1.5rem;
+    padding: 2.5rem;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .service-category:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(224, 133, 38, 0.3);
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.18);
+    }
+
+
+/* =========================================
+   CATEGORY ICONS
+   ========================================= */
+
+.service-category-icon {
+    width: 58px;
+    height: 58px;
+    display: block;
+    margin: 0 auto 1.25rem;
+    object-fit: contain;
+}
+
+
+/* =========================================
+   CATEGORY HEADINGS
+   ========================================= */
+
+.service-category h3 {
+    color: #f6d6a9;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+
+/* =========================================
+   SERVICE ITEMS
+   ========================================= */
+
+.service-items {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.service-item {
+    padding: 1.25rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 1rem;
+    border-left: 3px solid #e08526;
+    transition: background 0.25s ease, transform 0.25s ease;
+}
+
+    .service-item:hover {
+        background: rgba(255, 255, 255, 0.075);
+        transform: translateX(3px);
+    }
+
+    .service-item h4 {
+        color: white;
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: 0.65rem;
+    }
+
+
+    /* =========================================
+   SERVICE TIME
+   ========================================= */
+
+    .service-item .service-time {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 0.5rem;
+        color: #f6d6a9;
+        font-weight: 600;
+        font-size: 1rem;
+        margin: 0.35rem 0;
+    }
+
+.time-nowrap {
+    white-space: nowrap;
+}
+
+
+/* =========================================
+   SMALL DETAIL ICONS
+   ========================================= */
+
+.regular-detail-icon {
+    width: 20px;
+    height: 20px;
+    display: block;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+
+/* =========================================
+   SERVICE NOTES
+   ========================================= */
+
+.service-note {
+    color: #94a3b8;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+.service-note-with-icon {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+
+/* =========================================
+   ZOOM DETAILS
+   ========================================= */
+
+.regular-zoom-details {
+    margin-top: 1rem;
+    padding: 0.85rem 1rem;
+    background: rgba(65, 105, 225, 0.12);
+    border: 1px solid rgba(96, 165, 250, 0.25);
+    border-radius: 0.75rem;
+}
+
+.regular-zoom-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #bfdbfe;
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 0.55rem;
+}
+
+.regular-zoom-icon {
+    width: 23px;
+    height: 23px;
+    display: block;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.regular-zoom-details p {
+    color: #cbd5e1;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    margin: 0.2rem 0;
+    overflow-wrap: anywhere;
+}
+
+.regular-zoom-details strong {
+    color: white;
+    font-weight: 700;
+}
+
+
+/* =========================================
+   ADDITIONAL INFO SECTION
+   ========================================= */
+
+.services-additional {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.additional-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1.25rem;
+    transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+}
+
+    .additional-card:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(224, 133, 38, 0.3);
+        transform: translateY(-3px);
+    }
+
+
+/* =========================================
+   ADDITIONAL ICON
+   ========================================= */
+
+.additional-icon {
+    width: 52px;
+    height: 52px;
+    display: block;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.additional-content {
+    flex: 1;
+    min-width: 0;
+}
+
+
+/* =========================================
+   ADDITIONAL CARD TEXT
+   ========================================= */
+
+.additional-card h4 {
+    color: #f6d6a9;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.additional-card p {
+    color: #cbd5e1;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.additional-card .service-note {
+    margin-top: 0.5rem;
+    color: #94a3b8;
+}
+
+.additional-time {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+
+/* =========================================
+   HOUSE FELLOWSHIP ZOOM DETAILS
+   ========================================= */
+
+.additional-zoom-details {
+    margin-top: 1rem;
+}
+
+
+/* =========================================
+   TABLET / DESKTOP
+   ========================================= */
+
+@media (min-width: 768px) {
+
+    .services-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .services-additional {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+
+/* =========================================
+   MOBILE
+   ========================================= */
+
+@media (max-width: 767px) {
+
+    .regular-services-section {
+        padding: 4rem 0;
+    }
+
+    .services-header {
+        margin-bottom: 2.5rem;
+    }
+
+    .services-title-block .section-title {
+        font-size: 2rem;
+    }
+
+    .service-category {
+        padding: 2rem 1.5rem;
+    }
+
+    .service-category-icon {
+        width: 52px;
+        height: 52px;
+    }
+
+    .additional-card {
+        flex-direction: column;
+        text-align: center;
+        align-items: center;
+    }
+
+    .additional-icon {
+        width: 48px;
+        height: 48px;
+        margin: 0 auto;
+    }
+
+    .additional-content {
+        width: 100%;
+    }
+
+    .additional-time,
+    .additional-card .service-note-with-icon {
+        justify-content: center;
+    }
+
+    .regular-zoom-heading {
+        justify-content: center;
+    }
+}
+
+
+/* =========================================
+   VERY SMALL MOBILE
+   ========================================= */
+
+@media (max-width: 400px) {
+
+    .service-category {
+        padding: 1.5rem 1rem;
+    }
+
+    .service-item {
+        padding: 1rem;
+    }
+
+        .service-item .service-time {
+            font-size: 0.9rem;
+        }
+
+    .regular-detail-icon {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+/* =========================================
+   JOIN ZOOM SERVICE BUTTON
+   ========================================= */
+
+.regular-zoom-button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    margin-top: 0.85rem;
+    padding: 0.7rem 1rem;
+    background: #4169e1;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 0.65rem;
+    font: inherit;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .regular-zoom-button:hover {
+        background: #3157cc;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    }
+
+    .regular-zoom-button:focus-visible {
+        outline: 3px solid rgba(255, 255, 255, 0.8);
+        outline-offset: 3px;
+    }
+
+.regular-zoom-button-icon {
+    width: 21px;
+    height: 21px;
+    display: block;
+    object-fit: contain;
+    flex-shrink: 0;
 }
