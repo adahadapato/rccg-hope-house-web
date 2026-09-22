@@ -6,6 +6,16 @@ interface AdminLoginModalProps {
     onClose: () => void;
 }
 
+interface AdminLoginResponse {
+    accessToken: string;
+    refreshToken: string;
+    expiresAt: string;
+    role: string;
+    userName: string;
+    name: string;
+    email: string;
+}
+
 export default function AdminLoginModal({
     isOpen,
     onClose,
@@ -29,7 +39,10 @@ export default function AdminLoginModal({
             }
         };
 
-        window.addEventListener('keydown', handleEscape);
+        window.addEventListener(
+            'keydown',
+            handleEscape
+        );
 
         return () => {
             window.removeEventListener(
@@ -56,16 +69,20 @@ export default function AdminLoginModal({
         setErrorMessage(null);
 
         try {
-            const res = await apiFetch('/api/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    email,
-                    password,
-                }),
-            });
+            const res = await apiFetch(
+                '/api/auth/login',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type':
+                            'application/json',
+                    },
+                    body: JSON.stringify({
+                        email,
+                        password,
+                    }),
+                }
+            );
 
             if (!res.ok) {
                 setStatus('error');
@@ -79,11 +96,11 @@ export default function AdminLoginModal({
                 return;
             }
 
-            const data = await res.json();
+            const data =
+                (await res.json()) as AdminLoginResponse;
 
             /*
-             * Store authentication details for
-             * future admin functionality.
+             * Store authentication tokens.
              */
             localStorage.setItem(
                 'adminAccessToken',
@@ -95,20 +112,38 @@ export default function AdminLoginModal({
                 data.refreshToken
             );
 
+            /*
+             * Store authenticated administrator
+             * information for the admin interface.
+             */
             localStorage.setItem(
                 'adminRole',
                 data.role
             );
 
+            localStorage.setItem(
+                'adminName',
+                data.name
+            );
+
+            localStorage.setItem(
+                'adminEmail',
+                data.email
+            );
+
+            /*
+             * Authentication succeeded.
+             */
             setStatus('success');
 
+            /*
+             * Give the administrator a brief
+             * confirmation before opening the
+             * admin dashboard.
+             */
             setTimeout(() => {
-                setStatus('idle');
-                setEmail('');
-                setPassword('');
-                onClose();
-            }, 1500);
-
+                window.location.assign('/admin');
+            }, 800);
         } catch {
             setStatus('error');
 
@@ -123,10 +158,13 @@ export default function AdminLoginModal({
             className="admin-modal-overlay"
             onMouseDown={(event) => {
                 /*
-                 * Only close when the dark background
-                 * itself is clicked.
+                 * Only close when the dark
+                 * background itself is clicked.
                  */
-                if (event.target === event.currentTarget) {
+                if (
+                    event.target ===
+                    event.currentTarget
+                ) {
                     onClose();
                 }
             }}
@@ -153,7 +191,8 @@ export default function AdminLoginModal({
                     </h2>
 
                     <p>
-                        Sign in to manage Hope House content
+                        Sign in to manage Hope House
+                        content
                     </p>
                 </div>
 
@@ -171,7 +210,9 @@ export default function AdminLoginModal({
                             type="email"
                             value={email}
                             onChange={(event) =>
-                                setEmail(event.target.value)
+                                setEmail(
+                                    event.target.value
+                                )
                             }
                             autoComplete="username"
                             required
@@ -188,18 +229,21 @@ export default function AdminLoginModal({
                             type="password"
                             value={password}
                             onChange={(event) =>
-                                setPassword(event.target.value)
+                                setPassword(
+                                    event.target.value
+                                )
                             }
                             autoComplete="current-password"
                             required
                         />
                     </div>
 
-                    {status === 'error' && errorMessage && (
-                        <p className="app-message app-message-error">
-                            ✕ {errorMessage}
-                        </p>
-                    )}
+                    {status === 'error' &&
+                        errorMessage && (
+                            <p className="app-message app-message-error">
+                                ✕ {errorMessage}
+                            </p>
+                        )}
 
                     {status === 'success' && (
                         <p className="app-message app-message-success">
@@ -210,7 +254,11 @@ export default function AdminLoginModal({
                     <button
                         type="submit"
                         className="admin-sign-in-btn"
-                        disabled={status === 'submitting'}
+                        disabled={
+                            status ===
+                            'submitting' ||
+                            status === 'success'
+                        }
                     >
                         {status === 'submitting'
                             ? 'Signing in...'
@@ -223,7 +271,11 @@ export default function AdminLoginModal({
                         type="button"
                         className="admin-cancel-btn"
                         onClick={onClose}
-                        disabled={status === 'submitting'}
+                        disabled={
+                            status ===
+                            'submitting' ||
+                            status === 'success'
+                        }
                     >
                         Cancel
                     </button>

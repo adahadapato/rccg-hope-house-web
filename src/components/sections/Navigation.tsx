@@ -1,4 +1,5 @@
-﻿import { useEffect, useState } from 'react';
+﻿
+import { useEffect, useState } from 'react';
 import AdminLoginModal from './AdminLoginModal';
 import GiveOnlineModal from './GiveOnlineModal';
 
@@ -89,21 +90,6 @@ export default function Navigation() {
         setIsGiveOnlineOpen,
     ] = useState(false);
 
-    /*
-     * Authentication state.
-     *
-     * If adminAccessToken exists in localStorage,
-     * the navigation displays Logout.
-     */
-    const [isLoggedIn, setIsLoggedIn] =
-        useState(() => {
-            return Boolean(
-                localStorage.getItem(
-                    'adminAccessToken'
-                )
-            );
-        });
-
 
     /* =========================================
        PREVENT BACKGROUND SCROLL
@@ -180,71 +166,42 @@ export default function Navigation() {
 
 
     /* =========================================
-       CHECK LOGIN STATE
+       OPEN ADMIN
        ========================================= */
 
-    const checkLoginState = () => {
-        setIsLoggedIn(
-            Boolean(
-                localStorage.getItem(
-                    'adminAccessToken'
-                )
-            )
-        );
-    };
-
-
-    /* =========================================
-       OPEN LOGIN
-       ========================================= */
-
-    const handleLogin = () => {
+    const handleAdmin = () => {
         setIsMenuOpen(false);
         setMobileOpenDropdown(null);
+        setActiveDropdown(null);
+
+        /*
+         * If the administrator already has an
+         * authenticated session, return directly
+         * to the admin dashboard.
+         */
+        const accessToken =
+            localStorage.getItem(
+                'adminAccessToken'
+            );
+
+        if (accessToken) {
+            window.location.assign('/admin');
+            return;
+        }
+
+        /*
+         * Otherwise require authentication.
+         */
         setIsAdminLoginOpen(true);
     };
 
 
     /* =========================================
-       CLOSE LOGIN
+       CLOSE ADMIN LOGIN
        ========================================= */
 
     const handleLoginModalClose = () => {
         setIsAdminLoginOpen(false);
-
-        /*
-         * AdminLoginModal stores the access token
-         * after a successful login.
-         *
-         * Check localStorage again when the modal
-         * closes so Login immediately becomes Logout.
-         */
-        checkLoginState();
-    };
-
-
-    /* =========================================
-       LOGOUT
-       ========================================= */
-
-    const handleLogout = () => {
-        localStorage.removeItem(
-            'adminAccessToken'
-        );
-
-        localStorage.removeItem(
-            'adminRefreshToken'
-        );
-
-        localStorage.removeItem(
-            'adminRole'
-        );
-
-        setIsLoggedIn(false);
-
-        setIsMenuOpen(false);
-        setMobileOpenDropdown(null);
-        setActiveDropdown(null);
     };
 
 
@@ -422,24 +379,15 @@ export default function Navigation() {
 
 
                 {/* =================================
-                    LOGIN / LOGOUT
+                    ADMIN
                     ================================= */}
 
                 <button
                     type="button"
-                    className={`desktop-auth-btn ${isLoggedIn
-                            ? 'logged-in'
-                            : ''
-                        }`}
-                    onClick={
-                        isLoggedIn
-                            ? handleLogout
-                            : handleLogin
-                    }
+                    className="desktop-auth-btn"
+                    onClick={handleAdmin}
                 >
-                    {isLoggedIn
-                        ? 'Logout'
-                        : 'Login'}
+                    Admin
                 </button>
 
 
@@ -616,20 +564,14 @@ export default function Navigation() {
                     </button>
 
 
-                    {/* MOBILE LOGIN / LOGOUT */}
+                    {/* MOBILE ADMIN */}
 
                     <button
                         type="button"
                         className="mobile-auth-btn"
-                        onClick={
-                            isLoggedIn
-                                ? handleLogout
-                                : handleLogin
-                        }
+                        onClick={handleAdmin}
                     >
-                        {isLoggedIn
-                            ? 'Logout'
-                            : 'Login'}
+                        Admin
                     </button>
 
                 </div>
