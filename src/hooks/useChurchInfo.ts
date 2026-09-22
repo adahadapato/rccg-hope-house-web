@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { apiFetch } from '../api/api';
+import { apiFetch } from '@/api/api';
 export interface ChurchContactMethod {
     id: string;
     type: 'Phone' | 'Email';
