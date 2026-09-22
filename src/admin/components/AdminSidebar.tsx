@@ -1,5 +1,10 @@
 ﻿import { useState } from 'react';
 
+interface AdminSidebarProps {
+    mobileOpen: boolean;
+    onMobileClose: () => void;
+}
+
 interface NavigationItem {
     icon: string;
     label: string;
@@ -74,7 +79,10 @@ const navItems: NavigationItem[] = [
     },
 ];
 
-function AdminSidebar() {
+function AdminSidebar({
+    mobileOpen,
+    onMobileClose,
+}: AdminSidebarProps) {
     const currentPath =
         window.location.pathname;
 
@@ -98,11 +106,18 @@ function AdminSidebar() {
             return;
         }
 
+        onMobileClose();
+
         window.location.assign(path);
     }
 
     return (
-        <aside className="admin-sidebar">
+        <aside
+            className={`admin-sidebar ${mobileOpen
+                    ? 'mobile-open'
+                    : ''
+                }`}
+        >
             <div className="admin-brand">
                 <img
                     src="/rccg-logo.png"
@@ -113,10 +128,22 @@ function AdminSidebar() {
                 <div>
                     <strong>RCCG</strong>
                     <strong>Hope House</strong>
+
                     <span>
                         A Place of Hope for All
                     </span>
                 </div>
+
+                <button
+                    type="button"
+                    className="admin-mobile-sidebar-close"
+                    onClick={
+                        onMobileClose
+                    }
+                    aria-label="Close navigation menu"
+                >
+                    ×
+                </button>
             </div>
 
             <nav className="admin-navigation">
@@ -165,9 +192,7 @@ function AdminSidebar() {
                                             }`}
                                         onClick={() =>
                                             setGalleryOpen(
-                                                (
-                                                    current: boolean
-                                                ) =>
+                                                current =>
                                                     !current
                                             )
                                         }
