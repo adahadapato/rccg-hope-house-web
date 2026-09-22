@@ -1,5 +1,8 @@
 ﻿import { apiFetch } from '@/api/api';
-import { useEffect, useState } from 'react';
+import {
+    useEffect,
+    useState,
+} from 'react';
 
 interface AdminLoginModalProps {
     isOpen: boolean;
@@ -20,20 +23,32 @@ export default function AdminLoginModal({
     isOpen,
     onClose,
 }: AdminLoginModalProps) {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [email, setEmail] =
+        useState('');
+
+    const [password, setPassword] =
+        useState('');
 
     const [status, setStatus] = useState<
-        'idle' | 'submitting' | 'success' | 'error'
+        | 'idle'
+        | 'submitting'
+        | 'success'
+        | 'error'
     >('idle');
 
-    const [errorMessage, setErrorMessage] =
-        useState<string | null>(null);
+    const [
+        errorMessage,
+        setErrorMessage,
+    ] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!isOpen) return;
+        if (!isOpen) {
+            return;
+        }
 
-        const handleEscape = (event: KeyboardEvent) => {
+        const handleEscape = (
+            event: KeyboardEvent
+        ) => {
             if (event.key === 'Escape') {
                 onClose();
             }
@@ -56,10 +71,6 @@ export default function AdminLoginModal({
         return null;
     }
 
-    /* =========================================
-       LOGIN / API CONNECTION
-       ========================================= */
-
     const handleSubmit = async (
         event: React.FormEvent<HTMLFormElement>
     ) => {
@@ -69,26 +80,27 @@ export default function AdminLoginModal({
         setErrorMessage(null);
 
         try {
-            const res = await apiFetch(
-                '/api/auth/login',
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type':
-                            'application/json',
-                    },
-                    body: JSON.stringify({
-                        email,
-                        password,
-                    }),
-                }
-            );
+            const response =
+                await apiFetch(
+                    '/api/auth/login',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type':
+                                'application/json',
+                        },
+                        body: JSON.stringify({
+                            email,
+                            password,
+                        }),
+                    }
+                );
 
-            if (!res.ok) {
+            if (!response.ok) {
                 setStatus('error');
 
                 setErrorMessage(
-                    res.status === 401
+                    response.status === 401
                         ? 'Invalid email or password.'
                         : 'Something went wrong. Please try again.'
                 );
@@ -97,11 +109,8 @@ export default function AdminLoginModal({
             }
 
             const data =
-                (await res.json()) as AdminLoginResponse;
+                (await response.json()) as AdminLoginResponse;
 
-            /*
-             * Store authentication tokens.
-             */
             localStorage.setItem(
                 'adminAccessToken',
                 data.accessToken
@@ -112,10 +121,6 @@ export default function AdminLoginModal({
                 data.refreshToken
             );
 
-            /*
-             * Store authenticated administrator
-             * information for the admin interface.
-             */
             localStorage.setItem(
                 'adminRole',
                 data.role
@@ -131,19 +136,11 @@ export default function AdminLoginModal({
                 data.email
             );
 
-            /*
-             * Authentication succeeded.
-             */
             setStatus('success');
 
-            /*
-             * Give the administrator a brief
-             * confirmation before opening the
-             * admin dashboard.
-             */
-            setTimeout(() => {
-                window.location.assign('/admin');
-            }, 800);
+            window.location.assign(
+                '/admin'
+            );
         } catch {
             setStatus('error');
 
@@ -156,11 +153,7 @@ export default function AdminLoginModal({
     return (
         <div
             className="admin-modal-overlay"
-            onMouseDown={(event) => {
-                /*
-                 * Only close when the dark
-                 * background itself is clicked.
-                 */
+            onMouseDown={event => {
                 if (
                     event.target ===
                     event.currentTarget
@@ -209,9 +202,10 @@ export default function AdminLoginModal({
                             id="admin-email"
                             type="email"
                             value={email}
-                            onChange={(event) =>
+                            onChange={event =>
                                 setEmail(
-                                    event.target.value
+                                    event.target
+                                        .value
                                 )
                             }
                             autoComplete="username"
@@ -228,9 +222,10 @@ export default function AdminLoginModal({
                             id="admin-password"
                             type="password"
                             value={password}
-                            onChange={(event) =>
+                            onChange={event =>
                                 setPassword(
-                                    event.target.value
+                                    event.target
+                                        .value
                                 )
                             }
                             autoComplete="current-password"
@@ -241,15 +236,20 @@ export default function AdminLoginModal({
                     {status === 'error' &&
                         errorMessage && (
                             <p className="app-message app-message-error">
-                                ✕ {errorMessage}
+                                ✕{' '}
+                                {
+                                    errorMessage
+                                }
                             </p>
                         )}
 
-                    {status === 'success' && (
-                        <p className="app-message app-message-success">
-                            ✓ Logged in successfully.
-                        </p>
-                    )}
+                    {status ===
+                        'success' && (
+                            <p className="app-message app-message-success">
+                                ✓ Logged in
+                                successfully.
+                            </p>
+                        )}
 
                     <button
                         type="submit"
@@ -257,12 +257,15 @@ export default function AdminLoginModal({
                         disabled={
                             status ===
                             'submitting' ||
-                            status === 'success'
+                            status ===
+                            'success'
                         }
                     >
-                        {status === 'submitting'
+                        {status ===
+                            'submitting'
                             ? 'Signing in...'
-                            : status === 'success'
+                            : status ===
+                                'success'
                                 ? 'Logged In'
                                 : 'Sign In'}
                     </button>
@@ -274,7 +277,8 @@ export default function AdminLoginModal({
                         disabled={
                             status ===
                             'submitting' ||
-                            status === 'success'
+                            status ===
+                            'success'
                         }
                     >
                         Cancel
