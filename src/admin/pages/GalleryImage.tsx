@@ -246,14 +246,59 @@ function GalleryImage() {
         const controller =
             new AbortController();
 
-        void loadImages(
-            controller.signal
-        );
+        async function loadInitialImages() {
+            try {
+                const response =
+                    await apiFetch(
+                        '/api/gallery/admin/?skip=0&take=200',
+                        {
+                            signal:
+                                controller.signal,
+                        }
+                    );
+
+                if (!response.ok) {
+                    throw new Error(
+                        `Unable to load gallery images (${response.status}).`
+                    );
+                }
+
+                const data:
+                    GalleryImageDto[] =
+                    await response.json();
+
+                if (
+                    !controller.signal.aborted
+                ) {
+                    setImages(data);
+                }
+            } catch (err) {
+                if (
+                    (err as Error).name !==
+                        'AbortError' &&
+                    !controller.signal.aborted
+                ) {
+                    setError(
+                        err instanceof Error
+                            ? err.message
+                            : 'Unable to load gallery images.'
+                    );
+                }
+            } finally {
+                if (
+                    !controller.signal.aborted
+                ) {
+                    setLoading(false);
+                }
+            }
+        }
+
+        void loadInitialImages();
 
         return () => {
             controller.abort();
         };
-    }, [loadImages]);
+    }, []);
 
     useEffect(() => {
         return () => {

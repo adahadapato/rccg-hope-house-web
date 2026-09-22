@@ -1,6 +1,12 @@
-﻿import {useCallback, useEffect, useState,} from 'react';
+﻿import {
+    useCallback,
+    useEffect,
+    useState,
+} from 'react';
 
-import type { FormEvent, } from 'react';
+import type {
+    FormEvent,
+} from 'react';
 
 import { apiFetch } from '../../api/api';
 import AdminLayout from '../components/AdminLayout';
@@ -78,18 +84,13 @@ function GalleryCategory() {
 
     const loadCategories =
         useCallback(
-            async (
-                signal?: AbortSignal
-            ) => {
+            async () => {
                 try {
                     setError(null);
 
                     const response =
                         await apiFetch(
-                            '/api/gallery-categories/admin/',
-                            {
-                                signal,
-                            }
+                            '/api/gallery-categories/admin/'
                         );
 
                     if (!response.ok) {
@@ -116,21 +117,13 @@ function GalleryCategory() {
                         ordered
                     );
                 } catch (err) {
-                    if (
-                        (err as Error)
-                            .name !==
-                        'AbortError'
-                    ) {
-                        setError(
-                            'Unable to load gallery categories. Please try again.'
-                        );
-                    }
+                    setError(
+                        err instanceof Error
+                            ? err.message
+                            : 'Unable to load gallery categories. Please try again.'
+                    );
                 } finally {
-                    if (
-                        !signal?.aborted
-                    ) {
-                        setLoading(false);
-                    }
+                    setLoading(false);
                 }
             },
             []
@@ -140,14 +133,71 @@ function GalleryCategory() {
         const controller =
             new AbortController();
 
-        void loadCategories(
-            controller.signal
-        );
+        async function loadInitialCategories() {
+            try {
+                const response =
+                    await apiFetch(
+                        '/api/gallery-categories/admin/',
+                        {
+                            signal:
+                                controller.signal,
+                        }
+                    );
+
+                if (!response.ok) {
+                    throw new Error(
+                        `Failed to load gallery categories (${response.status})`
+                    );
+                }
+
+                const data:
+                    GalleryCategory[] =
+                    await response.json();
+
+                const ordered =
+                    [...data].sort(
+                        (a, b) =>
+                            a.displayOrder -
+                            b.displayOrder ||
+                            a.name.localeCompare(
+                                b.name
+                            )
+                    );
+
+                if (
+                    !controller.signal.aborted
+                ) {
+                    setCategories(
+                        ordered
+                    );
+                }
+            } catch (err) {
+                if (
+                    (err as Error).name !==
+                    'AbortError' &&
+                    !controller.signal.aborted
+                ) {
+                    setError(
+                        err instanceof Error
+                            ? err.message
+                            : 'Unable to load gallery categories. Please try again.'
+                    );
+                }
+            } finally {
+                if (
+                    !controller.signal.aborted
+                ) {
+                    setLoading(false);
+                }
+            }
+        }
+
+        void loadInitialCategories();
 
         return () => {
             controller.abort();
         };
-    }, [loadCategories]);
+    }, []);
 
     function openAddForm() {
         setEditingCategory(null);
@@ -459,9 +509,7 @@ function GalleryCategory() {
                             <span>
                                 {
                                     categories.filter(
-                                        (
-                                            category
-                                        ) =>
+                                        category =>
                                             category.isActive
                                     ).length
                                 }{' '}
@@ -471,9 +519,7 @@ function GalleryCategory() {
                             <span>
                                 {
                                     categories.filter(
-                                        (
-                                            category
-                                        ) =>
+                                        category =>
                                             !category.isActive
                                     ).length
                                 }{' '}
@@ -548,9 +594,7 @@ function GalleryCategory() {
 
                                 <tbody>
                                     {categories.map(
-                                        (
-                                            category
-                                        ) => (
+                                        category => (
                                             <tr
                                                 key={
                                                     category.id
@@ -665,9 +709,7 @@ function GalleryCategory() {
                         role="dialog"
                         aria-modal="true"
                         aria-labelledby="gallery-category-modal-title"
-                        onMouseDown={(
-                            event
-                        ) =>
+                        onMouseDown={event =>
                             event.stopPropagation()
                         }
                     >
@@ -720,13 +762,9 @@ function GalleryCategory() {
                                     value={
                                         form.name
                                     }
-                                    onChange={(
-                                        event
-                                    ) =>
+                                    onChange={event =>
                                         setForm(
-                                            (
-                                                current
-                                            ) => ({
+                                            current => ({
                                                 ...current,
                                                 name:
                                                     event
@@ -751,13 +789,9 @@ function GalleryCategory() {
                                     value={
                                         form.description
                                     }
-                                    onChange={(
-                                        event
-                                    ) =>
+                                    onChange={event =>
                                         setForm(
-                                            (
-                                                current
-                                            ) => ({
+                                            current => ({
                                                 ...current,
                                                 description:
                                                     event
@@ -784,13 +818,9 @@ function GalleryCategory() {
                                     value={
                                         form.displayOrder
                                     }
-                                    onChange={(
-                                        event
-                                    ) =>
+                                    onChange={event =>
                                         setForm(
-                                            (
-                                                current
-                                            ) => ({
+                                            current => ({
                                                 ...current,
                                                 displayOrder:
                                                     event

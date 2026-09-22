@@ -75,21 +75,30 @@ const navItems: NavigationItem[] = [
 ];
 
 function AdminSidebar() {
-    const currentPath = window.location.pathname;
+    const currentPath =
+        window.location.pathname;
 
     const galleryIsActive =
         currentPath === '/admin/gallery' ||
-        currentPath.startsWith('/admin/gallery/');
+        currentPath.startsWith(
+            '/admin/gallery/'
+        );
 
-    const [galleryOpen, setGalleryOpen] =
-        useState(galleryIsActive);
+    const [
+        galleryOpen,
+        setGalleryOpen,
+    ] = useState<boolean>(
+        galleryIsActive
+    );
 
-    function navigate(path?: string) {
+    function navigate(
+        path?: string
+    ) {
         if (!path) {
             return;
         }
 
-        window.location.href = path;
+        window.location.assign(path);
     }
 
     return (
@@ -111,127 +120,155 @@ function AdminSidebar() {
             </div>
 
             <nav className="admin-navigation">
-                {navItems.map((item) => {
-                    const hasChildren =
-                        Boolean(item.children?.length);
-
-                    const isGallery =
-                        item.label === 'Gallery';
-
-                    const isActive =
-                        item.path === '/admin'
-                            ? currentPath === '/admin' ||
-                            currentPath === '/admin/'
-                            : Boolean(
-                                item.path &&
-                                currentPath.startsWith(
-                                    item.path
-                                )
+                {navItems.map(
+                    item => {
+                        const hasChildren =
+                            Boolean(
+                                item.children
+                                    ?.length
                             );
 
-                    if (hasChildren && isGallery) {
-                        return (
-                            <div
-                                className="admin-nav-group"
-                                key={item.label}
-                            >
-                                <button
-                                    type="button"
-                                    className={`admin-nav-item ${galleryIsActive
-                                            ? 'active'
-                                            : ''
-                                        }`}
-                                    onClick={() =>
-                                        setGalleryOpen(
-                                            (current) =>
-                                                !current
-                                        )
-                                    }
-                                    aria-expanded={
-                                        galleryOpen
+                        const isGallery =
+                            item.label ===
+                            'Gallery';
+
+                        const isActive =
+                            item.path ===
+                                '/admin'
+                                ? currentPath ===
+                                '/admin' ||
+                                currentPath ===
+                                '/admin/'
+                                : Boolean(
+                                    item.path &&
+                                    currentPath.startsWith(
+                                        item.path
+                                    )
+                                );
+
+                        if (
+                            hasChildren &&
+                            isGallery
+                        ) {
+                            return (
+                                <div
+                                    className="admin-nav-group"
+                                    key={
+                                        item.label
                                     }
                                 >
-                                    <span className="admin-nav-icon">
-                                        {item.icon}
-                                    </span>
-
-                                    <span className="admin-nav-label">
-                                        {item.label}
-                                    </span>
-
-                                    <span
-                                        className={`admin-nav-chevron ${galleryOpen
-                                                ? 'open'
+                                    <button
+                                        type="button"
+                                        className={`admin-nav-item ${galleryIsActive
+                                                ? 'active'
                                                 : ''
                                             }`}
+                                        onClick={() =>
+                                            setGalleryOpen(
+                                                (
+                                                    current: boolean
+                                                ) =>
+                                                    !current
+                                            )
+                                        }
+                                        aria-expanded={
+                                            galleryOpen
+                                        }
                                     >
-                                        ›
-                                    </span>
-                                </button>
-
-                                {galleryOpen && (
-                                    <div className="admin-subnavigation">
-                                        {item.children?.map(
-                                            (child) => {
-                                                const childActive =
-                                                    currentPath ===
-                                                    child.path;
-
-                                                return (
-                                                    <button
-                                                        key={
-                                                            child.path
-                                                        }
-                                                        type="button"
-                                                        className={`admin-subnav-item ${childActive
-                                                                ? 'active'
-                                                                : ''
-                                                            }`}
-                                                        onClick={() =>
-                                                            navigate(
-                                                                child.path
-                                                            )
-                                                        }
-                                                    >
-                                                        <span className="admin-subnav-dot" />
-
-                                                        <span>
-                                                            {
-                                                                child.label
-                                                            }
-                                                        </span>
-                                                    </button>
-                                                );
+                                        <span className="admin-nav-icon">
+                                            {
+                                                item.icon
                                             }
-                                        )}
-                                    </div>
-                                )}
-                            </div>
+                                        </span>
+
+                                        <span className="admin-nav-label">
+                                            {
+                                                item.label
+                                            }
+                                        </span>
+
+                                        <span
+                                            className={`admin-nav-chevron ${galleryOpen
+                                                    ? 'open'
+                                                    : ''
+                                                }`}
+                                        >
+                                            ›
+                                        </span>
+                                    </button>
+
+                                    {galleryOpen && (
+                                        <div className="admin-subnavigation">
+                                            {item.children?.map(
+                                                child => {
+                                                    const childActive =
+                                                        currentPath ===
+                                                        child.path;
+
+                                                    return (
+                                                        <button
+                                                            key={
+                                                                child.path
+                                                            }
+                                                            type="button"
+                                                            className={`admin-subnav-item ${childActive
+                                                                    ? 'active'
+                                                                    : ''
+                                                                }`}
+                                                            onClick={() =>
+                                                                navigate(
+                                                                    child.path
+                                                                )
+                                                            }
+                                                        >
+                                                            <span className="admin-subnav-dot" />
+
+                                                            <span>
+                                                                {
+                                                                    child.label
+                                                                }
+                                                            </span>
+                                                        </button>
+                                                    );
+                                                }
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        }
+
+                        return (
+                            <button
+                                key={
+                                    item.label
+                                }
+                                type="button"
+                                className={`admin-nav-item ${isActive
+                                        ? 'active'
+                                        : ''
+                                    }`}
+                                onClick={() =>
+                                    navigate(
+                                        item.path
+                                    )
+                                }
+                            >
+                                <span className="admin-nav-icon">
+                                    {
+                                        item.icon
+                                    }
+                                </span>
+
+                                <span>
+                                    {
+                                        item.label
+                                    }
+                                </span>
+                            </button>
                         );
                     }
-
-                    return (
-                        <button
-                            key={item.label}
-                            type="button"
-                            className={`admin-nav-item ${isActive
-                                    ? 'active'
-                                    : ''
-                                }`}
-                            onClick={() =>
-                                navigate(item.path)
-                            }
-                        >
-                            <span className="admin-nav-icon">
-                                {item.icon}
-                            </span>
-
-                            <span>
-                                {item.label}
-                            </span>
-                        </button>
-                    );
-                })}
+                )}
             </nav>
 
             <div className="admin-sidebar-footer">
