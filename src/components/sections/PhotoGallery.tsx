@@ -332,8 +332,7 @@ export default function PhotoGallery() {
             const currentLeft =
                 track.scrollLeft;
 
-            let targetLeft =
-                currentLeft;
+            let targetLeft: number;
 
             if (direction === 'next') {
                 const nextCard =
