@@ -2,7 +2,9 @@
     useCallback,
     useEffect,
     useMemo,
-    useState
+    useRef,
+    useState,
+    type CSSProperties
 } from 'react';
 
 import useGallery, {
@@ -15,7 +17,6 @@ import { apiUrl } from '@/api/api';
 
 const INITIAL_VISIBLE_IMAGES = 9;
 const LOAD_MORE_COUNT = 9;
-const FEATURED_ROTATION_MS = 5000;
 
 function getImageUrl(path: string | null | undefined): string {
     if (!path) {
@@ -52,6 +53,21 @@ function formatEventDate(
     }).format(parsedDate);
 }
 
+function getAspectRatioStyle(
+    image: GalleryFeedImage
+): CSSProperties {
+    const safeWidth =
+        image.width > 0 ? image.width : 4;
+
+    const safeHeight =
+        image.height > 0 ? image.height : 3;
+
+    return {
+        '--gallery-aspect-ratio':
+            safeWidth / safeHeight
+    } as CSSProperties;
+}
+
 export default function PhotoGallery() {
     const {
         images,
@@ -65,9 +81,6 @@ export default function PhotoGallery() {
 
     const [visibleCount, setVisibleCount] =
         useState(INITIAL_VISIBLE_IMAGES);
-
-    const [featuredIndex, setFeaturedIndex] =
-        useState(0);
 
     const [selectedImageId, setSelectedImageId] =
         useState<string | null>(null);
@@ -107,15 +120,6 @@ export default function PhotoGallery() {
         );
     }, [images, selectedCategory]);
 
-    /*
-     * Only photographs explicitly marked as Featured
-     * participate in the Featured Moments carousel.
-     *
-     * If there are no explicitly featured photographs,
-     * show the first public photograph as a static
-     * fallback instead of turning ordinary gallery
-     * photographs into a carousel.
-     */
     const featuredImages = useMemo(() => {
         const explicitlyFeatured = images.filter(
             (image) => image.isFeatured
@@ -138,16 +142,6 @@ export default function PhotoGallery() {
     const hasMultipleFeaturedImages =
         featuredImages.length > 1;
 
-    const safeFeaturedIndex =
-        featuredImages.length === 0
-            ? 0
-            : featuredIndex % featuredImages.length;
-
-    const currentFeaturedImage =
-        featuredImages.length > 0
-            ? featuredImages[safeFeaturedIndex]
-            : null;
-
     const currentSelectedFeedImage = useMemo(
         () =>
             selectedImageId
@@ -159,29 +153,6 @@ export default function PhotoGallery() {
         [images, selectedImageId]
     );
 
-    /*
-     * Auto-rotation only exists when there are at least
-     * two featured photographs.
-     */
-    useEffect(() => {
-        if (!hasMultipleFeaturedImages) {
-            return;
-        }
-
-        const timer = window.setInterval(() => {
-            setFeaturedIndex((current) =>
-                (current + 1) % featuredImages.length
-            );
-        }, FEATURED_ROTATION_MS);
-
-        return () => {
-            window.clearInterval(timer);
-        };
-    }, [
-        featuredImages.length,
-        hasMultipleFeaturedImages
-    ]);
-
     const handleCategoryChange = useCallback(
         (category: string) => {
             setSelectedCategory(category);
@@ -190,32 +161,250 @@ export default function PhotoGallery() {
         []
     );
 
-    const showPreviousFeatured = useCallback(() => {
-        if (featuredImages.length <= 1) {
-            return;
+    const featuredTrackRef =
+        useRef<HTMLDivElement | null>(null);
+
+    const featuredPausedRef =
+        useRef(false);
+
+    const featuredCarouselImages = useMemo(
+        () =>
+            hasMultipleFeaturedImages
+                ? [
+                    ...featuredImages,
+                    ...featuredImages
+                ]
+                : featuredImages,
+        [
+            featuredImages,
+            hasMultipleFeaturedImages
+        ]
+    );
+
+    const getFeaturedLoopWidth = useCallback(() => {
+        const track = featuredTrackRef.current;
+
+        if (
+            !track ||
+            !hasMultipleFeaturedImages
+        ) {
+            return 0;
         }
 
-        setFeaturedIndex((current) => {
-            const safeCurrent =
-                current % featuredImages.length;
-
-            return safeCurrent === 0
-                ? featuredImages.length - 1
-                : safeCurrent - 1;
-        });
-    }, [featuredImages.length]);
-
-    const showNextFeatured = useCallback(() => {
-        if (featuredImages.length <= 1) {
-            return;
-        }
-
-        setFeaturedIndex(
-            (current) =>
-                (current + 1) %
-                featuredImages.length
+        const cards = Array.from(
+            track.querySelectorAll<HTMLElement>(
+                '.featured-gallery-card'
+            )
         );
-    }, [featuredImages.length]);
+
+        if (
+            cards.length <=
+            featuredImages.length
+        ) {
+            return 0;
+        }
+
+        return (
+            cards[featuredImages.length]
+                .offsetLeft -
+            cards[0].offsetLeft
+        );
+    }, [
+        featuredImages.length,
+        hasMultipleFeaturedImages
+    ]);
+
+    useEffect(() => {
+        const track = featuredTrackRef.current;
+
+        if (
+            !track ||
+            !hasMultipleFeaturedImages
+        ) {
+            return;
+        }
+
+        let cancelled = false;
+
+        const initialise = () => {
+            if (cancelled) {
+                return;
+            }
+
+            const loopWidth =
+                getFeaturedLoopWidth();
+
+            if (loopWidth > 0) {
+                track.scrollLeft = 0;
+            }
+        };
+
+        const frame =
+            window.requestAnimationFrame(
+                initialise
+            );
+
+        return () => {
+            cancelled = true;
+            window.cancelAnimationFrame(frame);
+        };
+    }, [
+        getFeaturedLoopWidth,
+        hasMultipleFeaturedImages
+    ]);
+
+    useEffect(() => {
+        const track = featuredTrackRef.current;
+
+        if (
+            !track ||
+            !hasMultipleFeaturedImages
+        ) {
+            return;
+        }
+
+        const AUTO_SCROLL_INTERVAL_MS = 35;
+        const AUTO_SCROLL_STEP_PX = 1;
+
+        const timer = window.setInterval(() => {
+            if (featuredPausedRef.current) {
+                return;
+            }
+
+            const loopWidth =
+                getFeaturedLoopWidth();
+
+            if (loopWidth <= 0) {
+                return;
+            }
+
+            const nextPosition =
+                track.scrollLeft +
+                AUTO_SCROLL_STEP_PX;
+
+            if (nextPosition >= loopWidth) {
+                track.scrollLeft =
+                    nextPosition - loopWidth;
+            } else {
+                track.scrollLeft =
+                    nextPosition;
+            }
+        }, AUTO_SCROLL_INTERVAL_MS);
+
+        return () => {
+            window.clearInterval(timer);
+        };
+    }, [
+        getFeaturedLoopWidth,
+        hasMultipleFeaturedImages
+    ]);
+
+    const moveFeaturedByCard = useCallback(
+        (
+            direction:
+                | 'previous'
+                | 'next'
+        ) => {
+            const track =
+                featuredTrackRef.current;
+
+            if (!track) {
+                return;
+            }
+
+            const loopWidth =
+                getFeaturedLoopWidth();
+
+            if (loopWidth <= 0) {
+                return;
+            }
+
+            const cards = Array.from(
+                track.querySelectorAll<HTMLElement>(
+                    '.featured-gallery-card'
+                )
+            );
+
+            if (cards.length === 0) {
+                return;
+            }
+
+            const currentLeft =
+                track.scrollLeft;
+
+            let targetLeft =
+                currentLeft;
+
+            if (direction === 'next') {
+                const nextCard =
+                    cards.find(
+                        (card) =>
+                            card.offsetLeft >
+                            currentLeft + 12
+                    );
+
+                targetLeft =
+                    nextCard
+                        ? nextCard.offsetLeft
+                        : currentLeft + 280;
+            } else {
+                const previousCards =
+                    cards.filter(
+                        (card) =>
+                            card.offsetLeft <
+                            currentLeft - 12
+                    );
+
+                const previousCard =
+                    previousCards[
+                    previousCards.length - 1
+                    ];
+
+                targetLeft =
+                    previousCard
+                        ? previousCard.offsetLeft
+                        : currentLeft - 280;
+            }
+
+            if (targetLeft >= loopWidth) {
+                targetLeft -= loopWidth;
+            }
+
+            if (targetLeft < 0) {
+                targetLeft += loopWidth;
+            }
+
+            track.scrollTo({
+                left: targetLeft,
+                behavior: 'smooth'
+            });
+        },
+        [getFeaturedLoopWidth]
+    );
+
+    const showPreviousFeatured =
+        useCallback(() => {
+            moveFeaturedByCard(
+                'previous'
+            );
+        }, [moveFeaturedByCard]);
+
+    const showNextFeatured =
+        useCallback(() => {
+            moveFeaturedByCard('next');
+        }, [moveFeaturedByCard]);
+
+    const pauseFeaturedCarousel =
+        useCallback(() => {
+            featuredPausedRef.current =
+                true;
+        }, []);
+
+    const resumeFeaturedCarousel =
+        useCallback(() => {
+            featuredPausedRef.current =
+                false;
+        }, []);
 
     const openLightbox = useCallback(
         async (imageId: string) => {
@@ -462,7 +651,7 @@ export default function PhotoGallery() {
                         !error &&
                         images.length > 0 && (
                             <>
-                                {currentFeaturedImage && (
+                                {featuredImages.length > 0 && (
                                     <section className="featured-gallery-section">
                                         <div className="gallery-section-heading">
                                             <span className="gallery-section-eyebrow">
@@ -488,60 +677,92 @@ export default function PhotoGallery() {
                                                     onClick={
                                                         showPreviousFeatured
                                                     }
-                                                    aria-label="Previous featured photograph"
+                                                    aria-label="Scroll featured photographs left"
                                                 >
                                                     ‹
                                                 </button>
                                             )}
 
-                                            <button
-                                                type="button"
-                                                className="featured-gallery-main"
-                                                onClick={() =>
-                                                    void openLightbox(
-                                                        currentFeaturedImage.id
-                                                    )
-                                                }
-                                                aria-label={`Open ${currentFeaturedImage.title}`}
+                                            <div
+                                                ref={featuredTrackRef}
+                                                className="featured-gallery-track"
                                             >
-                                                <img
-                                                    src={getImageUrl(
-                                                        currentFeaturedImage.thumbnailPath
-                                                    )}
-                                                    alt={
-                                                        currentFeaturedImage.altText ||
-                                                        currentFeaturedImage.title
+                                                {featuredCarouselImages.map(
+                                                    (image, carouselIndex) => {
+                                                        const date =
+                                                            formatEventDate(
+                                                                image.eventDate
+                                                            );
+
+                                                        return (
+                                                            <button
+                                                                key={`${image.id}-${carouselIndex}`}
+                                                                type="button"
+                                                                className="featured-gallery-card"
+                                                                style={
+                                                                    getAspectRatioStyle(
+                                                                        image
+                                                                    )
+                                                                }
+                                                                onMouseEnter={
+                                                                    pauseFeaturedCarousel
+                                                                }
+                                                                onMouseLeave={
+                                                                    resumeFeaturedCarousel
+                                                                }
+                                                                onFocus={
+                                                                    pauseFeaturedCarousel
+                                                                }
+                                                                onBlur={
+                                                                    resumeFeaturedCarousel
+                                                                }
+                                                                onClick={() =>
+                                                                    void openLightbox(
+                                                                        image.id
+                                                                    )
+                                                                }
+                                                                aria-label={`Open ${image.title}`}
+                                                            >
+                                                                <img
+                                                                    src={getImageUrl(
+                                                                        image.thumbnailPath
+                                                                    )}
+                                                                    alt={
+                                                                        image.altText ||
+                                                                        image.title
+                                                                    }
+                                                                />
+
+                                                                <div className="featured-gallery-shade" />
+
+                                                                <div className="featured-gallery-caption">
+                                                                    {image.categoryName && (
+                                                                        <span className="featured-gallery-category">
+                                                                            {
+                                                                                image.categoryName
+                                                                            }
+                                                                        </span>
+                                                                    )}
+
+                                                                    <h4>
+                                                                        {
+                                                                            image.title
+                                                                        }
+                                                                    </h4>
+
+                                                                    {date && (
+                                                                        <span className="featured-gallery-date">
+                                                                            {
+                                                                                date
+                                                                            }
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                            </button>
+                                                        );
                                                     }
-                                                />
-
-                                                <div className="featured-gallery-shade" />
-
-                                                <div className="featured-gallery-caption">
-                                                    {currentFeaturedImage.categoryName && (
-                                                        <span className="featured-gallery-category">
-                                                            {
-                                                                currentFeaturedImage.categoryName
-                                                            }
-                                                        </span>
-                                                    )}
-
-                                                    <h4>
-                                                        {
-                                                            currentFeaturedImage.title
-                                                        }
-                                                    </h4>
-
-                                                    {formatEventDate(
-                                                        currentFeaturedImage.eventDate
-                                                    ) && (
-                                                            <span className="featured-gallery-date">
-                                                                {formatEventDate(
-                                                                    currentFeaturedImage.eventDate
-                                                                )}
-                                                            </span>
-                                                        )}
-                                                </div>
-                                            </button>
+                                                )}
+                                            </div>
 
                                             {hasMultipleFeaturedImages && (
                                                 <button
@@ -550,45 +771,12 @@ export default function PhotoGallery() {
                                                     onClick={
                                                         showNextFeatured
                                                     }
-                                                    aria-label="Next featured photograph"
+                                                    aria-label="Scroll featured photographs right"
                                                 >
                                                     ›
                                                 </button>
                                             )}
                                         </div>
-
-                                        {hasMultipleFeaturedImages && (
-                                            <div
-                                                className="featured-gallery-dots"
-                                                aria-label="Featured gallery navigation"
-                                            >
-                                                {featuredImages.map(
-                                                    (
-                                                        image,
-                                                        index
-                                                    ) => (
-                                                        <button
-                                                            key={
-                                                                image.id
-                                                            }
-                                                            type="button"
-                                                            className={`featured-gallery-dot ${index ===
-                                                                    safeFeaturedIndex
-                                                                    ? 'active'
-                                                                    : ''
-                                                                }`}
-                                                            onClick={() =>
-                                                                setFeaturedIndex(
-                                                                    index
-                                                                )
-                                                            }
-                                                            aria-label={`Show featured photograph ${index + 1
-                                                                }`}
-                                                        />
-                                                    )
-                                                )}
-                                            </div>
-                                        )}
                                     </section>
                                 )}
 
@@ -622,9 +810,9 @@ export default function PhotoGallery() {
                                                     }
                                                     type="button"
                                                     className={`gallery-filter-button ${selectedCategory ===
-                                                            category
-                                                            ? 'active'
-                                                            : ''
+                                                        category
+                                                        ? 'active'
+                                                        : ''
                                                         }`}
                                                     onClick={() =>
                                                         handleCategoryChange(
@@ -896,6 +1084,7 @@ function GalleryCard({
             type="button"
             className={`public-gallery-card gallery-card-${index % 5
                 }`}
+            style={getAspectRatioStyle(image)}
             onClick={onOpen}
             aria-label={`Open ${image.title}`}
         >

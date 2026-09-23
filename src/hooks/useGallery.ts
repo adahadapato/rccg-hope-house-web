@@ -10,6 +10,8 @@ export interface GalleryFeedImage {
     categoryId: string | null;
     categoryName: string | null;
     tags: string[];
+    width: number;
+    height: number;
     isFeatured: boolean;
     eventDate: string | null;
     displayOrder: number;
@@ -19,8 +21,6 @@ export interface GalleryImageDetail extends GalleryFeedImage {
     description: string | null;
     imagePath: string;
     fileSizeBytes: number;
-    width: number;
-    height: number;
     isPublic: boolean;
     photographer: string | null;
     viewCount: number;
@@ -96,9 +96,12 @@ export default function useGallery(): UseGalleryResult {
 
         const initialiseGallery = async () => {
             try {
-                const response = await apiFetch(GALLERY_FEED_URL, {
-                    signal: controller.signal
-                });
+                const response = await apiFetch(
+                    GALLERY_FEED_URL,
+                    {
+                        signal: controller.signal
+                    }
+                );
 
                 if (!response.ok) {
                     throw new Error(
@@ -155,7 +158,9 @@ export default function useGallery(): UseGalleryResult {
 export async function getGalleryImageDetail(
     id: string
 ): Promise<GalleryImageDetail> {
-    const response = await apiFetch(`/api/gallery/${id}`);
+    const response = await apiFetch(
+        `/api/gallery/${id}`
+    );
 
     if (!response.ok) {
         throw new Error(
