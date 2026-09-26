@@ -255,7 +255,9 @@ function ProphecyCategories() {
         const controller =
             new AbortController();
 
-        void loadYears(controller.signal);
+        void Promise.resolve().then(() =>
+            loadYears(controller.signal)
+        );
 
         return () => {
             controller.abort();
@@ -263,17 +265,14 @@ function ProphecyCategories() {
     }, [loadYears]);
 
     useEffect(() => {
-        if (!selectedYearId) {
-            setCategories([]);
-            return;
-        }
-
         const controller =
             new AbortController();
 
-        void loadCategories(
-            selectedYearId,
-            controller.signal
+        void Promise.resolve().then(() =>
+            loadCategories(
+                selectedYearId,
+                controller.signal
+            )
         );
 
         return () => {

@@ -1,5 +1,4 @@
 ﻿import {
-    useEffect,
     useState,
 } from 'react';
 
@@ -178,38 +177,6 @@ function AdminSidebar({
         initiallyOpenGroups
     );
 
-    useEffect(() => {
-        const activeGroups =
-            navItems
-                .filter(item =>
-                    item.children?.some(
-                        child =>
-                            pathMatches(
-                                currentPath,
-                                child.path
-                            )
-                    )
-                )
-                .map(item => item.label);
-
-        if (
-            activeGroups.length === 0
-        ) {
-            return;
-        }
-
-        setOpenGroups(current => {
-            const next =
-                new Set(current);
-
-            activeGroups.forEach(
-                group =>
-                    next.add(group)
-            );
-
-            return Array.from(next);
-        });
-    }, [currentPath]);
 
     function navigate(
         path?: string
@@ -244,8 +211,8 @@ function AdminSidebar({
     return (
         <aside
             className={`admin-sidebar ${mobileOpen
-                    ? 'mobile-open'
-                    : ''
+                ? 'mobile-open'
+                : ''
                 }`}
         >
             <div className="admin-brand">
@@ -306,8 +273,8 @@ function AdminSidebar({
                                     }
                                     type="button"
                                     className={`admin-nav-item ${active
-                                            ? 'active'
-                                            : ''
+                                        ? 'active'
+                                        : ''
                                         }`}
                                     onClick={() =>
                                         navigate(
@@ -354,8 +321,8 @@ function AdminSidebar({
                                 <button
                                     type="button"
                                     className={`admin-nav-item ${groupActive
-                                            ? 'active'
-                                            : ''
+                                        ? 'active'
+                                        : ''
                                         }`}
                                     onClick={() =>
                                         toggleGroup(
@@ -380,8 +347,8 @@ function AdminSidebar({
 
                                     <span
                                         className={`admin-nav-chevron ${groupOpen
-                                                ? 'open'
-                                                : ''
+                                            ? 'open'
+                                            : ''
                                             }`}
                                         aria-hidden="true"
                                     >
@@ -411,8 +378,8 @@ function AdminSidebar({
                                                         }
                                                         type="button"
                                                         className={`admin-subnav-item ${childActive
-                                                                ? 'active'
-                                                                : ''
+                                                            ? 'active'
+                                                            : ''
                                                             } ${!available
                                                                 ? 'admin-subnav-item-disabled'
                                                                 : ''
