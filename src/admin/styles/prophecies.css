@@ -1,0 +1,395 @@
+.prophecies-admin-page {
+    width: 100%;
+}
+
+.prophecies-admin-header {
+    margin-bottom: 24px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+    .prophecies-admin-header h1 {
+        margin: 5px 0 7px;
+        color: #0b1941;
+        font-size: clamp(27px, 3vw, 34px);
+    }
+
+    .prophecies-admin-header p {
+        max-width: 720px;
+        margin: 0;
+        color: #68738c;
+        line-height: 1.55;
+    }
+
+.prophecy-year-tabs {
+    margin-bottom: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.prophecy-year-tab {
+    min-width: 112px;
+    padding: 11px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    border: 1px solid #dfe4ed;
+    border-radius: 10px;
+    background: #fff;
+    color: #253451;
+    font: inherit;
+    cursor: pointer;
+}
+
+    .prophecy-year-tab:hover {
+        border-color: #b8c8e6;
+        background: #f8faff;
+    }
+
+    .prophecy-year-tab.active {
+        border-color: #5d83d0;
+        background: #eef4ff;
+        box-shadow: 0 0 0 3px rgba(63,125,232,.08);
+    }
+
+    .prophecy-year-tab strong {
+        font-size: 15px;
+    }
+
+    .prophecy-year-tab span {
+        padding: 4px 7px;
+        border-radius: 999px;
+        font-size: 9px;
+        font-weight: 700;
+    }
+
+    .prophecy-year-tab .published, .prophecy-publication-badge.published {
+        background: #e5f7ec;
+        color: #167747;
+    }
+
+    .prophecy-year-tab .draft, .prophecy-publication-badge.draft {
+        background: #f1f2f5;
+        color: #687181;
+    }
+
+.prophecy-summary-grid {
+    margin-bottom: 18px;
+    display: grid;
+    grid-template-columns: repeat(4,minmax(0,1fr));
+    gap: 14px;
+}
+
+.prophecy-summary-card {
+    min-height: 88px;
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    border: 1px solid #e8ebf2;
+    border-radius: 13px;
+    background: #fff;
+    box-shadow: 0 3px 12px rgba(28,44,79,.04);
+}
+
+    .prophecy-summary-card > span {
+        width: 42px;
+        height: 42px;
+        flex: 0 0 42px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        background: #edf3ff;
+        color: #3b6dcc;
+    }
+
+    .prophecy-summary-card div {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .prophecy-summary-card strong {
+        color: #10204a;
+        font-size: 22px;
+    }
+
+    .prophecy-summary-card small {
+        color: #748097;
+        font-size: 11px;
+    }
+
+.prophecy-year-panel {
+    padding: 0;
+    overflow: hidden;
+}
+
+.prophecy-year-panel-header {
+    padding: 20px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    border-bottom: 1px solid #e8ebf2;
+}
+
+.prophecy-year-title-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+    .prophecy-year-title-row h2 {
+        margin: 0;
+        color: #11204a;
+        font-size: 20px;
+    }
+
+.prophecy-year-panel-header p {
+    margin: 6px 0 0;
+    color: #778298;
+    font-size: 12px;
+}
+
+.prophecy-publication-badge {
+    padding: 5px 9px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.prophecy-year-actions, .prophecy-category-actions, .prophecy-item-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.prophecy-category-toolbar {
+    padding: 17px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    background: #fafbfe;
+    border-bottom: 1px solid #e8ebf2;
+}
+
+    .prophecy-category-toolbar h3 {
+        margin: 0 0 3px;
+        color: #172447;
+        font-size: 15px;
+    }
+
+    .prophecy-category-toolbar p {
+        margin: 0;
+        color: #7a859a;
+        font-size: 11px;
+    }
+
+.prophecy-category-list {
+    padding: 18px;
+    display: grid;
+    gap: 16px;
+    background: #f8f9fc;
+}
+
+.prophecy-category-card {
+    overflow: hidden;
+    border: 1px solid #e0e5ee;
+    border-radius: 12px;
+    background: #fff;
+}
+
+    .prophecy-category-card.inactive {
+        opacity: .72;
+    }
+
+.prophecy-category-header {
+    padding: 16px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.prophecy-category-heading {
+    min-width: 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.prophecy-order-badge {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    display: grid;
+    place-items: center;
+    border-radius: 9px;
+    background: #eef3fd;
+    color: #4165a8;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.prophecy-category-name-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+    .prophecy-category-name-row h3 {
+        margin: 0;
+        color: #172447;
+        font-size: 16px;
+    }
+
+.prophecy-category-heading p {
+    margin: 5px 0 0;
+    color: #738096;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.prophecy-small-primary {
+    min-height: 31px;
+    padding: 0 10px;
+    font-size: 10px;
+}
+
+.prophecy-item-list {
+    display: grid;
+}
+
+.prophecy-admin-item {
+    padding: 14px 16px;
+    display: grid;
+    grid-template-columns: 42px minmax(0,1fr) auto;
+    align-items: flex-start;
+    gap: 12px;
+    border-bottom: 1px solid #edf0f4;
+}
+
+    .prophecy-admin-item:last-child {
+        border-bottom: 0;
+    }
+
+    .prophecy-admin-item.inactive {
+        background: #fafafa;
+        opacity: .68;
+    }
+
+.prophecy-item-number {
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #fff4d8;
+    color: #a66b00;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.prophecy-item-content {
+    min-width: 0;
+}
+
+    .prophecy-item-content p {
+        margin: 1px 0 8px;
+        color: #33415d;
+        font-size: 13px;
+        line-height: 1.6;
+        white-space: pre-wrap;
+    }
+
+.prophecy-item-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    color: #8a94a6;
+    font-size: 10px;
+}
+
+    .prophecy-item-meta .active-text {
+        color: #18804b;
+        font-weight: 700;
+    }
+
+    .prophecy-item-meta .inactive-text {
+        color: #8b5360;
+        font-weight: 700;
+    }
+
+.prophecy-empty-category {
+    padding: 22px 16px;
+    color: #8490a3;
+    font-size: 12px;
+    text-align: center;
+}
+
+.prophecy-loading-panel {
+    min-height: 250px;
+}
+
+.prophecy-compact-modal {
+    width: min(470px,100%);
+}
+
+.prophecy-item-modal {
+    width: min(680px,100%);
+}
+
+@media (max-width: 1050px) {
+    .prophecy-summary-grid {
+        grid-template-columns: repeat(2,minmax(0,1fr));
+    }
+
+    .prophecy-category-header {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 760px) {
+    .prophecies-admin-header, .prophecy-year-panel-header, .prophecy-category-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+        .prophecies-admin-header .admin-primary-button, .prophecy-category-toolbar .admin-primary-button {
+            align-self: flex-start;
+        }
+
+    .prophecy-admin-item {
+        grid-template-columns: 38px minmax(0,1fr);
+    }
+
+    .prophecy-item-actions {
+        grid-column: 2;
+    }
+}
+
+@media (max-width: 520px) {
+    .prophecy-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .prophecy-year-tab {
+        flex: 1 1 100%;
+    }
+
+    .prophecy-category-list {
+        padding: 10px;
+    }
+
+    .prophecy-category-actions, .prophecy-year-actions {
+        width: 100%;
+    }
+}

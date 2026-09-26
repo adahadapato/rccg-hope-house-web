@@ -1,6 +1,167 @@
-﻿export default function ThemeOfTheYear() {
+﻿import { useEffect, useState } from 'react';
+import { apiFetch } from '@/api/api';
+
+interface ThemeOfTheYearDto {
+    id: string;
+    year: number;
+    themeTitle: string;
+    scriptureText: string;
+    scriptureReference: string;
+    primaryDescription: string;
+    secondaryDescription: string | null;
+    callToActionText: string | null;
+}
+
+export default function ThemeOfTheYear() {
+    const [theme, setTheme] = useState<ThemeOfTheYearDto | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        let cancelled = false;
+
+        async function loadTheme() {
+            try {
+                setLoading(true);
+                setError(null);
+
+                const response = await apiFetch(
+                    '/api/themes-of-the-year/current'
+                );
+
+                if (!response.ok) {
+                    throw new Error(
+                        `Unable to load Theme of the Year (${response.status}).`
+                    );
+                }
+
+                const data =
+                    (await response.json()) as ThemeOfTheYearDto;
+
+                if (!cancelled) {
+                    setTheme(data);
+                }
+            } catch (err) {
+                if (!cancelled) {
+                    console.error(
+                        'Failed to load Theme of the Year:',
+                        err
+                    );
+
+                    setError(
+                        'The Theme of the Year is temporarily unavailable.'
+                    );
+                }
+            } finally {
+                if (!cancelled) {
+                    setLoading(false);
+                }
+            }
+        }
+
+        void loadTheme();
+
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
+    if (loading) {
+        return (
+            <section
+                id="theme-of-year"
+                className="section theme-of-year-section"
+            >
+                <div className="theme-bg-elements">
+                    <div className="floating-shape shape-1"></div>
+                    <div className="floating-shape shape-2"></div>
+                    <div className="glow-orb orb-1"></div>
+                </div>
+
+                <div className="container">
+                    <div className="theme-centered-content">
+                        <div className="theme-header-animated">
+                            <div className="theme-label">
+                                <span className="label-line"></span>
+                                <span>ANNUAL THEME</span>
+                                <span className="label-line"></span>
+                            </div>
+
+                            <h2 className="theme-main-title centered">
+                                <span className="title-word">THEME</span>
+                                <span className="title-word">OF THE</span>
+                                <span className="title-word highlight">
+                                    YEAR
+                                </span>
+                            </h2>
+
+                            <div className="theme-divider">
+                                <div className="divider-line"></div>
+                                <div className="divider-icon">✦</div>
+                                <div className="divider-line"></div>
+                            </div>
+
+                            <p className="theme-subtitle centered">
+                                Loading annual theme...
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
+    if (error || !theme) {
+        return (
+            <section
+                id="theme-of-year"
+                className="section theme-of-year-section"
+            >
+                <div className="theme-bg-elements">
+                    <div className="floating-shape shape-1"></div>
+                    <div className="floating-shape shape-2"></div>
+                    <div className="glow-orb orb-1"></div>
+                </div>
+
+                <div className="container">
+                    <div className="theme-centered-content">
+                        <div className="theme-header-animated">
+                            <div className="theme-label">
+                                <span className="label-line"></span>
+                                <span>ANNUAL THEME</span>
+                                <span className="label-line"></span>
+                            </div>
+
+                            <h2 className="theme-main-title centered">
+                                <span className="title-word">THEME</span>
+                                <span className="title-word">OF THE</span>
+                                <span className="title-word highlight">
+                                    YEAR
+                                </span>
+                            </h2>
+
+                            <div className="theme-divider">
+                                <div className="divider-line"></div>
+                                <div className="divider-icon">✦</div>
+                                <div className="divider-line"></div>
+                            </div>
+
+                            <p className="theme-subtitle centered">
+                                {error ??
+                                    'The Theme of the Year is temporarily unavailable.'}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
     return (
-        <section id="theme-of-year" className="section theme-of-year-section">
+        <section
+            id="theme-of-year"
+            className="section theme-of-year-section"
+        >
             {/* Animated Background Elements */}
             <div className="theme-bg-elements">
                 <div className="floating-shape shape-1"></div>
@@ -14,29 +175,41 @@
                     <div className="theme-header-animated">
                         <div className="theme-label">
                             <span className="label-line"></span>
-                            <span>ANNUAL THEME</span>
+                            <span>ANNUAL THEME {theme.year}</span>
                             <span className="label-line"></span>
                         </div>
+
                         <h2 className="theme-main-title centered">
                             <span className="title-word">THEME</span>
                             <span className="title-word">OF THE</span>
-                            <span className="title-word highlight">YEAR</span>
+                            <span className="title-word highlight">
+                                YEAR
+                            </span>
                         </h2>
+
                         <div className="theme-divider">
                             <div className="divider-line"></div>
                             <div className="divider-icon">✦</div>
                             <div className="divider-line"></div>
                         </div>
-                        <h3 className="theme-subtitle centered">"A Brand New Beginning"</h3>
+
+                        <h3 className="theme-subtitle centered">
+                            {theme.themeTitle}
+                        </h3>
                     </div>
 
                     {/* Scripture with Style */}
                     <div className="theme-scripture-box centered">
                         <div className="scripture-icon">📖</div>
+
                         <blockquote className="scripture-text">
-                            "Forget the former things; do not dwell on the past. See, I am doing a new thing! Now it springs up; do you not perceive it? I am making a way in the wilderness and streams in the wasteland."
+                            &ldquo;{theme.scriptureText}&rdquo;
                         </blockquote>
-                        <cite className="scripture-reference">Isaiah 43:18-19 (NIV)</cite>
+
+                        <cite className="scripture-reference">
+                            {theme.scriptureReference}
+                        </cite>
+
                         <div className="scripture-accent"></div>
                     </div>
 
@@ -44,36 +217,51 @@
                     <div className="theme-description-container centered">
                         <div className="description-card">
                             <div className="card-icon">✨</div>
+
                             <p className="description-text">
-                                According to prophecy for the year 2026 as declared by our father in the Lord (Daddy GO), we are in a season of a Brand-New beginning. <span className="highlight-text">To God be all the glory.</span>
+                                {theme.primaryDescription}
                             </p>
                         </div>
 
-                        <div className="description-divider">
-                            <div className="divider-dot"></div>
-                            <div className="divider-line"></div>
-                            <div className="divider-dot"></div>
-                        </div>
+                        {theme.secondaryDescription && (
+                            <>
+                                <div className="description-divider">
+                                    <div className="divider-dot"></div>
+                                    <div className="divider-line"></div>
+                                    <div className="divider-dot"></div>
+                                </div>
 
-                        <div className="description-card secondary">
-                            <div className="card-accent"></div>
-                            <p className="description-text">
-                                More so, in agreement with the above text, the Lord is set to do a new thing. Let us put the ugly past behind us and be expectant for brand new things from the Lord, by living a brand-new life of complete obedience in holy living, good works, in giving of praises, thanksgiving and supplications.
-                            </p>
-                            <div className="card-footer">
-                                <span className="footer-icon">🙌</span>
-                            </div>
-                        </div>
+                                <div className="description-card secondary">
+                                    <div className="card-accent"></div>
+
+                                    <p className="description-text">
+                                        {theme.secondaryDescription}
+                                    </p>
+
+                                    <div className="card-footer">
+                                        <span className="footer-icon">
+                                            🙌
+                                        </span>
+                                    </div>
+                                </div>
+                            </>
+                        )}
                     </div>
 
                     {/* Call to Action */}
-                    <div className="theme-cta-box centered">
-                        <div className="cta-content">
-                            <div className="cta-icon">🙏</div>
-                            <p className="cta-text">Join us as we embark on this transformative journey!</p>
+                    {theme.callToActionText && (
+                        <div className="theme-cta-box centered">
+                            <div className="cta-content">
+                                <div className="cta-icon">🙏</div>
+
+                                <p className="cta-text">
+                                    {theme.callToActionText}
+                                </p>
+                            </div>
+
+                            <div className="cta-decoration"></div>
                         </div>
-                        <div className="cta-decoration"></div>
-                    </div>
+                    )}
                 </div>
             </div>
         </section>

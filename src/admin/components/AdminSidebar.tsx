@@ -1,8 +1,16 @@
-﻿import { useState } from 'react';
+﻿import {
+    useEffect,
+    useState,
+} from 'react';
 
 interface AdminSidebarProps {
     mobileOpen: boolean;
     onMobileClose: () => void;
+}
+
+interface NavigationChild {
+    label: string;
+    path?: string;
 }
 
 interface NavigationItem {
@@ -12,37 +20,44 @@ interface NavigationItem {
     children?: NavigationChild[];
 }
 
-interface NavigationChild {
-    label: string;
-    path: string;
-}
-
 const navItems: NavigationItem[] = [
     {
         icon: '⌂',
         label: 'Dashboard',
         path: '/admin',
     },
+
     {
         icon: '▤',
-        label: 'Devotionals',
+        label: 'Ministries',
+        children: [
+            {
+                label: 'Services',
+                path: '/admin/services',
+            },
+            {
+                label: 'Devotionals',
+            },
+            {
+                label: "Pastor's Corner",
+                path: '/admin/sermons',
+            },
+        ],
     },
-    {
-        icon: '▶',
-        label: 'Sermons',
-    },
-    {
-        icon: '▣',
-        label: 'Services',
-    },
+
     {
         icon: '□',
         label: 'Events',
+        children: [
+            {
+                label: 'Events',
+            },
+            {
+                label: 'News & Updates',
+            },
+        ],
     },
-    {
-        icon: '▤',
-        label: 'News & Updates',
-    },
+
     {
         icon: '▧',
         label: 'Gallery',
@@ -57,47 +72,144 @@ const navItems: NavigationItem[] = [
             },
         ],
     },
+
+    {
+        icon: '✦',
+        label: 'Annual Content',
+        children: [
+            {
+                label: 'Theme of the Year',
+                path: '/admin/themes',
+            },
+            {
+                label: 'Prophecies',
+                path: '/admin/prophecies',
+            },
+            {
+                label: 'Prophecy Categories',
+                path: '/admin/prophecies/categories',
+            },
+            {
+                label: 'Prayer for the Year',
+            },
+        ],
+    },
+
     {
         icon: '♡',
-        label: 'Prayer Requests',
+        label: 'Connect',
+        children: [
+            {
+                label: 'Prayer Requests',
+            },
+            {
+                label: 'Contacts',
+            },
+        ],
     },
-    {
-        icon: '♙',
-        label: 'Contacts',
-    },
-    {
-        icon: '♟',
-        label: 'Users',
-    },
-    {
-        icon: '♟',
-        label: 'Members',
-    },
+
     {
         icon: '⚙',
-        label: 'Settings',
+        label: 'Administration',
+        children: [
+            {
+                label: 'Users',
+            },
+            {
+                label: 'Members',
+            },
+            {
+                label: 'Settings',
+            },
+        ],
     },
 ];
+
+function pathMatches(
+    currentPath: string,
+    path?: string
+) {
+    if (!path) {
+        return false;
+    }
+
+    if (path === '/admin') {
+        return (
+            currentPath === '/admin' ||
+            currentPath === '/admin/'
+        );
+    }
+
+    return (
+        currentPath === path ||
+        currentPath.startsWith(
+            `${path}/`
+        )
+    );
+}
 
 function AdminSidebar({
     mobileOpen,
     onMobileClose,
 }: AdminSidebarProps) {
     const currentPath =
-        window.location.pathname;
+        window.location.pathname.replace(
+            /\/+$/,
+            ''
+        ) || '/';
 
-    const galleryIsActive =
-        currentPath === '/admin/gallery' ||
-        currentPath.startsWith(
-            '/admin/gallery/'
-        );
+    const initiallyOpenGroups =
+        navItems
+            .filter(item =>
+                item.children?.some(
+                    child =>
+                        pathMatches(
+                            currentPath,
+                            child.path
+                        )
+                )
+            )
+            .map(item => item.label);
 
     const [
-        galleryOpen,
-        setGalleryOpen,
-    ] = useState<boolean>(
-        galleryIsActive
+        openGroups,
+        setOpenGroups,
+    ] = useState<string[]>(
+        initiallyOpenGroups
     );
+
+    useEffect(() => {
+        const activeGroups =
+            navItems
+                .filter(item =>
+                    item.children?.some(
+                        child =>
+                            pathMatches(
+                                currentPath,
+                                child.path
+                            )
+                    )
+                )
+                .map(item => item.label);
+
+        if (
+            activeGroups.length === 0
+        ) {
+            return;
+        }
+
+        setOpenGroups(current => {
+            const next =
+                new Set(current);
+
+            activeGroups.forEach(
+                group =>
+                    next.add(group)
+            );
+
+            return Array.from(next);
+        });
+    }, [currentPath]);
 
     function navigate(
         path?: string
@@ -108,7 +220,25 @@ function AdminSidebar({
 
         onMobileClose();
 
-        window.location.assign(path);
+        window.location.assign(
+            path
+        );
+    }
+
+    function toggleGroup(
+        label: string
+    ) {
+        setOpenGroups(current =>
+            current.includes(label)
+                ? current.filter(
+                    item =>
+                        item !== label
+                )
+                : [
+                    ...current,
+                    label,
+                ]
+        );
     }
 
     return (
@@ -126,8 +256,13 @@ function AdminSidebar({
                 />
 
                 <div>
-                    <strong>RCCG</strong>
-                    <strong>Hope House</strong>
+                    <strong>
+                        RCCG
+                    </strong>
+
+                    <strong>
+                        Hope House
+                    </strong>
 
                     <span>
                         A Place of Hope for All
@@ -155,142 +290,166 @@ function AdminSidebar({
                                     ?.length
                             );
 
-                        const isGallery =
-                            item.label ===
-                            'Gallery';
-
-                        const isActive =
-                            item.path ===
-                                '/admin'
-                                ? currentPath ===
-                                '/admin' ||
-                                currentPath ===
-                                '/admin/'
-                                : Boolean(
-                                    item.path &&
-                                    currentPath.startsWith(
-                                        item.path
-                                    )
+                        if (
+                            !hasChildren
+                        ) {
+                            const active =
+                                pathMatches(
+                                    currentPath,
+                                    item.path
                                 );
 
-                        if (
-                            hasChildren &&
-                            isGallery
-                        ) {
                             return (
-                                <div
-                                    className="admin-nav-group"
+                                <button
                                     key={
                                         item.label
                                     }
+                                    type="button"
+                                    className={`admin-nav-item ${active
+                                            ? 'active'
+                                            : ''
+                                        }`}
+                                    onClick={() =>
+                                        navigate(
+                                            item.path
+                                        )
+                                    }
                                 >
-                                    <button
-                                        type="button"
-                                        className={`admin-nav-item ${galleryIsActive
-                                                ? 'active'
-                                                : ''
-                                            }`}
-                                        onClick={() =>
-                                            setGalleryOpen(
-                                                current =>
-                                                    !current
-                                            )
+                                    <span className="admin-nav-icon">
+                                        {
+                                            item.icon
                                         }
-                                        aria-expanded={
-                                            galleryOpen
+                                    </span>
+
+                                    <span className="admin-nav-label">
+                                        {
+                                            item.label
                                         }
-                                    >
-                                        <span className="admin-nav-icon">
-                                            {
-                                                item.icon
-                                            }
-                                        </span>
-
-                                        <span className="admin-nav-label">
-                                            {
-                                                item.label
-                                            }
-                                        </span>
-
-                                        <span
-                                            className={`admin-nav-chevron ${galleryOpen
-                                                    ? 'open'
-                                                    : ''
-                                                }`}
-                                        >
-                                            ›
-                                        </span>
-                                    </button>
-
-                                    {galleryOpen && (
-                                        <div className="admin-subnavigation">
-                                            {item.children?.map(
-                                                child => {
-                                                    const childActive =
-                                                        currentPath ===
-                                                        child.path;
-
-                                                    return (
-                                                        <button
-                                                            key={
-                                                                child.path
-                                                            }
-                                                            type="button"
-                                                            className={`admin-subnav-item ${childActive
-                                                                    ? 'active'
-                                                                    : ''
-                                                                }`}
-                                                            onClick={() =>
-                                                                navigate(
-                                                                    child.path
-                                                                )
-                                                            }
-                                                        >
-                                                            <span className="admin-subnav-dot" />
-
-                                                            <span>
-                                                                {
-                                                                    child.label
-                                                                }
-                                                            </span>
-                                                        </button>
-                                                    );
-                                                }
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
+                                    </span>
+                                </button>
                             );
                         }
 
+                        const groupOpen =
+                            openGroups.includes(
+                                item.label
+                            );
+
+                        const groupActive =
+                            item.children?.some(
+                                child =>
+                                    pathMatches(
+                                        currentPath,
+                                        child.path
+                                    )
+                            ) ?? false;
+
                         return (
-                            <button
+                            <div
                                 key={
                                     item.label
                                 }
-                                type="button"
-                                className={`admin-nav-item ${isActive
-                                        ? 'active'
-                                        : ''
-                                    }`}
-                                onClick={() =>
-                                    navigate(
-                                        item.path
-                                    )
-                                }
+                                className="admin-nav-group"
                             >
-                                <span className="admin-nav-icon">
-                                    {
-                                        item.icon
+                                <button
+                                    type="button"
+                                    className={`admin-nav-item ${groupActive
+                                            ? 'active'
+                                            : ''
+                                        }`}
+                                    onClick={() =>
+                                        toggleGroup(
+                                            item.label
+                                        )
                                     }
-                                </span>
+                                    aria-expanded={
+                                        groupOpen
+                                    }
+                                >
+                                    <span className="admin-nav-icon">
+                                        {
+                                            item.icon
+                                        }
+                                    </span>
 
-                                <span>
-                                    {
-                                        item.label
-                                    }
-                                </span>
-                            </button>
+                                    <span className="admin-nav-label">
+                                        {
+                                            item.label
+                                        }
+                                    </span>
+
+                                    <span
+                                        className={`admin-nav-chevron ${groupOpen
+                                                ? 'open'
+                                                : ''
+                                            }`}
+                                        aria-hidden="true"
+                                    >
+                                        ›
+                                    </span>
+                                </button>
+
+                                {groupOpen && (
+                                    <div className="admin-subnavigation">
+                                        {item.children?.map(
+                                            child => {
+                                                const childActive =
+                                                    pathMatches(
+                                                        currentPath,
+                                                        child.path
+                                                    );
+
+                                                const available =
+                                                    Boolean(
+                                                        child.path
+                                                    );
+
+                                                return (
+                                                    <button
+                                                        key={
+                                                            child.label
+                                                        }
+                                                        type="button"
+                                                        className={`admin-subnav-item ${childActive
+                                                                ? 'active'
+                                                                : ''
+                                                            } ${!available
+                                                                ? 'admin-subnav-item-disabled'
+                                                                : ''
+                                                            }`}
+                                                        onClick={() =>
+                                                            navigate(
+                                                                child.path
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            !available
+                                                        }
+                                                        aria-current={
+                                                            childActive
+                                                                ? 'page'
+                                                                : undefined
+                                                        }
+                                                        title={
+                                                            available
+                                                                ? undefined
+                                                                : 'Coming soon'
+                                                        }
+                                                    >
+                                                        <span className="admin-subnav-dot" />
+
+                                                        <span>
+                                                            {
+                                                                child.label
+                                                            }
+                                                        </span>
+                                                    </button>
+                                                );
+                                            }
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                         );
                     }
                 )}
@@ -301,7 +460,10 @@ function AdminSidebar({
                     href="/"
                     className="admin-view-site"
                 >
-                    <span>↗</span>
+                    <span>
+                        ↗
+                    </span>
+
                     View Website
                 </a>
 
