@@ -13,7 +13,11 @@ import type {
 import {
     apiFetch,
     apiUrl,
+    getApiErrorDetails,
+    getNetworkErrorDetails,
 } from '../../api/api';
+import type { ApiErrorDetails } from '../../api/api';
+import ApiErrorState from '../../components/sections/ApiErrorState';
 
 import {
     useGalleryCategories,
@@ -80,6 +84,19 @@ const emptyUploadForm: UploadFormState = {
     displayOrder: '0',
 };
 
+function toApiErrorDetails(error: unknown): ApiErrorDetails {
+    if (
+        error &&
+        typeof error === 'object' &&
+        'status' in error &&
+        'message' in error
+    ) {
+        return error as ApiErrorDetails;
+    }
+
+    return getNetworkErrorDetails(error);
+}
+
 function GalleryImage() {
     const {
         galleryCategories,
@@ -98,9 +115,19 @@ function GalleryImage() {
     ] = useState(true);
 
     const [
+        retrying,
+        setRetrying,
+    ] = useState(false);
+
+    const [
         error,
         setError,
     ] = useState<string | null>(null);
+
+    const [
+        loadError,
+        setLoadError,
+    ] = useState<ApiErrorDetails | null>(null);
 
     const [
         successMessage,
@@ -202,6 +229,7 @@ function GalleryImage() {
             ) => {
                 try {
                     setError(null);
+                    setLoadError(null);
 
                     const response =
                         await apiFetch(
@@ -212,7 +240,8 @@ function GalleryImage() {
                         );
 
                     if (!response.ok) {
-                        throw new Error(
+                        throw await getApiErrorDetails(
+                            response,
                             `Unable to load gallery images (${response.status}).`
                         );
                     }
@@ -227,10 +256,8 @@ function GalleryImage() {
                         (err as Error).name !==
                         'AbortError'
                     ) {
-                        setError(
-                            err instanceof Error
-                                ? err.message
-                                : 'Unable to load gallery images.'
+                        setLoadError(
+                            toApiErrorDetails(err)
                         );
                     }
                 } finally {
@@ -248,6 +275,9 @@ function GalleryImage() {
 
         async function loadInitialImages() {
             try {
+                setError(null);
+                setLoadError(null);
+
                 const response =
                     await apiFetch(
                         '/api/gallery/admin/?skip=0&take=200',
@@ -258,7 +288,8 @@ function GalleryImage() {
                     );
 
                 if (!response.ok) {
-                    throw new Error(
+                    throw await getApiErrorDetails(
+                        response,
                         `Unable to load gallery images (${response.status}).`
                     );
                 }
@@ -275,13 +306,11 @@ function GalleryImage() {
             } catch (err) {
                 if (
                     (err as Error).name !==
-                        'AbortError' &&
+                    'AbortError' &&
                     !controller.signal.aborted
                 ) {
-                    setError(
-                        err instanceof Error
-                            ? err.message
-                            : 'Unable to load gallery images.'
+                    setLoadError(
+                        toApiErrorDetails(err)
                     );
                 }
             } finally {
@@ -504,6 +533,39 @@ function GalleryImage() {
         return parsed;
     }
 
+    async function retryLoad(): Promise<boolean> {
+        setRetrying(true);
+        setError(null);
+        setLoadError(null);
+        setSuccessMessage(null);
+
+        try {
+            const response = await apiFetch(
+                '/api/gallery/admin/?skip=0&take=200'
+            );
+
+            if (!response.ok) {
+                throw await getApiErrorDetails(
+                    response,
+                    `Unable to load gallery images (${response.status}).`
+                );
+            }
+
+            const data: GalleryImageDto[] =
+                await response.json();
+
+            setImages(data);
+            return true;
+        } catch (err) {
+            setLoadError(
+                toApiErrorDetails(err)
+            );
+            return false;
+        } finally {
+            setRetrying(false);
+        }
+    }
+
     function openUpload() {
         setError(null);
         setSuccessMessage(null);
@@ -702,32 +764,11 @@ function GalleryImage() {
                 );
 
             if (!response.ok) {
-                let message =
-                    'Unable to upload the gallery image.';
-
-                try {
-                    const body =
-                        await response.json();
-
-                    if (
-                        typeof body?.detail ===
-                        'string'
-                    ) {
-                        message =
-                            body.detail;
-                    } else if (
-                        typeof body?.title ===
-                        'string'
-                    ) {
-                        message =
-                            body.title;
-                    }
-                } catch {
-                    // Keep default message.
-                }
-
                 throw new Error(
-                    message
+                    (await getApiErrorDetails(
+                        response,
+                        'Unable to upload the gallery image.'
+                    )).message
                 );
             }
 
@@ -963,32 +1004,11 @@ function GalleryImage() {
                 );
 
             if (!response.ok) {
-                let message =
-                    'Unable to update the gallery image.';
-
-                try {
-                    const body =
-                        await response.json();
-
-                    if (
-                        typeof body?.detail ===
-                        'string'
-                    ) {
-                        message =
-                            body.detail;
-                    } else if (
-                        typeof body?.title ===
-                        'string'
-                    ) {
-                        message =
-                            body.title;
-                    }
-                } catch {
-                    // Keep default message.
-                }
-
                 throw new Error(
-                    message
+                    (await getApiErrorDetails(
+                        response,
+                        'Unable to update the gallery image.'
+                    )).message
                 );
             }
 
@@ -1043,7 +1063,10 @@ function GalleryImage() {
 
             if (!response.ok) {
                 throw new Error(
-                    'Unable to change image visibility.'
+                    (await getApiErrorDetails(
+                        response,
+                        'Unable to change image visibility.'
+                    )).message
                 );
             }
 
@@ -1096,7 +1119,10 @@ function GalleryImage() {
 
             if (!response.ok) {
                 throw new Error(
-                    'Unable to change featured status.'
+                    (await getApiErrorDetails(
+                        response,
+                        'Unable to change featured status.'
+                    )).message
                 );
             }
 
@@ -1149,7 +1175,10 @@ function GalleryImage() {
 
             if (!response.ok) {
                 throw new Error(
-                    'Unable to delete the gallery image.'
+                    (await getApiErrorDetails(
+                        response,
+                        'Unable to delete the gallery image.'
+                    )).message
                 );
             }
 
@@ -1238,451 +1267,463 @@ function GalleryImage() {
                     </div>
                 )}
 
-                <div className="gallery-image-summary-grid">
-                    <div className="gallery-image-summary-card">
-                        <span className="gallery-summary-symbol">
-                            ▧
-                        </span>
+                {loadError ? (
+                    <ApiErrorState
+                        status={loadError.status}
+                        title={loadError.title}
+                        message={loadError.message}
+                        onRetry={retryLoad}
+                        retrying={retrying}
+                    />
+                ) : (
+                    <>
+                        <div className="gallery-image-summary-grid">
+                            <div className="gallery-image-summary-card">
+                                <span className="gallery-summary-symbol">
+                                    ▧
+                                </span>
 
-                        <div>
-                            <strong>
-                                {
-                                    images.length
-                                }
-                            </strong>
-                            <span>
-                                Total Images
-                            </span>
-                        </div>
-                    </div>
-
-                    <div className="gallery-image-summary-card">
-                        <span className="gallery-summary-symbol public">
-                            ●
-                        </span>
-
-                        <div>
-                            <strong>
-                                {
-                                    publicCount
-                                }
-                            </strong>
-                            <span>
-                                Public
-                            </span>
-                        </div>
-                    </div>
-
-                    <div className="gallery-image-summary-card">
-                        <span className="gallery-summary-symbol private">
-                            ●
-                        </span>
-
-                        <div>
-                            <strong>
-                                {
-                                    privateCount
-                                }
-                            </strong>
-                            <span>
-                                Private
-                            </span>
-                        </div>
-                    </div>
-
-                    <div className="gallery-image-summary-card">
-                        <span className="gallery-summary-symbol featured">
-                            ★
-                        </span>
-
-                        <div>
-                            <strong>
-                                {
-                                    featuredCount
-                                }
-                            </strong>
-                            <span>
-                                Featured
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <article className="admin-panel gallery-images-panel">
-                    <div className="gallery-images-toolbar">
-                        <div className="gallery-images-search">
-                            <span>⌕</span>
-
-                            <input
-                                type="search"
-                                value={
-                                    searchText
-                                }
-                                onChange={event =>
-                                    setSearchText(
-                                        event
-                                            .target
-                                            .value
-                                    )
-                                }
-                                placeholder="Search gallery images..."
-                            />
-                        </div>
-
-                        <select
-                            value={
-                                categoryFilter
-                            }
-                            onChange={event =>
-                                setCategoryFilter(
-                                    event.target
-                                        .value
-                                )
-                            }
-                            aria-label="Filter by category"
-                        >
-                            <option value="">
-                                All Categories
-                            </option>
-
-                            {galleryCategories.map(
-                                category => (
-                                    <option
-                                        key={
-                                            category.id
-                                        }
-                                        value={
-                                            category.id
-                                        }
-                                    >
+                                <div>
+                                    <strong>
                                         {
-                                            category.name
+                                            images.length
                                         }
+                                    </strong>
+                                    <span>
+                                        Total Images
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="gallery-image-summary-card">
+                                <span className="gallery-summary-symbol public">
+                                    ●
+                                </span>
+
+                                <div>
+                                    <strong>
+                                        {
+                                            publicCount
+                                        }
+                                    </strong>
+                                    <span>
+                                        Public
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="gallery-image-summary-card">
+                                <span className="gallery-summary-symbol private">
+                                    ●
+                                </span>
+
+                                <div>
+                                    <strong>
+                                        {
+                                            privateCount
+                                        }
+                                    </strong>
+                                    <span>
+                                        Private
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="gallery-image-summary-card">
+                                <span className="gallery-summary-symbol featured">
+                                    ★
+                                </span>
+
+                                <div>
+                                    <strong>
+                                        {
+                                            featuredCount
+                                        }
+                                    </strong>
+                                    <span>
+                                        Featured
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <article className="admin-panel gallery-images-panel">
+                            <div className="gallery-images-toolbar">
+                                <div className="gallery-images-search">
+                                    <span>⌕</span>
+
+                                    <input
+                                        type="search"
+                                        value={
+                                            searchText
+                                        }
+                                        onChange={event =>
+                                            setSearchText(
+                                                event
+                                                    .target
+                                                    .value
+                                            )
+                                        }
+                                        placeholder="Search gallery images..."
+                                    />
+                                </div>
+
+                                <select
+                                    value={
+                                        categoryFilter
+                                    }
+                                    onChange={event =>
+                                        setCategoryFilter(
+                                            event.target
+                                                .value
+                                        )
+                                    }
+                                    aria-label="Filter by category"
+                                >
+                                    <option value="">
+                                        All Categories
                                     </option>
-                                )
-                            )}
-                        </select>
 
-                        <select
-                            value={
-                                visibilityFilter
-                            }
-                            onChange={event =>
-                                setVisibilityFilter(
-                                    event.target
-                                        .value
-                                )
-                            }
-                            aria-label="Filter by visibility"
-                        >
-                            <option value="all">
-                                All Visibility
-                            </option>
-                            <option value="public">
-                                Public
-                            </option>
-                            <option value="private">
-                                Private
-                            </option>
-                        </select>
-
-                        <select
-                            value={
-                                featuredFilter
-                            }
-                            onChange={event =>
-                                setFeaturedFilter(
-                                    event.target
-                                        .value
-                                )
-                            }
-                            aria-label="Filter by featured status"
-                        >
-                            <option value="all">
-                                All Images
-                            </option>
-                            <option value="featured">
-                                Featured
-                            </option>
-                            <option value="not-featured">
-                                Not Featured
-                            </option>
-                        </select>
-                    </div>
-
-                    <div className="gallery-images-result-heading">
-                        <div>
-                            <h2>
-                                Images
-                            </h2>
-
-                            <p>
-                                Showing{' '}
-                                {
-                                    filteredImages.length
-                                }{' '}
-                                of{' '}
-                                {
-                                    images.length
-                                }{' '}
-                                images
-                            </p>
-                        </div>
-                    </div>
-
-                    {loading ? (
-                        <div className="admin-empty-state">
-                            <div className="admin-loading-spinner" />
-
-                            <strong>
-                                Loading gallery
-                                images...
-                            </strong>
-                        </div>
-                    ) : images.length ===
-                        0 ? (
-                        <div className="admin-empty-state">
-                            <span className="admin-empty-icon">
-                                ▧
-                            </span>
-
-                            <strong>
-                                No gallery images
-                                yet
-                            </strong>
-
-                            <p>
-                                Upload your first
-                                church gallery image
-                                to begin building the
-                                gallery.
-                            </p>
-
-                            <button
-                                type="button"
-                                className="admin-primary-button"
-                                onClick={
-                                    openUpload
-                                }
-                                disabled={
-                                    galleryCategories.length ===
-                                    0
-                                }
-                            >
-                                Upload Image
-                            </button>
-                        </div>
-                    ) : filteredImages.length ===
-                        0 ? (
-                        <div className="admin-empty-state">
-                            <span className="admin-empty-icon">
-                                ⌕
-                            </span>
-
-                            <strong>
-                                No matching images
-                            </strong>
-
-                            <p>
-                                Try changing your
-                                search or gallery
-                                filters.
-                            </p>
-                        </div>
-                    ) : (
-                        <div className="gallery-admin-grid">
-                            {filteredImages.map(
-                                image => (
-                                    <article
-                                        key={
-                                            image.id
-                                        }
-                                        className="gallery-admin-card"
-                                    >
-                                        <div className="gallery-admin-image-wrapper">
-                                            <img
-                                                src={getImageUrl(
-                                                    image
-                                                )}
-                                                alt={
-                                                    image.altText
+                                    {galleryCategories.map(
+                                        category => (
+                                            <option
+                                                key={
+                                                    category.id
                                                 }
-                                                className="gallery-admin-image"
-                                            />
+                                                value={
+                                                    category.id
+                                                }
+                                            >
+                                                {
+                                                    category.name
+                                                }
+                                            </option>
+                                        )
+                                    )}
+                                </select>
 
-                                            <div className="gallery-card-badges">
-                                                <span
-                                                    className={`gallery-visibility-badge ${image.isPublic
-                                                            ? 'public'
-                                                            : 'private'
-                                                        }`}
-                                                >
-                                                    {image.isPublic
-                                                        ? 'Public'
-                                                        : 'Private'}
-                                                </span>
+                                <select
+                                    value={
+                                        visibilityFilter
+                                    }
+                                    onChange={event =>
+                                        setVisibilityFilter(
+                                            event.target
+                                                .value
+                                        )
+                                    }
+                                    aria-label="Filter by visibility"
+                                >
+                                    <option value="all">
+                                        All Visibility
+                                    </option>
+                                    <option value="public">
+                                        Public
+                                    </option>
+                                    <option value="private">
+                                        Private
+                                    </option>
+                                </select>
 
-                                                {image.isFeatured && (
-                                                    <span className="gallery-featured-badge">
-                                                        ★
-                                                        Featured
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
+                                <select
+                                    value={
+                                        featuredFilter
+                                    }
+                                    onChange={event =>
+                                        setFeaturedFilter(
+                                            event.target
+                                                .value
+                                        )
+                                    }
+                                    aria-label="Filter by featured status"
+                                >
+                                    <option value="all">
+                                        All Images
+                                    </option>
+                                    <option value="featured">
+                                        Featured
+                                    </option>
+                                    <option value="not-featured">
+                                        Not Featured
+                                    </option>
+                                </select>
+                            </div>
 
-                                        <div className="gallery-admin-card-body">
-                                            <div className="gallery-admin-card-title">
-                                                <div>
-                                                    <h3>
-                                                        {
-                                                            image.title
+                            <div className="gallery-images-result-heading">
+                                <div>
+                                    <h2>
+                                        Images
+                                    </h2>
+
+                                    <p>
+                                        Showing{' '}
+                                        {
+                                            filteredImages.length
+                                        }{' '}
+                                        of{' '}
+                                        {
+                                            images.length
+                                        }{' '}
+                                        images
+                                    </p>
+                                </div>
+                            </div>
+
+                            {loading ? (
+                                <div className="admin-empty-state">
+                                    <div className="admin-loading-spinner" />
+
+                                    <strong>
+                                        Loading gallery
+                                        images...
+                                    </strong>
+                                </div>
+                            ) : images.length ===
+                                0 ? (
+                                <div className="admin-empty-state">
+                                    <span className="admin-empty-icon">
+                                        ▧
+                                    </span>
+
+                                    <strong>
+                                        No gallery images
+                                        yet
+                                    </strong>
+
+                                    <p>
+                                        Upload your first
+                                        church gallery image
+                                        to begin building the
+                                        gallery.
+                                    </p>
+
+                                    <button
+                                        type="button"
+                                        className="admin-primary-button"
+                                        onClick={
+                                            openUpload
+                                        }
+                                        disabled={
+                                            galleryCategories.length ===
+                                            0
+                                        }
+                                    >
+                                        Upload Image
+                                    </button>
+                                </div>
+                            ) : filteredImages.length ===
+                                0 ? (
+                                <div className="admin-empty-state">
+                                    <span className="admin-empty-icon">
+                                        ⌕
+                                    </span>
+
+                                    <strong>
+                                        No matching images
+                                    </strong>
+
+                                    <p>
+                                        Try changing your
+                                        search or gallery
+                                        filters.
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="gallery-admin-grid">
+                                    {filteredImages.map(
+                                        image => (
+                                            <article
+                                                key={
+                                                    image.id
+                                                }
+                                                className="gallery-admin-card"
+                                            >
+                                                <div className="gallery-admin-image-wrapper">
+                                                    <img
+                                                        src={getImageUrl(
+                                                            image
+                                                        )}
+                                                        alt={
+                                                            image.altText
                                                         }
-                                                    </h3>
+                                                        className="gallery-admin-image"
+                                                    />
 
-                                                    <span>
-                                                        {
-                                                            image.categoryName
-                                                        }
-                                                    </span>
-                                                </div>
-                                            </div>
+                                                    <div className="gallery-card-badges">
+                                                        <span
+                                                            className={`gallery-visibility-badge ${image.isPublic
+                                                                ? 'public'
+                                                                : 'private'
+                                                                }`}
+                                                        >
+                                                            {image.isPublic
+                                                                ? 'Public'
+                                                                : 'Private'}
+                                                        </span>
 
-                                            {image.description && (
-                                                <p className="gallery-admin-description">
-                                                    {
-                                                        image.description
-                                                    }
-                                                </p>
-                                            )}
-
-                                            <div className="gallery-admin-meta">
-                                                <span>
-                                                    {
-                                                        formatDate(
-                                                            image.eventDate
-                                                        )
-                                                    }
-                                                </span>
-
-                                                <span>
-                                                    {
-                                                        image.width
-                                                    }
-                                                    ×
-                                                    {
-                                                        image.height
-                                                    }
-                                                </span>
-
-                                                <span>
-                                                    {
-                                                        formatFileSize(
-                                                            image.fileSizeBytes
-                                                        )
-                                                    }
-                                                </span>
-
-                                                <span>
-                                                    Order:{' '}
-                                                    {
-                                                        image.displayOrder
-                                                    }
-                                                </span>
-                                            </div>
-
-                                            {image.tags.length >
-                                                0 && (
-                                                    <div className="gallery-admin-tags">
-                                                        {image.tags.map(
-                                                            tag => (
-                                                                <span
-                                                                    key={
-                                                                        tag
-                                                                    }
-                                                                >
-                                                                    #
-                                                                    {
-                                                                        tag
-                                                                    }
-                                                                </span>
-                                                            )
+                                                        {image.isFeatured && (
+                                                            <span className="gallery-featured-badge">
+                                                                ★
+                                                                Featured
+                                                            </span>
                                                         )}
                                                     </div>
-                                                )}
+                                                </div>
 
-                                            <div className="gallery-admin-card-actions">
-                                                <button
-                                                    type="button"
-                                                    className="gallery-card-action edit"
-                                                    onClick={() =>
-                                                        openEdit(
-                                                            image
-                                                        )
-                                                    }
-                                                >
-                                                    Edit
-                                                </button>
+                                                <div className="gallery-admin-card-body">
+                                                    <div className="gallery-admin-card-title">
+                                                        <div>
+                                                            <h3>
+                                                                {
+                                                                    image.title
+                                                                }
+                                                            </h3>
 
-                                                <button
-                                                    type="button"
-                                                    className="gallery-card-action"
-                                                    disabled={
-                                                        actionImageId ===
-                                                        image.id
-                                                    }
-                                                    onClick={() =>
-                                                        void toggleFeatured(
-                                                            image
-                                                        )
-                                                    }
-                                                >
-                                                    {image.isFeatured
-                                                        ? 'Unfeature'
-                                                        : 'Feature'}
-                                                </button>
+                                                            <span>
+                                                                {
+                                                                    image.categoryName
+                                                                }
+                                                            </span>
+                                                        </div>
+                                                    </div>
 
-                                                <button
-                                                    type="button"
-                                                    className="gallery-card-action"
-                                                    disabled={
-                                                        actionImageId ===
-                                                        image.id
-                                                    }
-                                                    onClick={() =>
-                                                        void toggleVisibility(
-                                                            image
-                                                        )
-                                                    }
-                                                >
-                                                    {image.isPublic
-                                                        ? 'Make Private'
-                                                        : 'Publish'}
-                                                </button>
+                                                    {image.description && (
+                                                        <p className="gallery-admin-description">
+                                                            {
+                                                                image.description
+                                                            }
+                                                        </p>
+                                                    )}
 
-                                                <button
-                                                    type="button"
-                                                    className="gallery-card-action delete"
-                                                    disabled={
-                                                        actionImageId ===
-                                                        image.id
-                                                    }
-                                                    onClick={() =>
-                                                        void deleteImage(
-                                                            image
-                                                        )
-                                                    }
-                                                >
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </article>
-                                )
+                                                    <div className="gallery-admin-meta">
+                                                        <span>
+                                                            {
+                                                                formatDate(
+                                                                    image.eventDate
+                                                                )
+                                                            }
+                                                        </span>
+
+                                                        <span>
+                                                            {
+                                                                image.width
+                                                            }
+                                                            ×
+                                                            {
+                                                                image.height
+                                                            }
+                                                        </span>
+
+                                                        <span>
+                                                            {
+                                                                formatFileSize(
+                                                                    image.fileSizeBytes
+                                                                )
+                                                            }
+                                                        </span>
+
+                                                        <span>
+                                                            Order:{' '}
+                                                            {
+                                                                image.displayOrder
+                                                            }
+                                                        </span>
+                                                    </div>
+
+                                                    {image.tags.length >
+                                                        0 && (
+                                                            <div className="gallery-admin-tags">
+                                                                {image.tags.map(
+                                                                    tag => (
+                                                                        <span
+                                                                            key={
+                                                                                tag
+                                                                            }
+                                                                        >
+                                                                            #
+                                                                            {
+                                                                                tag
+                                                                            }
+                                                                        </span>
+                                                                    )
+                                                                )}
+                                                            </div>
+                                                        )}
+
+                                                    <div className="gallery-admin-card-actions">
+                                                        <button
+                                                            type="button"
+                                                            className="gallery-card-action edit"
+                                                            onClick={() =>
+                                                                openEdit(
+                                                                    image
+                                                                )
+                                                            }
+                                                        >
+                                                            Edit
+                                                        </button>
+
+                                                        <button
+                                                            type="button"
+                                                            className="gallery-card-action"
+                                                            disabled={
+                                                                actionImageId ===
+                                                                image.id
+                                                            }
+                                                            onClick={() =>
+                                                                void toggleFeatured(
+                                                                    image
+                                                                )
+                                                            }
+                                                        >
+                                                            {image.isFeatured
+                                                                ? 'Unfeature'
+                                                                : 'Feature'}
+                                                        </button>
+
+                                                        <button
+                                                            type="button"
+                                                            className="gallery-card-action"
+                                                            disabled={
+                                                                actionImageId ===
+                                                                image.id
+                                                            }
+                                                            onClick={() =>
+                                                                void toggleVisibility(
+                                                                    image
+                                                                )
+                                                            }
+                                                        >
+                                                            {image.isPublic
+                                                                ? 'Make Private'
+                                                                : 'Publish'}
+                                                        </button>
+
+                                                        <button
+                                                            type="button"
+                                                            className="gallery-card-action delete"
+                                                            disabled={
+                                                                actionImageId ===
+                                                                image.id
+                                                            }
+                                                            onClick={() =>
+                                                                void deleteImage(
+                                                                    image
+                                                                )
+                                                            }
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </article>
+                                        )
+                                    )}
+                                </div>
                             )}
-                        </div>
-                    )}
-                </article>
+                        </article>
+                    </>
+                )}
             </section>
 
             {uploadOpen && (

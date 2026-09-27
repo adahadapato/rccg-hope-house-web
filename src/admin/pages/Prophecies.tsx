@@ -7,7 +7,13 @@
 
 import type { FormEvent } from 'react';
 
-import { apiFetch } from '../../api/api';
+import {
+    apiFetch,
+    getApiErrorDetails,
+    getNetworkErrorDetails,
+} from '../../api/api';
+import type { ApiErrorDetails } from '../../api/api';
+import ApiErrorState from '../../components/sections/ApiErrorState';
 import AdminLayout from '../components/AdminLayout';
 import '../styles/admin.css';
 import '../styles/prophecies.css';
@@ -55,24 +61,15 @@ const emptyYearForm: YearFormState = { year: new Date().getFullYear().toString()
 const emptyCategoryForm: CategoryFormState = { name: '', description: '', displayOrder: '0' };
 const emptyProphecyForm: ProphecyFormState = { text: '', displayOrder: '0' };
 
-async function readProblem(response: Response, fallback: string) {
-    try {
-        const body = await response.json();
-        if (typeof body?.detail === 'string') return body.detail;
-        if (typeof body?.title === 'string') return body.title;
-    } catch {
-        // Keep fallback.
-    }
-    return fallback;
-}
-
 function Prophecies() {
     const [years, setYears] = useState<ProphecyYear[]>([]);
     const [selectedYearId, setSelectedYearId] = useState<string | null>(null);
     const [categories, setCategories] = useState<ProphecyCategory[]>([]);
     const [loading, setLoading] = useState(true);
+    const [retrying, setRetrying] = useState(false);
     const [loadingContent, setLoadingContent] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [loadError, setLoadError] = useState<ApiErrorDetails | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [actionKey, setActionKey] = useState<string | null>(null);
 
@@ -119,7 +116,10 @@ function Prophecies() {
         );
 
         if (!response.ok) {
-            throw new Error(await readProblem(response, `Unable to load prophecy categories (${response.status}).`));
+            throw await getApiErrorDetails(
+                response,
+                `Unable to load prophecy categories (${response.status}).`
+            );
         }
 
         const data: ProphecyCategory[] = await response.json();
@@ -134,7 +134,10 @@ function Prophecies() {
     const loadYears = useCallback(async (preferredYearId?: string | null, signal?: AbortSignal) => {
         const response = await apiFetch('/api/prophecies/admin/years', { signal });
         if (!response.ok) {
-            throw new Error(await readProblem(response, `Unable to load prophecy years (${response.status}).`));
+            throw await getApiErrorDetails(
+                response,
+                `Unable to load prophecy years (${response.status}).`
+            );
         }
 
         const data: ProphecyYear[] = await response.json();
@@ -150,13 +153,34 @@ function Prophecies() {
         return nextId;
     }, []);
 
+    function toApiErrorDetails(err: unknown): ApiErrorDetails {
+        if (
+            err &&
+            typeof err === 'object' &&
+            'status' in err &&
+            'message' in err
+        ) {
+            return err as ApiErrorDetails;
+        }
+
+        return getNetworkErrorDetails(err);
+    }
+
     const refresh = useCallback(async (preferredYearId?: string | null) => {
         setError(null);
-        const nextId = await loadYears(preferredYearId ?? selectedYearId);
-        if (nextId) {
-            setCategories(await loadCategories(nextId));
-        } else {
-            setCategories([]);
+        setLoadError(null);
+
+        try {
+            const nextId = await loadYears(preferredYearId ?? selectedYearId);
+
+            if (nextId) {
+                setCategories(await loadCategories(nextId));
+            } else {
+                setCategories([]);
+            }
+        } catch (err) {
+            setLoadError(toApiErrorDetails(err));
+            throw err;
         }
     }, [loadCategories, loadYears, selectedYearId]);
 
@@ -166,13 +190,14 @@ function Prophecies() {
         async function initialise() {
             try {
                 setError(null);
+                setLoadError(null);
                 const yearId = await loadYears(null, controller.signal);
                 if (yearId && !controller.signal.aborted) {
                     setCategories(await loadCategories(yearId, controller.signal));
                 }
             } catch (err) {
                 if ((err as Error).name !== 'AbortError' && !controller.signal.aborted) {
-                    setError(err instanceof Error ? err.message : 'Unable to load prophecies.');
+                    setLoadError(toApiErrorDetails(err));
                 }
             } finally {
                 if (!controller.signal.aborted) setLoading(false);
@@ -188,13 +213,39 @@ function Prophecies() {
         setSelectedYearId(id);
         setLoadingContent(true);
         setError(null);
+        setLoadError(null);
         setSuccessMessage(null);
+
         try {
             setCategories(await loadCategories(id));
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Unable to load this prophecy year.');
+            setLoadError(toApiErrorDetails(err));
         } finally {
             setLoadingContent(false);
+        }
+    }
+
+    async function retryLoad(): Promise<boolean> {
+        setRetrying(true);
+        setError(null);
+        setSuccessMessage(null);
+
+        try {
+            const yearId = await loadYears(selectedYearId);
+
+            if (yearId) {
+                setCategories(await loadCategories(yearId));
+            } else {
+                setCategories([]);
+            }
+
+            setLoadError(null);
+            return true;
+        } catch (err) {
+            setLoadError(toApiErrorDetails(err));
+            return false;
+        } finally {
+            setRetrying(false);
         }
     }
 
@@ -240,7 +291,12 @@ function Prophecies() {
                 });
 
             if (!response.ok) {
-                throw new Error(await readProblem(response, editingYear ? 'Unable to update the prophecy year.' : 'Unable to create the prophecy year.'));
+                throw new Error((await getApiErrorDetails(
+                    response,
+                    editingYear
+                        ? 'Unable to update the prophecy year.'
+                        : 'Unable to create the prophecy year.'
+                )).message);
             }
 
             let preferredId = editingYear?.id ?? null;
@@ -275,7 +331,10 @@ function Prophecies() {
         setSuccessMessage(null);
         try {
             const response = await apiFetch(`/api/prophecies/admin/years/${year.id}/${action}`, { method: 'POST' });
-            if (!response.ok) throw new Error(await readProblem(response, `Unable to ${action} ${year.year}.`));
+            if (!response.ok) throw new Error((await getApiErrorDetails(
+                response,
+                `Unable to ${action} ${year.year}.`
+            )).message);
             setSuccessMessage(`${year.year} has been ${year.isPublished ? 'unpublished' : 'published'}.`);
             await refresh(year.id);
         } catch (err) {
@@ -340,7 +399,12 @@ function Prophecies() {
                     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
                 });
 
-            if (!response.ok) throw new Error(await readProblem(response, editingCategory ? 'Unable to update the category.' : 'Unable to create the category.'));
+            if (!response.ok) throw new Error((await getApiErrorDetails(
+                response,
+                editingCategory
+                    ? 'Unable to update the category.'
+                    : 'Unable to create the category.'
+            )).message);
             setCategoryFormOpen(false);
             setEditingCategory(null);
             setSuccessMessage(editingCategory ? 'Prophecy category updated successfully.' : 'Prophecy category created successfully.');
@@ -360,7 +424,10 @@ function Prophecies() {
         setSuccessMessage(null);
         try {
             const response = await apiFetch(`/api/prophecies/admin/categories/${category.id}/${action}`, { method: 'POST' });
-            if (!response.ok) throw new Error(await readProblem(response, `Unable to ${action} the category.`));
+            if (!response.ok) throw new Error((await getApiErrorDetails(
+                response,
+                `Unable to ${action} the category.`
+            )).message);
             setSuccessMessage(`"${category.name}" has been ${category.isActive ? 'deactivated' : 'activated'}.`);
             await refresh(selectedYearId);
         } catch (err) {
@@ -421,7 +488,12 @@ function Prophecies() {
                     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
                 });
 
-            if (!response.ok) throw new Error(await readProblem(response, editingProphecy ? 'Unable to update the prophecy.' : 'Unable to create the prophecy.'));
+            if (!response.ok) throw new Error((await getApiErrorDetails(
+                response,
+                editingProphecy
+                    ? 'Unable to update the prophecy.'
+                    : 'Unable to create the prophecy.'
+            )).message);
             setProphecyFormOpen(false);
             setEditingProphecy(null);
             setProphecyCategoryId(null);
@@ -442,7 +514,10 @@ function Prophecies() {
         setSuccessMessage(null);
         try {
             const response = await apiFetch(`/api/prophecies/admin/items/${prophecy.id}/${action}`, { method: 'POST' });
-            if (!response.ok) throw new Error(await readProblem(response, `Unable to ${action} the prophecy.`));
+            if (!response.ok) throw new Error((await getApiErrorDetails(
+                response,
+                `Unable to ${action} the prophecy.`
+            )).message);
             setSuccessMessage(`Prophecy ${prophecy.isActive ? 'deactivated' : 'activated'} successfully.`);
             await refresh(selectedYearId);
         } catch (err) {
@@ -473,6 +548,14 @@ function Prophecies() {
                     <article className="admin-panel prophecy-loading-panel">
                         <div className="admin-empty-state"><div className="admin-loading-spinner" /><strong>Loading prophecies...</strong></div>
                     </article>
+                ) : loadError ? (
+                    <ApiErrorState
+                        status={loadError.status}
+                        title={loadError.title}
+                        message={loadError.message}
+                        onRetry={retryLoad}
+                        retrying={retrying}
+                    />
                 ) : years.length === 0 ? (
                     <article className="admin-panel">
                         <div className="admin-empty-state">

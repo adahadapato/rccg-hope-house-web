@@ -6,7 +6,13 @@
     type FormEvent,
 } from 'react';
 
-import { apiFetch } from '@/api/api';
+import {
+    apiFetch,
+    getApiErrorDetails,
+    getNetworkErrorDetails,
+} from '@/api/api';
+import type { ApiErrorDetails } from '@/api/api';
+import ApiErrorState from '@/components/sections/ApiErrorState';
 import AdminLayout from '../components/AdminLayout';
 
 import '../styles/admin.css';
@@ -46,40 +52,17 @@ const emptyForm: ThemeFormState = {
     callToActionText: '',
 };
 
-async function readProblem(
-    response: Response,
-    fallback: string
-) {
-    try {
-        const body = await response.json();
-
-        if (typeof body?.detail === 'string') {
-            return body.detail;
-        }
-
-        if (typeof body?.title === 'string') {
-            return body.title;
-        }
-
-        if (body?.errors) {
-            const messages = Object.values(
-                body.errors
-            )
-                .flat()
-                .filter(
-                    (item): item is string =>
-                        typeof item === 'string'
-                );
-
-            if (messages.length > 0) {
-                return messages.join(' ');
-            }
-        }
-    } catch {
-        // Use fallback.
+function toApiErrorDetails(error: unknown): ApiErrorDetails {
+    if (
+        error &&
+        typeof error === 'object' &&
+        'status' in error &&
+        'message' in error
+    ) {
+        return error as ApiErrorDetails;
     }
 
-    return fallback;
+    return getNetworkErrorDetails(error);
 }
 
 function ThemesOfTheYear() {
@@ -89,11 +72,17 @@ function ThemesOfTheYear() {
     const [loading, setLoading] =
         useState(true);
 
+    const [retrying, setRetrying] =
+        useState(false);
+
     const [saving, setSaving] =
         useState(false);
 
     const [error, setError] =
         useState<string | null>(null);
+
+    const [loadError, setLoadError] =
+        useState<ApiErrorDetails | null>(null);
 
     const [
         successMessage,
@@ -143,11 +132,9 @@ function ThemesOfTheYear() {
             );
 
             if (!response.ok) {
-                throw new Error(
-                    await readProblem(
-                        response,
-                        `Unable to load themes (${response.status}).`
-                    )
+                throw await getApiErrorDetails(
+                    response,
+                    `Unable to load themes (${response.status}).`
                 );
             }
 
@@ -166,6 +153,7 @@ function ThemesOfTheYear() {
         async function initialise() {
             try {
                 setError(null);
+                setLoadError(null);
 
                 await loadThemes(
                     controller.signal
@@ -176,10 +164,8 @@ function ThemesOfTheYear() {
                     'AbortError' &&
                     !controller.signal.aborted
                 ) {
-                    setError(
-                        err instanceof Error
-                            ? err.message
-                            : 'Unable to load themes.'
+                    setLoadError(
+                        toApiErrorDetails(err)
                     );
                 }
             } finally {
@@ -197,6 +183,25 @@ function ThemesOfTheYear() {
             controller.abort();
         };
     }, [loadThemes]);
+
+    async function retryLoad(): Promise<boolean> {
+        setRetrying(true);
+        setError(null);
+        setSuccessMessage(null);
+
+        try {
+            await loadThemes();
+            setLoadError(null);
+            return true;
+        } catch (err) {
+            setLoadError(
+                toApiErrorDetails(err)
+            );
+            return false;
+        } finally {
+            setRetrying(false);
+        }
+    }
 
     function openCreateForm() {
         const highestYear =
@@ -370,12 +375,12 @@ function ThemesOfTheYear() {
 
             if (!response.ok) {
                 throw new Error(
-                    await readProblem(
+                    (await getApiErrorDetails(
                         response,
                         editingTheme
                             ? 'Unable to update the theme.'
                             : 'Unable to create the theme.'
-                    )
+                    )).message
                 );
             }
 
@@ -454,232 +459,244 @@ function ThemesOfTheYear() {
                     </div>
                 )}
 
-                {!loading &&
-                    currentTheme && (
-                        <article className="theme-current-card">
-                            <div className="theme-current-year">
-                                <span>
-                                    CURRENT
-                                </span>
+                {loadError ? (
+                    <ApiErrorState
+                        status={loadError.status}
+                        title={loadError.title}
+                        message={loadError.message}
+                        onRetry={retryLoad}
+                        retrying={retrying}
+                    />
+                ) : (
+                    <>
+                        {!loading &&
+                            currentTheme && (
+                                <article className="theme-current-card">
+                                    <div className="theme-current-year">
+                                        <span>
+                                            CURRENT
+                                        </span>
 
-                                <strong>
-                                    {
-                                        currentTheme.year
-                                    }
-                                </strong>
-                            </div>
+                                        <strong>
+                                            {
+                                                currentTheme.year
+                                            }
+                                        </strong>
+                                    </div>
 
-                            <div className="theme-current-content">
-                                <span className="admin-eyebrow">
-                                    Current Theme
-                                </span>
+                                    <div className="theme-current-content">
+                                        <span className="admin-eyebrow">
+                                            Current Theme
+                                        </span>
 
-                                <h2>
-                                    {
-                                        currentTheme.themeTitle
-                                    }
-                                </h2>
+                                        <h2>
+                                            {
+                                                currentTheme.themeTitle
+                                            }
+                                        </h2>
 
-                                <blockquote>
-                                    &ldquo;
-                                    {
-                                        currentTheme.scriptureText
-                                    }
-                                    &rdquo;
-                                </blockquote>
+                                        <blockquote>
+                                            &ldquo;
+                                            {
+                                                currentTheme.scriptureText
+                                            }
+                                            &rdquo;
+                                        </blockquote>
 
-                                <strong className="theme-scripture-reference">
-                                    {
-                                        currentTheme.scriptureReference
-                                    }
-                                </strong>
-                            </div>
+                                        <strong className="theme-scripture-reference">
+                                            {
+                                                currentTheme.scriptureReference
+                                            }
+                                        </strong>
+                                    </div>
 
-                            <button
-                                type="button"
-                                className="admin-secondary-button"
-                                onClick={() =>
-                                    openEditForm(
-                                        currentTheme
-                                    )
-                                }
-                            >
-                                Edit Theme
-                            </button>
-                        </article>
-                    )}
-
-                <article className="admin-panel theme-history-panel">
-                    <div className="theme-panel-heading">
-                        <div>
-                            <h2>
-                                Theme History
-                            </h2>
-
-                            <p>
-                                Annual themes stored
-                                in the database.
-                            </p>
-                        </div>
-
-                        <span className="theme-count">
-                            {themes.length}{' '}
-                            {themes.length === 1
-                                ? 'theme'
-                                : 'themes'}
-                        </span>
-                    </div>
-
-                    {loading ? (
-                        <div className="admin-empty-state">
-                            <div className="admin-loading-spinner" />
-
-                            <strong>
-                                Loading themes...
-                            </strong>
-                        </div>
-                    ) : sortedThemes.length ===
-                        0 ? (
-                        <div className="admin-empty-state">
-                            <strong>
-                                No themes yet
-                            </strong>
-
-                            <p>
-                                Create the first
-                                Theme of the Year.
-                            </p>
-
-                            <button
-                                type="button"
-                                className="admin-primary-button"
-                                onClick={
-                                    openCreateForm
-                                }
-                            >
-                                New Theme
-                            </button>
-                        </div>
-                    ) : (
-                        <div className="admin-table-wrapper">
-                            <table className="admin-data-table theme-table">
-                                <thead>
-                                    <tr>
-                                        <th>
-                                            Year
-                                        </th>
-
-                                        <th>
-                                            Theme
-                                        </th>
-
-                                        <th>
-                                            Scripture
-                                        </th>
-
-                                        <th>
-                                            Status
-                                        </th>
-
-                                        <th>
-                                            Actions
-                                        </th>
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-                                    {sortedThemes.map(
-                                        theme => {
-                                            const isCurrent =
-                                                theme.id ===
+                                    <button
+                                        type="button"
+                                        className="admin-secondary-button"
+                                        onClick={() =>
+                                            openEditForm(
                                                 currentTheme
-                                                    ?.id;
+                                            )
+                                        }
+                                    >
+                                        Edit Theme
+                                    </button>
+                                </article>
+                            )}
 
-                                            return (
-                                                <tr
-                                                    key={
-                                                        theme.id
-                                                    }
-                                                >
-                                                    <td>
-                                                        <strong className="theme-year-cell">
-                                                            {
-                                                                theme.year
-                                                            }
-                                                        </strong>
-                                                    </td>
+                        <article className="admin-panel theme-history-panel">
+                            <div className="theme-panel-heading">
+                                <div>
+                                    <h2>
+                                        Theme History
+                                    </h2>
 
-                                                    <td>
-                                                        <div className="theme-title-cell">
-                                                            <strong>
-                                                                {
-                                                                    theme.themeTitle
-                                                                }
-                                                            </strong>
+                                    <p>
+                                        Annual themes stored
+                                        in the database.
+                                    </p>
+                                </div>
 
-                                                            <small>
-                                                                {
-                                                                    theme.primaryDescription
-                                                                }
-                                                            </small>
-                                                        </div>
-                                                    </td>
+                                <span className="theme-count">
+                                    {themes.length}{' '}
+                                    {themes.length === 1
+                                        ? 'theme'
+                                        : 'themes'}
+                                </span>
+                            </div>
 
-                                                    <td>
-                                                        <div className="theme-reference-cell">
-                                                            <strong>
-                                                                {
-                                                                    theme.scriptureReference
-                                                                }
-                                                            </strong>
+                            {loading ? (
+                                <div className="admin-empty-state">
+                                    <div className="admin-loading-spinner" />
 
-                                                            <small>
-                                                                {
-                                                                    theme.scriptureText
-                                                                }
-                                                            </small>
-                                                        </div>
-                                                    </td>
+                                    <strong>
+                                        Loading themes...
+                                    </strong>
+                                </div>
+                            ) : sortedThemes.length ===
+                                0 ? (
+                                <div className="admin-empty-state">
+                                    <strong>
+                                        No themes yet
+                                    </strong>
 
-                                                    <td>
-                                                        {isCurrent ? (
-                                                            <span className="theme-status current">
-                                                                Current
-                                                            </span>
-                                                        ) : theme.year >
-                                                            currentCalendarYear ? (
-                                                            <span className="theme-status future">
-                                                                Future
-                                                            </span>
-                                                        ) : (
-                                                            <span className="theme-status previous">
-                                                                Previous
-                                                            </span>
-                                                        )}
-                                                    </td>
+                                    <p>
+                                        Create the first
+                                        Theme of the Year.
+                                    </p>
 
-                                                    <td>
-                                                        <button
-                                                            type="button"
-                                                            className="admin-action-button edit"
-                                                            onClick={() =>
-                                                                openEditForm(
-                                                                    theme
-                                                                )
+                                    <button
+                                        type="button"
+                                        className="admin-primary-button"
+                                        onClick={
+                                            openCreateForm
+                                        }
+                                    >
+                                        New Theme
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="admin-table-wrapper">
+                                    <table className="admin-data-table theme-table">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    Year
+                                                </th>
+
+                                                <th>
+                                                    Theme
+                                                </th>
+
+                                                <th>
+                                                    Scripture
+                                                </th>
+
+                                                <th>
+                                                    Status
+                                                </th>
+
+                                                <th>
+                                                    Actions
+                                                </th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            {sortedThemes.map(
+                                                theme => {
+                                                    const isCurrent =
+                                                        theme.id ===
+                                                        currentTheme
+                                                            ?.id;
+
+                                                    return (
+                                                        <tr
+                                                            key={
+                                                                theme.id
                                                             }
                                                         >
-                                                            Edit
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            );
-                                        }
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-                </article>
+                                                            <td>
+                                                                <strong className="theme-year-cell">
+                                                                    {
+                                                                        theme.year
+                                                                    }
+                                                                </strong>
+                                                            </td>
+
+                                                            <td>
+                                                                <div className="theme-title-cell">
+                                                                    <strong>
+                                                                        {
+                                                                            theme.themeTitle
+                                                                        }
+                                                                    </strong>
+
+                                                                    <small>
+                                                                        {
+                                                                            theme.primaryDescription
+                                                                        }
+                                                                    </small>
+                                                                </div>
+                                                            </td>
+
+                                                            <td>
+                                                                <div className="theme-reference-cell">
+                                                                    <strong>
+                                                                        {
+                                                                            theme.scriptureReference
+                                                                        }
+                                                                    </strong>
+
+                                                                    <small>
+                                                                        {
+                                                                            theme.scriptureText
+                                                                        }
+                                                                    </small>
+                                                                </div>
+                                                            </td>
+
+                                                            <td>
+                                                                {isCurrent ? (
+                                                                    <span className="theme-status current">
+                                                                        Current
+                                                                    </span>
+                                                                ) : theme.year >
+                                                                    currentCalendarYear ? (
+                                                                    <span className="theme-status future">
+                                                                        Future
+                                                                    </span>
+                                                                ) : (
+                                                                    <span className="theme-status previous">
+                                                                        Previous
+                                                                    </span>
+                                                                )}
+                                                            </td>
+
+                                                            <td>
+                                                                <button
+                                                                    type="button"
+                                                                    className="admin-action-button edit"
+                                                                    onClick={() =>
+                                                                        openEditForm(
+                                                                            theme
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    Edit
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                }
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </article>
+                    </>
+                )}
             </section>
 
             {formOpen && (

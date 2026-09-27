@@ -1,0 +1,93 @@
+.api-error-state {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 1.5rem;
+    border: 1px solid #fecaca;
+    border-radius: 14px;
+    background: #fff7f7;
+    color: #991b1b;
+}
+
+.api-error-state-icon {
+    display: grid;
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    border-radius: 50%;
+    background: #fee2e2;
+    color: #991b1b;
+    font-size: 1.3rem;
+    font-weight: 800;
+}
+
+.api-error-state-content {
+    min-width: 0;
+}
+
+    .api-error-state-content strong {
+        display: block;
+        margin: 0;
+        color: #991b1b;
+        font-size: 1.05rem;
+    }
+
+    .api-error-state-content p {
+        margin: 0.35rem 0 0;
+        color: #b91c1c;
+        line-height: 1.55;
+    }
+
+    .api-error-state-content small {
+        display: block;
+        margin-top: 0.4rem;
+        color: #9f1239;
+        font-size: 0.72rem;
+    }
+
+.api-error-state-retry {
+    margin-top: 1rem;
+    padding: 0.62rem 1rem;
+    border: 0;
+    border-radius: 8px;
+    background: #991b1b;
+    color: #fff;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+}
+
+    .api-error-state-retry:hover:not(:disabled) {
+        background: #7f1d1d;
+    }
+
+    .api-error-state-retry:disabled {
+        opacity: 0.65;
+        cursor: not-allowed;
+    }
+
+.api-error-state-compact {
+    padding: 1rem 1.1rem;
+}
+
+    .api-error-state-compact .api-error-state-icon {
+        flex-basis: 34px;
+        width: 34px;
+        height: 34px;
+        font-size: 1rem;
+    }
+
+@media (max-width: 600px) {
+    .api-error-state {
+        padding: 1rem;
+    }
+
+    .api-error-state-icon {
+        flex-basis: 36px;
+        width: 36px;
+        height: 36px;
+    }
+}

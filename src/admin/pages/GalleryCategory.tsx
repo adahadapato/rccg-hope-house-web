@@ -8,7 +8,13 @@ import type {
     FormEvent,
 } from 'react';
 
-import { apiFetch } from '../../api/api';
+import {
+    apiFetch,
+    getApiErrorDetails,
+    getNetworkErrorDetails,
+} from '../../api/api';
+import type { ApiErrorDetails } from '../../api/api';
+import ApiErrorState from '../../components/sections/ApiErrorState';
 import AdminLayout from '../components/AdminLayout';
 import '../styles/admin.css';
 
@@ -44,9 +50,19 @@ function GalleryCategory() {
     ] = useState(true);
 
     const [
+        retrying,
+        setRetrying,
+    ] = useState(false);
+
+    const [
         error,
         setError,
     ] = useState<string | null>(null);
+
+    const [
+        loadError,
+        setLoadError,
+    ] = useState<ApiErrorDetails | null>(null);
 
     const [
         successMessage,
@@ -85,18 +101,24 @@ function GalleryCategory() {
     const loadCategories =
         useCallback(
             async () => {
-                try {
-                    setError(null);
+                setLoading(true);
+                setError(null);
+                setLoadError(null);
 
+                try {
                     const response =
                         await apiFetch(
                             '/api/gallery-categories/admin/'
                         );
 
                     if (!response.ok) {
-                        throw new Error(
-                            `Failed to load gallery categories (${response.status})`
+                        setLoadError(
+                            await getApiErrorDetails(
+                                response,
+                                `Unable to load gallery categories (${response.status}).`
+                            )
                         );
+                        return;
                     }
 
                     const data:
@@ -113,14 +135,10 @@ function GalleryCategory() {
                                 )
                         );
 
-                    setCategories(
-                        ordered
-                    );
+                    setCategories(ordered);
                 } catch (err) {
-                    setError(
-                        err instanceof Error
-                            ? err.message
-                            : 'Unable to load gallery categories. Please try again.'
+                    setLoadError(
+                        getNetworkErrorDetails(err)
                     );
                 } finally {
                     setLoading(false);
@@ -134,6 +152,9 @@ function GalleryCategory() {
             new AbortController();
 
         async function loadInitialCategories() {
+            setError(null);
+            setLoadError(null);
+
             try {
                 const response =
                     await apiFetch(
@@ -145,9 +166,16 @@ function GalleryCategory() {
                     );
 
                 if (!response.ok) {
-                    throw new Error(
-                        `Failed to load gallery categories (${response.status})`
-                    );
+                    if (!controller.signal.aborted) {
+                        setLoadError(
+                            await getApiErrorDetails(
+                                response,
+                                `Unable to load gallery categories (${response.status}).`
+                            )
+                        );
+                    }
+
+                    return;
                 }
 
                 const data:
@@ -167,9 +195,7 @@ function GalleryCategory() {
                 if (
                     !controller.signal.aborted
                 ) {
-                    setCategories(
-                        ordered
-                    );
+                    setCategories(ordered);
                 }
             } catch (err) {
                 if (
@@ -177,10 +203,8 @@ function GalleryCategory() {
                     'AbortError' &&
                     !controller.signal.aborted
                 ) {
-                    setError(
-                        err instanceof Error
-                            ? err.message
-                            : 'Unable to load gallery categories. Please try again.'
+                    setLoadError(
+                        getNetworkErrorDetails(err)
                     );
                 }
             } finally {
@@ -198,6 +222,56 @@ function GalleryCategory() {
             controller.abort();
         };
     }, []);
+
+    async function retryLoad(): Promise<boolean> {
+        setRetrying(true);
+        setError(null);
+        setLoadError(null);
+        setSuccessMessage(null);
+
+        try {
+            const response =
+                await apiFetch(
+                    '/api/gallery-categories/admin/'
+                );
+
+            if (!response.ok) {
+                throw await getApiErrorDetails(
+                    response,
+                    `Unable to load gallery categories (${response.status}).`
+                );
+            }
+
+            const data:
+                GalleryCategory[] =
+                await response.json();
+
+            const ordered =
+                [...data].sort(
+                    (a, b) =>
+                        a.displayOrder -
+                        b.displayOrder ||
+                        a.name.localeCompare(
+                            b.name
+                        )
+                );
+
+            setCategories(ordered);
+            return true;
+        } catch (err) {
+            setLoadError(
+                err &&
+                    typeof err === 'object' &&
+                    'status' in err &&
+                    'message' in err
+                    ? err as ApiErrorDetails
+                    : getNetworkErrorDetails(err)
+            );
+            return false;
+        } finally {
+            setRetrying(false);
+        }
+    }
 
     function openAddForm() {
         setEditingCategory(null);
@@ -317,36 +391,16 @@ function GalleryCategory() {
                     );
 
             if (!response.ok) {
-                let message =
-                    editingCategory
-                        ? 'Unable to update the category.'
-                        : 'Unable to create the category.';
-
-                try {
-                    const problem =
-                        await response.json();
-
-                    if (
-                        typeof problem
-                            ?.detail ===
-                        'string'
-                    ) {
-                        message =
-                            problem.detail;
-                    } else if (
-                        typeof problem
-                            ?.title ===
-                        'string'
-                    ) {
-                        message =
-                            problem.title;
-                    }
-                } catch {
-                    // Keep the default message.
-                }
+                const details =
+                    await getApiErrorDetails(
+                        response,
+                        editingCategory
+                            ? 'Unable to update the category.'
+                            : 'Unable to create the category.'
+                    );
 
                 throw new Error(
-                    message
+                    details.message
                 );
             }
 
@@ -408,8 +462,14 @@ function GalleryCategory() {
                 );
 
             if (!response.ok) {
+                const details =
+                    await getApiErrorDetails(
+                        response,
+                        `Unable to ${action} the category.`
+                    );
+
                 throw new Error(
-                    `Unable to ${action} the category.`
+                    details.message
                 );
             }
 
@@ -486,214 +546,224 @@ function GalleryCategory() {
                     </div>
                 )}
 
-                <article className="admin-panel gallery-category-panel">
-                    <div className="gallery-category-panel-header">
-                        <div>
-                            <h2>
-                                Categories
-                            </h2>
+                {loadError ? (
+                    <ApiErrorState
+                        status={loadError.status}
+                        title={loadError.title}
+                        message={loadError.message}
+                        onRetry={retryLoad}
+                        retrying={retrying}
+                    />
+                ) : (
+                    <article className="admin-panel gallery-category-panel">
+                        <div className="gallery-category-panel-header">
+                            <div>
+                                <h2>
+                                    Categories
+                                </h2>
 
-                            <p>
-                                {
-                                    categories.length
-                                }{' '}
-                                categor
-                                {categories.length ===
-                                    1
-                                    ? 'y'
-                                    : 'ies'}
-                            </p>
+                                <p>
+                                    {
+                                        categories.length
+                                    }{' '}
+                                    categor
+                                    {categories.length ===
+                                        1
+                                        ? 'y'
+                                        : 'ies'}
+                                </p>
+                            </div>
+
+                            <div className="gallery-category-summary">
+                                <span>
+                                    {
+                                        categories.filter(
+                                            category =>
+                                                category.isActive
+                                        ).length
+                                    }{' '}
+                                    active
+                                </span>
+
+                                <span>
+                                    {
+                                        categories.filter(
+                                            category =>
+                                                !category.isActive
+                                        ).length
+                                    }{' '}
+                                    inactive
+                                </span>
+                            </div>
                         </div>
 
-                        <div className="gallery-category-summary">
-                            <span>
-                                {
-                                    categories.filter(
-                                        category =>
-                                            category.isActive
-                                    ).length
-                                }{' '}
-                                active
-                            </span>
+                        {loading ? (
+                            <div className="admin-empty-state">
+                                <div className="admin-loading-spinner" />
 
-                            <span>
-                                {
-                                    categories.filter(
-                                        category =>
-                                            !category.isActive
-                                    ).length
-                                }{' '}
-                                inactive
-                            </span>
-                        </div>
-                    </div>
+                                <strong>
+                                    Loading categories...
+                                </strong>
+                            </div>
+                        ) : categories.length ===
+                            0 ? (
+                            <div className="admin-empty-state">
+                                <span className="admin-empty-icon">
+                                    ▧
+                                </span>
 
-                    {loading ? (
-                        <div className="admin-empty-state">
-                            <div className="admin-loading-spinner" />
+                                <strong>
+                                    No gallery
+                                    categories yet
+                                </strong>
 
-                            <strong>
-                                Loading categories...
-                            </strong>
-                        </div>
-                    ) : categories.length ===
-                        0 ? (
-                        <div className="admin-empty-state">
-                            <span className="admin-empty-icon">
-                                ▧
-                            </span>
+                                <p>
+                                    Create your first
+                                    category to begin
+                                    organising gallery
+                                    images.
+                                </p>
 
-                            <strong>
-                                No gallery
-                                categories yet
-                            </strong>
+                                <button
+                                    type="button"
+                                    className="admin-primary-button"
+                                    onClick={
+                                        openAddForm
+                                    }
+                                >
+                                    Add Category
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="admin-table-wrapper">
+                                <table className="admin-data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                Category
+                                            </th>
 
-                            <p>
-                                Create your first
-                                category to begin
-                                organising gallery
-                                images.
-                            </p>
+                                            <th>
+                                                Description
+                                            </th>
 
-                            <button
-                                type="button"
-                                className="admin-primary-button"
-                                onClick={
-                                    openAddForm
-                                }
-                            >
-                                Add Category
-                            </button>
-                        </div>
-                    ) : (
-                        <div className="admin-table-wrapper">
-                            <table className="admin-data-table">
-                                <thead>
-                                    <tr>
-                                        <th>
-                                            Category
-                                        </th>
+                                            <th>
+                                                Order
+                                            </th>
 
-                                        <th>
-                                            Description
-                                        </th>
+                                            <th>
+                                                Status
+                                            </th>
 
-                                        <th>
-                                            Order
-                                        </th>
+                                            <th className="admin-table-actions-heading">
+                                                Actions
+                                            </th>
+                                        </tr>
+                                    </thead>
 
-                                        <th>
-                                            Status
-                                        </th>
+                                    <tbody>
+                                        {categories.map(
+                                            category => (
+                                                <tr
+                                                    key={
+                                                        category.id
+                                                    }
+                                                    className={
+                                                        !category.isActive
+                                                            ? 'inactive-row'
+                                                            : ''
+                                                    }
+                                                >
+                                                    <td>
+                                                        <div className="gallery-category-name">
+                                                            <span className="gallery-category-icon">
+                                                                ▧
+                                                            </span>
 
-                                        <th className="admin-table-actions-heading">
-                                            Actions
-                                        </th>
-                                    </tr>
-                                </thead>
+                                                            <strong>
+                                                                {
+                                                                    category.name
+                                                                }
+                                                            </strong>
+                                                        </div>
+                                                    </td>
 
-                                <tbody>
-                                    {categories.map(
-                                        category => (
-                                            <tr
-                                                key={
-                                                    category.id
-                                                }
-                                                className={
-                                                    !category.isActive
-                                                        ? 'inactive-row'
-                                                        : ''
-                                                }
-                                            >
-                                                <td>
-                                                    <div className="gallery-category-name">
-                                                        <span className="gallery-category-icon">
-                                                            ▧
-                                                        </span>
+                                                    <td className="gallery-category-description">
+                                                        {category.description ||
+                                                            '—'}
+                                                    </td>
 
-                                                        <strong>
+                                                    <td>
+                                                        <span className="display-order-badge">
                                                             {
-                                                                category.name
+                                                                category.displayOrder
                                                             }
-                                                        </strong>
-                                                    </div>
-                                                </td>
+                                                        </span>
+                                                    </td>
 
-                                                <td className="gallery-category-description">
-                                                    {category.description ||
-                                                        '—'}
-                                                </td>
-
-                                                <td>
-                                                    <span className="display-order-badge">
-                                                        {
-                                                            category.displayOrder
-                                                        }
-                                                    </span>
-                                                </td>
-
-                                                <td>
-                                                    <span
-                                                        className={`category-status ${category.isActive
+                                                    <td>
+                                                        <span
+                                                            className={`category-status ${category.isActive
                                                                 ? 'active'
                                                                 : 'inactive'
-                                                            }`}
-                                                    >
-                                                        <span />
-
-                                                        {category.isActive
-                                                            ? 'Active'
-                                                            : 'Inactive'}
-                                                    </span>
-                                                </td>
-
-                                                <td>
-                                                    <div className="admin-table-actions">
-                                                        <button
-                                                            type="button"
-                                                            className="admin-action-button edit"
-                                                            onClick={() =>
-                                                                openEditForm(
-                                                                    category
-                                                                )
-                                                            }
+                                                                }`}
                                                         >
-                                                            Edit
-                                                        </button>
+                                                            <span />
 
-                                                        <button
-                                                            type="button"
-                                                            className={`admin-action-button ${category.isActive
+                                                            {category.isActive
+                                                                ? 'Active'
+                                                                : 'Inactive'}
+                                                        </span>
+                                                    </td>
+
+                                                    <td>
+                                                        <div className="admin-table-actions">
+                                                            <button
+                                                                type="button"
+                                                                className="admin-action-button edit"
+                                                                onClick={() =>
+                                                                    openEditForm(
+                                                                        category
+                                                                    )
+                                                                }
+                                                            >
+                                                                Edit
+                                                            </button>
+
+                                                            <button
+                                                                type="button"
+                                                                className={`admin-action-button ${category.isActive
                                                                     ? 'deactivate'
                                                                     : 'activate'
-                                                                }`}
-                                                            disabled={
-                                                                actionCategoryId ===
-                                                                category.id
-                                                            }
-                                                            onClick={() =>
-                                                                void changeStatus(
-                                                                    category
-                                                                )
-                                                            }
-                                                        >
-                                                            {actionCategoryId ===
-                                                                category.id
-                                                                ? 'Working...'
-                                                                : category.isActive
-                                                                    ? 'Deactivate'
-                                                                    : 'Activate'}
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        )
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-                </article>
+                                                                    }`}
+                                                                disabled={
+                                                                    actionCategoryId ===
+                                                                    category.id
+                                                                }
+                                                                onClick={() =>
+                                                                    void changeStatus(
+                                                                        category
+                                                                    )
+                                                                }
+                                                            >
+                                                                {actionCategoryId ===
+                                                                    category.id
+                                                                    ? 'Working...'
+                                                                    : category.isActive
+                                                                        ? 'Deactivate'
+                                                                        : 'Activate'}
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </article>
+                )}
             </section>
 
             {formOpen && (

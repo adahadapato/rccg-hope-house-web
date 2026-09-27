@@ -6,7 +6,13 @@
     type FormEvent,
 } from 'react';
 
-import { apiFetch } from '../../api/api';
+import {
+    apiFetch,
+    getApiErrorDetails,
+    getNetworkErrorDetails,
+    type ApiErrorDetails,
+} from '@/api/api';
+import ApiErrorState from '@/components/sections/ApiErrorState';
 import ConfirmDialog from '@/components/sections/ConfirmDialog';
 import AdminLayout from '../components/AdminLayout';
 
@@ -150,42 +156,6 @@ const emptyForm: SermonFormState = {
     detailedLessons: [],
 };
 
-async function readProblem(
-    response: Response,
-    fallback: string
-) {
-    try {
-        const body = await response.json();
-
-        if (typeof body?.detail === 'string') {
-            return body.detail;
-        }
-
-        if (typeof body?.title === 'string') {
-            return body.title;
-        }
-
-        if (body?.errors) {
-            const messages = Object.values(
-                body.errors
-            )
-                .flat()
-                .filter(
-                    (item): item is string =>
-                        typeof item === 'string'
-                );
-
-            if (messages.length > 0) {
-                return messages.join(' ');
-            }
-        }
-    } catch {
-        // Keep fallback.
-    }
-
-    return fallback;
-}
-
 function categoryName(value: number) {
     return (
         categories.find(
@@ -216,13 +186,19 @@ function Sermons() {
     const [loading, setLoading] =
         useState(true);
 
+    const [retrying, setRetrying] =
+        useState(false);
+
     const [saving, setSaving] =
         useState(false);
 
     const [actionPostId, setActionPostId] =
         useState<string | null>(null);
 
-    const [error, setError] =
+    const [loadError, setLoadError] =
+        useState<ApiErrorDetails | null>(null);
+
+    const [actionError, setActionError] =
         useState<string | null>(null);
 
     const [successMessage, setSuccessMessage] =
@@ -310,7 +286,7 @@ function Sermons() {
         });
     }, [posts, filter, search]);
 
-    const loadPosts = useCallback(
+    const fetchPosts = useCallback(
         async (signal?: AbortSignal) => {
             const response = await apiFetch(
                 '/api/pastor-posts/admin/?includeDrafts=true',
@@ -318,23 +294,20 @@ function Sermons() {
             );
 
             if (!response.ok) {
-                throw new Error(
-                    await readProblem(
-                        response,
-                        `Unable to load sermons (${response.status}).`
-                    )
+                throw await getApiErrorDetails(
+                    response,
+                    'Unable to load sermons.'
                 );
             }
 
-            const data: PastorPost[] =
-                await response.json();
-
-            setPosts(data);
+            return (
+                await response.json()
+            ) as PastorPost[];
         },
         []
     );
 
-    const loadThemes = useCallback(
+    const fetchThemes = useCallback(
         async (signal?: AbortSignal) => {
             const response = await apiFetch(
                 '/api/themes-of-the-year/admin',
@@ -342,55 +315,69 @@ function Sermons() {
             );
 
             if (!response.ok) {
-                throw new Error(
-                    await readProblem(
-                        response,
-                        `Unable to load themes (${response.status}).`
-                    )
+                throw await getApiErrorDetails(
+                    response,
+                    'Unable to load themes.'
                 );
             }
 
-            const data: ThemeOfTheYear[] =
-                await response.json();
-
-            setThemes(
-                [...data].sort(
-                    (a, b) => b.year - a.year
-                )
-            );
+            return (
+                await response.json()
+            ) as ThemeOfTheYear[];
         },
         []
     );
 
-    const refreshPosts = useCallback(
-        async () => {
-            await loadPosts();
+    const loadAll = useCallback(
+        async (signal?: AbortSignal) => {
+            const [postData, themeData] =
+                await Promise.all([
+                    fetchPosts(signal),
+                    fetchThemes(signal),
+                ]);
+
+            setPosts(postData);
+
+            setThemes(
+                [...themeData].sort(
+                    (a, b) => b.year - a.year
+                )
+            );
+
+            setLoadError(null);
         },
-        [loadPosts]
+        [fetchPosts, fetchThemes]
     );
 
     useEffect(() => {
         const controller =
             new AbortController();
 
-        async function initialise() {
+        const initialise = async () => {
             try {
-                setError(null);
+                setLoading(true);
 
-                await Promise.all([
-                    loadPosts(controller.signal),
-                    loadThemes(controller.signal),
-                ]);
-            } catch (err) {
+                await loadAll(
+                    controller.signal
+                );
+            } catch (error) {
                 if (
-                    (err as Error).name !==
-                    'AbortError' &&
-                    !controller.signal.aborted
+                    controller.signal.aborted
                 ) {
-                    setError(
-                        err instanceof Error
-                            ? err.message
-                            : 'Unable to load sermons.'
+                    return;
+                }
+
+                if (
+                    typeof error === 'object' &&
+                    error !== null &&
+                    'message' in error
+                ) {
+                    setLoadError(
+                        error as ApiErrorDetails
+                    );
+                } else {
+                    setLoadError(
+                        getNetworkErrorDetails()
                     );
                 }
             } finally {
@@ -400,14 +387,79 @@ function Sermons() {
                     setLoading(false);
                 }
             }
-        }
+        };
 
         void initialise();
 
         return () => {
             controller.abort();
         };
-    }, [loadPosts, loadThemes]);
+    }, [loadAll]);
+
+    async function retryLoad(): Promise<boolean> {
+        setRetrying(true);
+        setActionError(null);
+        setSuccessMessage(null);
+
+        try {
+            await loadAll();
+            return true;
+        } catch (error) {
+            if (
+                typeof error === 'object' &&
+                error !== null &&
+                'message' in error
+            ) {
+                setLoadError(
+                    error as ApiErrorDetails
+                );
+            } else {
+                setLoadError(
+                    getNetworkErrorDetails()
+                );
+            }
+
+            return false;
+        } finally {
+            setRetrying(false);
+        }
+    }
+
+    async function refreshPosts() {
+        const postData =
+            await fetchPosts();
+
+        setPosts(postData);
+    }
+
+    function showSuccess(
+        message: string
+    ) {
+        setSuccessMessage(message);
+
+        window.setTimeout(() => {
+            setSuccessMessage(current =>
+                current === message
+                    ? null
+                    : current
+            );
+        }, 3500);
+    }
+
+    async function actionFailure(
+        response: Response,
+        fallback: string
+    ) {
+        const details =
+            await getApiErrorDetails(
+                response,
+                fallback
+            );
+
+        throw new Error(
+            details.message
+        );
+    }
 
     function openAddForm() {
         setEditingPost(null);
@@ -418,7 +470,7 @@ function Sermons() {
                 themes[0]?.id ?? '',
         });
 
-        setError(null);
+        setActionError(null);
         setSuccessMessage(null);
         setFormOpen(true);
     }
@@ -454,9 +506,11 @@ function Sermons() {
                 post.structuredContent
                     ?.firstPoints?.map(
                         point => ({
-                            title: point.title,
+                            title:
+                                point.title,
                             content:
-                                point.content ?? '',
+                                point.content ??
+                                '',
                             bullets:
                                 point.bullets?.join(
                                     '\n'
@@ -483,7 +537,8 @@ function Sermons() {
                 post.structuredContent
                     ?.detailedLessons?.map(
                         lesson => ({
-                            title: lesson.title,
+                            title:
+                                lesson.title,
                             bullets:
                                 lesson.bullets.join(
                                     '\n'
@@ -492,7 +547,7 @@ function Sermons() {
                     ) ?? [],
         });
 
-        setError(null);
+        setActionError(null);
         setSuccessMessage(null);
         setFormOpen(true);
     }
@@ -615,13 +670,14 @@ function Sermons() {
                 'image/'
             )
         ) {
-            setError(
+            setActionError(
                 'Please select a valid image file.'
             );
             return;
         }
 
-        const reader = new FileReader();
+        const reader =
+            new FileReader();
 
         reader.onload = () => {
             const result =
@@ -634,7 +690,7 @@ function Sermons() {
                 result.indexOf(',');
 
             if (commaIndex < 0) {
-                setError(
+                setActionError(
                     'Unable to read the selected image.'
                 );
                 return;
@@ -652,7 +708,7 @@ function Sermons() {
         };
 
         reader.onerror = () => {
-            setError(
+            setActionError(
                 'Unable to read the selected image.'
             );
         };
@@ -677,7 +733,8 @@ function Sermons() {
                 }))
                 .filter(
                     point =>
-                        point.title.length > 0
+                        point.title.length >
+                        0
                 );
 
         const hasPreface =
@@ -703,7 +760,8 @@ function Sermons() {
                 }))
                 .filter(
                     lesson =>
-                        lesson.title.length > 0
+                        lesson.title.length >
+                        0
                 );
 
         if (
@@ -720,19 +778,21 @@ function Sermons() {
                     ? firstPoints
                     : null,
 
-            prefaceSection: hasPreface
-                ? {
-                    mainHeading:
-                        form.prefaceMainHeading.trim(),
-                    preamble:
-                        form.prefacePreamble.trim(),
-                    subHeading:
-                        form.prefaceSubHeading.trim(),
-                }
-                : null,
+            prefaceSection:
+                hasPreface
+                    ? {
+                        mainHeading:
+                            form.prefaceMainHeading.trim(),
+                        preamble:
+                            form.prefacePreamble.trim(),
+                        subHeading:
+                            form.prefaceSubHeading.trim(),
+                    }
+                    : null,
 
             detailedLessons:
-                detailedLessons.length > 0
+                detailedLessons.length >
+                    0
                     ? detailedLessons
                     : null,
         };
@@ -750,21 +810,23 @@ function Sermons() {
             form.content.trim();
 
         if (!title) {
-            setError(
+            setActionError(
                 'Sermon title is required.'
             );
             return;
         }
 
         if (!content) {
-            setError(
+            setActionError(
                 'Main sermon content is required.'
             );
             return;
         }
 
-        if (!form.themeOfTheYearId) {
-            setError(
+        if (
+            !form.themeOfTheYearId
+        ) {
+            setActionError(
                 'Please select a Theme of the Year.'
             );
             return;
@@ -781,14 +843,14 @@ function Sermons() {
             category < 1 ||
             category > 8
         ) {
-            setError(
+            setActionError(
                 'Please select a valid category.'
             );
             return;
         }
 
         setSaving(true);
-        setError(null);
+        setActionError(null);
         setSuccessMessage(null);
 
         try {
@@ -858,13 +920,11 @@ function Sermons() {
                     );
 
             if (!response.ok) {
-                throw new Error(
-                    await readProblem(
-                        response,
-                        editingPost
-                            ? 'Unable to update the sermon.'
-                            : 'Unable to create the sermon.'
-                    )
+                await actionFailure(
+                    response,
+                    editingPost
+                        ? 'Unable to update the sermon.'
+                        : 'Unable to create the sermon.'
                 );
             }
 
@@ -872,17 +932,17 @@ function Sermons() {
             setEditingPost(null);
             setForm(emptyForm);
 
-            setSuccessMessage(
+            showSuccess(
                 editingPost
                     ? 'Sermon updated successfully.'
                     : 'Sermon created successfully as a draft.'
             );
 
             await refreshPosts();
-        } catch (err) {
-            setError(
-                err instanceof Error
-                    ? err.message
+        } catch (error) {
+            setActionError(
+                error instanceof Error
+                    ? error.message
                     : 'Unable to save the sermon.'
             );
         } finally {
@@ -894,7 +954,7 @@ function Sermons() {
         post: PastorPost,
         action: ConfirmationAction
     ) {
-        setError(null);
+        setActionError(null);
         setSuccessMessage(null);
 
         setConfirmation({
@@ -920,7 +980,7 @@ function Sermons() {
             confirmation;
 
         setActionPostId(post.id);
-        setError(null);
+        setActionError(null);
         setSuccessMessage(null);
 
         try {
@@ -930,46 +990,48 @@ function Sermons() {
                 action === 'publish' ||
                 action === 'unpublish'
             ) {
-                response = await apiFetch(
-                    `/api/pastor-posts/admin/${post.id}/${action}`,
-                    {
-                        method: 'POST',
-                    }
-                );
+                response =
+                    await apiFetch(
+                        `/api/pastor-posts/admin/${post.id}/${action}`,
+                        {
+                            method: 'POST',
+                        }
+                    );
             } else if (
                 action === 'pin' ||
                 action === 'unpin'
             ) {
-                response = await apiFetch(
-                    `/api/pastor-posts/admin/${post.id}/pin`,
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type':
-                                'application/json',
-                        },
-                        body: JSON.stringify({
-                            isPinned:
-                                action ===
-                                'pin',
-                        }),
-                    }
-                );
+                response =
+                    await apiFetch(
+                        `/api/pastor-posts/admin/${post.id}/pin`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type':
+                                    'application/json',
+                            },
+                            body:
+                                JSON.stringify({
+                                    isPinned:
+                                        action ===
+                                        'pin',
+                                }),
+                        }
+                    );
             } else {
-                response = await apiFetch(
-                    `/api/pastor-posts/admin/${post.id}`,
-                    {
-                        method: 'DELETE',
-                    }
-                );
+                response =
+                    await apiFetch(
+                        `/api/pastor-posts/admin/${post.id}`,
+                        {
+                            method: 'DELETE',
+                        }
+                    );
             }
 
             if (!response.ok) {
-                throw new Error(
-                    await readProblem(
-                        response,
-                        `Unable to ${action} the sermon.`
-                    )
+                await actionFailure(
+                    response,
+                    `Unable to ${action} the sermon.`
                 );
             }
 
@@ -990,19 +1052,21 @@ function Sermons() {
                     'Sermon deleted successfully.',
             };
 
-            setSuccessMessage(
+            setConfirmation(null);
+
+            showSuccess(
                 messages[action]
             );
 
-            setConfirmation(null);
-
             await refreshPosts();
-        } catch (err) {
-            setError(
-                err instanceof Error
-                    ? err.message
+        } catch (error) {
+            setActionError(
+                error instanceof Error
+                    ? error.message
                     : `Unable to ${action} the sermon.`
             );
+
+            setConfirmation(null);
         } finally {
             setActionPostId(null);
         }
@@ -1112,32 +1176,56 @@ function Sermons() {
 
                         <p>
                             Create, edit and manage
-                            Pastor&apos;s Corner
-                            messages, devotionals and
-                            sermon content.
+                            Pastor&apos;s Corner messages,
+                            devotionals and sermon content.
                         </p>
                     </div>
 
-                    <button
-                        type="button"
-                        className="admin-primary-button"
-                        onClick={openAddForm}
-                        disabled={
-                            loading ||
-                            themes.length === 0
-                        }
-                    >
-                        <span>＋</span>
-                        New Sermon
-                    </button>
+                    {!loadError &&
+                        !loading && (
+                            <button
+                                type="button"
+                                className="admin-primary-button"
+                                onClick={
+                                    openAddForm
+                                }
+                                disabled={
+                                    themes.length ===
+                                    0
+                                }
+                            >
+                                <span>＋</span>
+                                New Sermon
+                            </button>
+                        )}
                 </div>
 
-                {error && (
+                {actionError && (
                     <div
                         className="admin-message admin-message-error"
                         role="alert"
                     >
-                        {error}
+                        <div>
+                            <strong>
+                                Something went wrong
+                            </strong>
+
+                            <p>
+                                {actionError}
+                            </p>
+                        </div>
+
+                        <button
+                            type="button"
+                            onClick={() =>
+                                setActionError(
+                                    null
+                                )
+                            }
+                            aria-label="Dismiss error"
+                        >
+                            ×
+                        </button>
                     </div>
                 )}
 
@@ -1150,382 +1238,430 @@ function Sermons() {
                     </div>
                 )}
 
-                {!loading &&
-                    themes.length === 0 && (
-                        <div
-                            className="admin-message admin-message-error"
-                            role="alert"
-                        >
-                            No Theme of the Year
-                            records are available.
-                            Create a theme before
-                            creating a sermon.
-                        </div>
-                    )}
+                {loading ? (
+                    <div className="admin-empty-state">
+                        <div className="admin-loading-spinner" />
 
-                <div className="sermon-summary-grid">
-                    <div className="sermon-summary-card">
-                        <span>▤</span>
-
-                        <div>
-                            <strong>
-                                {posts.length}
-                            </strong>
-                            <small>
-                                Total Sermons
-                            </small>
-                        </div>
+                        <strong>
+                            Loading sermons...
+                        </strong>
                     </div>
+                ) : loadError ? (
+                    <ApiErrorState
+                        status={
+                            loadError.status
+                        }
+                        title={
+                            loadError.title
+                        }
+                        message={
+                            loadError.message
+                        }
+                        onRetry={
+                            retryLoad
+                        }
+                        retrying={
+                            retrying
+                        }
+                    />
+                ) : (
+                    <>
+                        {themes.length ===
+                            0 && (
+                                <div
+                                    className="admin-message admin-message-error"
+                                    role="alert"
+                                >
+                                    No Theme of the
+                                    Year records are
+                                    available. Create
+                                    a theme before
+                                    creating a sermon.
+                                </div>
+                            )}
 
-                    <div className="sermon-summary-card">
-                        <span>●</span>
+                        <div className="sermon-summary-grid">
+                            <div className="sermon-summary-card">
+                                <span>▤</span>
 
-                        <div>
-                            <strong>
-                                {publishedCount}
-                            </strong>
-                            <small>
-                                Published
-                            </small>
+                                <div>
+                                    <strong>
+                                        {
+                                            posts.length
+                                        }
+                                    </strong>
+                                    <small>
+                                        Total Sermons
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div className="sermon-summary-card">
+                                <span>●</span>
+
+                                <div>
+                                    <strong>
+                                        {
+                                            publishedCount
+                                        }
+                                    </strong>
+                                    <small>
+                                        Published
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div className="sermon-summary-card">
+                                <span>◷</span>
+
+                                <div>
+                                    <strong>
+                                        {
+                                            draftCount
+                                        }
+                                    </strong>
+                                    <small>
+                                        Drafts
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div className="sermon-summary-card">
+                                <span>★</span>
+
+                                <div>
+                                    <strong>
+                                        {
+                                            pinnedCount
+                                        }
+                                    </strong>
+                                    <small>
+                                        Pinned
+                                    </small>
+                                </div>
+                            </div>
                         </div>
-                    </div>
 
-                    <div className="sermon-summary-card">
-                        <span>◷</span>
+                        <article className="admin-panel sermon-management-panel">
+                            <div className="sermon-toolbar">
+                                <div>
+                                    <h2>
+                                        Sermon Library
+                                    </h2>
 
-                        <div>
-                            <strong>
-                                {draftCount}
-                            </strong>
-                            <small>Drafts</small>
-                        </div>
-                    </div>
+                                    <p>
+                                        Manage draft and
+                                        published
+                                        Pastor&apos;s
+                                        Corner content.
+                                    </p>
+                                </div>
 
-                    <div className="sermon-summary-card">
-                        <span>★</span>
+                                <div className="sermon-toolbar-controls">
+                                    <input
+                                        type="search"
+                                        value={
+                                            search
+                                        }
+                                        onChange={
+                                            event =>
+                                                setSearch(
+                                                    event
+                                                        .target
+                                                        .value
+                                                )
+                                        }
+                                        placeholder="Search sermons..."
+                                        aria-label="Search sermons"
+                                        className="sermon-search"
+                                    />
 
-                        <div>
-                            <strong>
-                                {pinnedCount}
-                            </strong>
-                            <small>Pinned</small>
-                        </div>
-                    </div>
-                </div>
+                                    <select
+                                        value={
+                                            filter
+                                        }
+                                        onChange={
+                                            event =>
+                                                setFilter(
+                                                    event
+                                                        .target
+                                                        .value as FilterType
+                                                )
+                                        }
+                                        aria-label="Filter sermons"
+                                        className="sermon-filter"
+                                    >
+                                        <option value="all">
+                                            All sermons
+                                        </option>
 
-                <article className="admin-panel sermon-management-panel">
-                    <div className="sermon-toolbar">
-                        <div>
-                            <h2>
-                                Sermon Library
-                            </h2>
+                                        <option value="published">
+                                            Published
+                                        </option>
 
-                            <p>
-                                Manage draft and
-                                published Pastor&apos;s
-                                Corner content.
-                            </p>
-                        </div>
+                                        <option value="draft">
+                                            Drafts
+                                        </option>
 
-                        <div className="sermon-toolbar-controls">
-                            <input
-                                type="search"
-                                value={search}
-                                onChange={event =>
-                                    setSearch(
-                                        event.target
-                                            .value
-                                    )
-                                }
-                                placeholder="Search sermons..."
-                                aria-label="Search sermons"
-                                className="sermon-search"
-                            />
+                                        <option value="pinned">
+                                            Pinned
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
 
-                            <select
-                                value={filter}
-                                onChange={event =>
-                                    setFilter(
-                                        event.target
-                                            .value as FilterType
-                                    )
-                                }
-                                aria-label="Filter sermons"
-                                className="sermon-filter"
-                            >
-                                <option value="all">
-                                    All sermons
-                                </option>
+                            {posts.length ===
+                                0 ? (
+                                <div className="admin-empty-state">
+                                    <span className="admin-empty-icon">
+                                        ▶
+                                    </span>
 
-                                <option value="published">
-                                    Published
-                                </option>
+                                    <strong>
+                                        No sermons yet
+                                    </strong>
 
-                                <option value="draft">
-                                    Drafts
-                                </option>
+                                    <p>
+                                        Create your
+                                        first
+                                        Pastor&apos;s
+                                        Corner sermon.
+                                    </p>
 
-                                <option value="pinned">
-                                    Pinned
-                                </option>
-                            </select>
-                        </div>
-                    </div>
+                                    <button
+                                        type="button"
+                                        className="admin-primary-button"
+                                        onClick={
+                                            openAddForm
+                                        }
+                                        disabled={
+                                            themes.length ===
+                                            0
+                                        }
+                                    >
+                                        New Sermon
+                                    </button>
+                                </div>
+                            ) : filteredPosts.length ===
+                                0 ? (
+                                <div className="admin-empty-state">
+                                    <strong>
+                                        No matching
+                                        sermons
+                                    </strong>
 
-                    {loading ? (
-                        <div className="admin-empty-state">
-                            <div className="admin-loading-spinner" />
-
-                            <strong>
-                                Loading sermons...
-                            </strong>
-                        </div>
-                    ) : posts.length === 0 ? (
-                        <div className="admin-empty-state">
-                            <span className="admin-empty-icon">
-                                ▶
-                            </span>
-
-                            <strong>
-                                No sermons yet
-                            </strong>
-
-                            <p>
-                                Create your first
-                                Pastor&apos;s Corner
-                                sermon.
-                            </p>
-
-                            <button
-                                type="button"
-                                className="admin-primary-button"
-                                onClick={
-                                    openAddForm
-                                }
-                                disabled={
-                                    themes.length ===
-                                    0
-                                }
-                            >
-                                New Sermon
-                            </button>
-                        </div>
-                    ) : filteredPosts.length ===
-                        0 ? (
-                        <div className="admin-empty-state">
-                            <strong>
-                                No matching sermons
-                            </strong>
-
-                            <p>
-                                Try changing your
-                                search or filter.
-                            </p>
-                        </div>
-                    ) : (
-                        <div className="admin-table-wrapper">
-                            <table className="admin-data-table sermon-table">
-                                <thead>
-                                    <tr>
-                                        <th>
-                                            Sermon
-                                        </th>
-                                        <th>
-                                            Theme
-                                        </th>
-                                        <th>
-                                            Category
-                                        </th>
-                                        <th>
-                                            Status
-                                        </th>
-                                        <th>
-                                            Views
-                                        </th>
-                                        <th>
-                                            Actions
-                                        </th>
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-                                    {filteredPosts.map(
-                                        post => (
-                                            <tr
-                                                key={
-                                                    post.id
-                                                }
-                                            >
-                                                <td>
-                                                    <div className="sermon-title-cell">
-                                                        {post.coverImageData &&
-                                                            post.coverImageContentType ? (
-                                                            <img
-                                                                src={`data:${post.coverImageContentType};base64,${post.coverImageData}`}
-                                                                alt=""
-                                                            />
-                                                        ) : (
-                                                            <span className="sermon-cover-placeholder">
-                                                                ▶
-                                                            </span>
-                                                        )}
-
-                                                        <div>
-                                                            <strong>
-                                                                {
-                                                                    post.title
-                                                                }
-                                                            </strong>
-
-                                                            <small>
-                                                                {
-                                                                    post.authorName
-                                                                }
-                                                            </small>
-
-                                                            {post.bibleReference && (
-                                                                <small>
-                                                                    {
-                                                                        post.bibleReference
-                                                                    }
-                                                                </small>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                </td>
-
-                                                <td>
-                                                    <span className="sermon-theme">
-                                                        {post.themeTitle ??
-                                                            '—'}
-                                                    </span>
-                                                </td>
-
-                                                <td>
-                                                    {categoryName(
-                                                        post.category
-                                                    )}
-                                                </td>
-
-                                                <td>
-                                                    <div className="sermon-status-list">
-                                                        <span
-                                                            className={`sermon-status ${post.isPublished
-                                                                ? 'published'
-                                                                : 'draft'
-                                                                }`}
-                                                        >
-                                                            {post.isPublished
-                                                                ? 'Published'
-                                                                : 'Draft'}
-                                                        </span>
-
-                                                        {post.isPinned && (
-                                                            <span className="sermon-status pinned">
-                                                                ★
-                                                                Pinned
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                </td>
-
-                                                <td>
-                                                    {
-                                                        post.viewCount
-                                                    }
-                                                </td>
-
-                                                <td>
-                                                    <div className="admin-table-actions sermon-actions">
-                                                        <button
-                                                            type="button"
-                                                            className="admin-action-button edit"
-                                                            onClick={() =>
-                                                                openEditForm(
-                                                                    post
-                                                                )
-                                                            }
-                                                            disabled={
-                                                                actionPostId ===
-                                                                post.id
-                                                            }
-                                                        >
-                                                            Edit
-                                                        </button>
-
-                                                        <button
-                                                            type="button"
-                                                            className={`admin-action-button ${post.isPublished
-                                                                ? 'deactivate'
-                                                                : 'activate'
-                                                                }`}
-                                                            onClick={() =>
-                                                                requestAction(
-                                                                    post,
-                                                                    post.isPublished
-                                                                        ? 'unpublish'
-                                                                        : 'publish'
-                                                                )
-                                                            }
-                                                            disabled={
-                                                                actionPostId ===
-                                                                post.id
-                                                            }
-                                                        >
-                                                            {post.isPublished
-                                                                ? 'Unpublish'
-                                                                : 'Publish'}
-                                                        </button>
-
-                                                        {post.isPublished && (
-                                                            <button
-                                                                type="button"
-                                                                className="admin-action-button sermon-pin-button"
-                                                                onClick={() =>
-                                                                    requestAction(
-                                                                        post,
-                                                                        post.isPinned
-                                                                            ? 'unpin'
-                                                                            : 'pin'
-                                                                    )
-                                                                }
-                                                                disabled={
-                                                                    actionPostId ===
-                                                                    post.id
-                                                                }
-                                                            >
-                                                                {post.isPinned
-                                                                    ? 'Unpin'
-                                                                    : 'Pin'}
-                                                            </button>
-                                                        )}
-
-                                                        <button
-                                                            type="button"
-                                                            className="admin-action-button sermon-delete-button"
-                                                            onClick={() =>
-                                                                requestAction(
-                                                                    post,
-                                                                    'delete'
-                                                                )
-                                                            }
-                                                            disabled={
-                                                                actionPostId ===
-                                                                post.id
-                                                            }
-                                                        >
-                                                            Delete
-                                                        </button>
-                                                    </div>
-                                                </td>
+                                    <p>
+                                        Try changing
+                                        your search
+                                        or filter.
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="admin-table-wrapper">
+                                    <table className="admin-data-table sermon-table">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    Sermon
+                                                </th>
+                                                <th>
+                                                    Theme
+                                                </th>
+                                                <th>
+                                                    Category
+                                                </th>
+                                                <th>
+                                                    Status
+                                                </th>
+                                                <th>
+                                                    Views
+                                                </th>
+                                                <th>
+                                                    Actions
+                                                </th>
                                             </tr>
-                                        )
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-                </article>
+                                        </thead>
+
+                                        <tbody>
+                                            {filteredPosts.map(
+                                                post => (
+                                                    <tr
+                                                        key={
+                                                            post.id
+                                                        }
+                                                    >
+                                                        <td>
+                                                            <div className="sermon-title-cell">
+                                                                {post.coverImageData &&
+                                                                    post.coverImageContentType ? (
+                                                                    <img
+                                                                        src={`data:${post.coverImageContentType};base64,${post.coverImageData}`}
+                                                                        alt=""
+                                                                    />
+                                                                ) : (
+                                                                    <span className="sermon-cover-placeholder">
+                                                                        ▶
+                                                                    </span>
+                                                                )}
+
+                                                                <div>
+                                                                    <strong>
+                                                                        {
+                                                                            post.title
+                                                                        }
+                                                                    </strong>
+
+                                                                    <small>
+                                                                        {
+                                                                            post.authorName
+                                                                        }
+                                                                    </small>
+
+                                                                    {post.bibleReference && (
+                                                                        <small>
+                                                                            {
+                                                                                post.bibleReference
+                                                                            }
+                                                                        </small>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </td>
+
+                                                        <td>
+                                                            <span className="sermon-theme">
+                                                                {post.themeTitle ??
+                                                                    '—'}
+                                                            </span>
+                                                        </td>
+
+                                                        <td>
+                                                            {categoryName(
+                                                                post.category
+                                                            )}
+                                                        </td>
+
+                                                        <td>
+                                                            <div className="sermon-status-list">
+                                                                <span
+                                                                    className={`sermon-status ${post.isPublished
+                                                                        ? 'published'
+                                                                        : 'draft'
+                                                                        }`}
+                                                                >
+                                                                    {post.isPublished
+                                                                        ? 'Published'
+                                                                        : 'Draft'}
+                                                                </span>
+
+                                                                {post.isPinned && (
+                                                                    <span className="sermon-status pinned">
+                                                                        ★
+                                                                        Pinned
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </td>
+
+                                                        <td>
+                                                            {
+                                                                post.viewCount
+                                                            }
+                                                        </td>
+
+                                                        <td>
+                                                            <div className="admin-table-actions sermon-actions">
+                                                                <button
+                                                                    type="button"
+                                                                    className="admin-action-button edit"
+                                                                    onClick={() =>
+                                                                        openEditForm(
+                                                                            post
+                                                                        )
+                                                                    }
+                                                                    disabled={
+                                                                        actionPostId ===
+                                                                        post.id
+                                                                    }
+                                                                >
+                                                                    Edit
+                                                                </button>
+
+                                                                <button
+                                                                    type="button"
+                                                                    className={`admin-action-button ${post.isPublished
+                                                                        ? 'deactivate'
+                                                                        : 'activate'
+                                                                        }`}
+                                                                    onClick={() =>
+                                                                        requestAction(
+                                                                            post,
+                                                                            post.isPublished
+                                                                                ? 'unpublish'
+                                                                                : 'publish'
+                                                                        )
+                                                                    }
+                                                                    disabled={
+                                                                        actionPostId ===
+                                                                        post.id
+                                                                    }
+                                                                >
+                                                                    {post.isPublished
+                                                                        ? 'Unpublish'
+                                                                        : 'Publish'}
+                                                                </button>
+
+                                                                {post.isPublished && (
+                                                                    <button
+                                                                        type="button"
+                                                                        className="admin-action-button sermon-pin-button"
+                                                                        onClick={() =>
+                                                                            requestAction(
+                                                                                post,
+                                                                                post.isPinned
+                                                                                    ? 'unpin'
+                                                                                    : 'pin'
+                                                                            )
+                                                                        }
+                                                                        disabled={
+                                                                            actionPostId ===
+                                                                            post.id
+                                                                        }
+                                                                    >
+                                                                        {post.isPinned
+                                                                            ? 'Unpin'
+                                                                            : 'Pin'}
+                                                                    </button>
+                                                                )}
+
+                                                                <button
+                                                                    type="button"
+                                                                    className="admin-action-button sermon-delete-button"
+                                                                    onClick={() =>
+                                                                        requestAction(
+                                                                            post,
+                                                                            'delete'
+                                                                        )
+                                                                    }
+                                                                    disabled={
+                                                                        actionPostId ===
+                                                                        post.id
+                                                                    }
+                                                                >
+                                                                    Delete
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                )
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </article>
+                    </>
+                )}
             </section>
 
             {formOpen && (
@@ -1662,8 +1798,7 @@ function Sermons() {
                                             required
                                         >
                                             <option value="">
-                                                Select
-                                                theme
+                                                Select theme
                                             </option>
 
                                             {themes.map(
@@ -1735,8 +1870,7 @@ function Sermons() {
                                 <div className="sermon-form-grid">
                                     <div className="admin-form-group">
                                         <label htmlFor="sermon-reference">
-                                            Bible
-                                            Reference
+                                            Bible Reference
                                         </label>
 
                                         <input
@@ -1863,75 +1997,49 @@ function Sermons() {
 
                             <div className="sermon-form-section">
                                 <div className="sermon-form-section-heading">
-                                    <span>
-                                        02
-                                    </span>
-
+                                    <span>02</span>
                                     <div>
-                                        <h3>
-                                            Introduction
-                                        </h3>
-
+                                        <h3>Introduction</h3>
                                         <p>
-                                            Optional
-                                            introduction
-                                            displayed before
-                                            the structured
-                                            lesson content.
+                                            Optional introduction displayed before the structured lesson content.
                                         </p>
                                     </div>
                                 </div>
 
                                 <div className="admin-form-group">
                                     <label htmlFor="sermon-intro-heading">
-                                        Introduction
-                                        Heading
+                                        Introduction Heading
                                     </label>
 
                                     <input
                                         id="sermon-intro-heading"
                                         type="text"
-                                        value={
-                                            form.introHeading
-                                        }
-                                        onChange={
-                                            event =>
-                                                setForm(
-                                                    current => ({
-                                                        ...current,
-                                                        introHeading:
-                                                            event
-                                                                .target
-                                                                .value,
-                                                    })
-                                                )
+                                        value={form.introHeading}
+                                        onChange={event =>
+                                            setForm(current => ({
+                                                ...current,
+                                                introHeading:
+                                                    event.target.value,
+                                            }))
                                         }
                                     />
                                 </div>
 
                                 <div className="admin-form-group">
                                     <label htmlFor="sermon-intro-text">
-                                        Introduction
-                                        Text
+                                        Introduction Text
                                     </label>
 
                                     <textarea
                                         id="sermon-intro-text"
                                         rows={5}
-                                        value={
-                                            form.introText
-                                        }
-                                        onChange={
-                                            event =>
-                                                setForm(
-                                                    current => ({
-                                                        ...current,
-                                                        introText:
-                                                            event
-                                                                .target
-                                                                .value,
-                                                    })
-                                                )
+                                        value={form.introText}
+                                        onChange={event =>
+                                            setForm(current => ({
+                                                ...current,
+                                                introText:
+                                                    event.target.value,
+                                            }))
                                         }
                                     />
                                 </div>
@@ -1939,59 +2047,39 @@ function Sermons() {
 
                             <div className="sermon-form-section">
                                 <div className="sermon-form-section-heading sermon-section-with-action">
-                                    <span>
-                                        03
-                                    </span>
+                                    <span>03</span>
 
                                     <div>
-                                        <h3>
-                                            First Points
-                                        </h3>
-
+                                        <h3>First Points</h3>
                                         <p>
-                                            Add introductory
-                                            points with
-                                            optional text
-                                            and bullet
-                                            lists.
+                                            Add introductory points with optional text and bullet lists.
                                         </p>
                                     </div>
 
                                     <button
                                         type="button"
                                         className="admin-secondary-button"
-                                        onClick={
-                                            addFirstPoint
-                                        }
+                                        onClick={addFirstPoint}
                                     >
                                         ＋ Add Point
                                     </button>
                                 </div>
 
-                                {form.firstPoints.length ===
-                                    0 ? (
+                                {form.firstPoints.length === 0 ? (
                                     <div className="sermon-structured-empty">
-                                        No first
-                                        points added.
+                                        No first points added.
                                     </div>
                                 ) : (
                                     <div className="sermon-repeat-list">
                                         {form.firstPoints.map(
-                                            (
-                                                point,
-                                                index
-                                            ) => (
+                                            (point, index) => (
                                                 <div
                                                     className="sermon-repeat-card"
-                                                    key={
-                                                        index
-                                                    }
+                                                    key={index}
                                                 >
                                                     <div className="sermon-repeat-heading">
                                                         <strong>
-                                                            Point{' '}
-                                                            {index +
-                                                                1}
+                                                            Point {index + 1}
                                                         </strong>
 
                                                         <button
@@ -2013,18 +2101,13 @@ function Sermons() {
 
                                                         <input
                                                             type="text"
-                                                            value={
-                                                                point.title
-                                                            }
-                                                            onChange={
-                                                                event =>
-                                                                    updateFirstPoint(
-                                                                        index,
-                                                                        'title',
-                                                                        event
-                                                                            .target
-                                                                            .value
-                                                                    )
+                                                            value={point.title}
+                                                            onChange={event =>
+                                                                updateFirstPoint(
+                                                                    index,
+                                                                    'title',
+                                                                    event.target.value
+                                                                )
                                                             }
                                                         />
                                                     </div>
@@ -2035,21 +2118,14 @@ function Sermons() {
                                                         </label>
 
                                                         <textarea
-                                                            rows={
-                                                                4
-                                                            }
-                                                            value={
-                                                                point.content
-                                                            }
-                                                            onChange={
-                                                                event =>
-                                                                    updateFirstPoint(
-                                                                        index,
-                                                                        'content',
-                                                                        event
-                                                                            .target
-                                                                            .value
-                                                                    )
+                                                            rows={4}
+                                                            value={point.content}
+                                                            onChange={event =>
+                                                                updateFirstPoint(
+                                                                    index,
+                                                                    'content',
+                                                                    event.target.value
+                                                                )
                                                             }
                                                         />
                                                     </div>
@@ -2060,30 +2136,20 @@ function Sermons() {
                                                         </label>
 
                                                         <textarea
-                                                            rows={
-                                                                4
-                                                            }
-                                                            value={
-                                                                point.bullets
-                                                            }
-                                                            onChange={
-                                                                event =>
-                                                                    updateFirstPoint(
-                                                                        index,
-                                                                        'bullets',
-                                                                        event
-                                                                            .target
-                                                                            .value
-                                                                    )
+                                                            rows={4}
+                                                            value={point.bullets}
+                                                            onChange={event =>
+                                                                updateFirstPoint(
+                                                                    index,
+                                                                    'bullets',
+                                                                    event.target.value
+                                                                )
                                                             }
                                                             placeholder="Enter one bullet per line"
                                                         />
 
                                                         <small>
-                                                            One
-                                                            bullet
-                                                            per
-                                                            line.
+                                                            One bullet per line.
                                                         </small>
                                                     </div>
                                                 </div>
@@ -2095,21 +2161,15 @@ function Sermons() {
 
                             <div className="sermon-form-section">
                                 <div className="sermon-form-section-heading">
-                                    <span>
-                                        04
-                                    </span>
+                                    <span>04</span>
 
                                     <div>
                                         <h3>
-                                            Preface
-                                            Section
+                                            Preface Section
                                         </h3>
 
                                         <p>
-                                            Optional
-                                            transition into
-                                            the detailed
-                                            lessons.
+                                            Optional transition into the detailed lessons.
                                         </p>
                                     </div>
                                 </div>
@@ -2122,20 +2182,13 @@ function Sermons() {
                                     <input
                                         id="preface-heading"
                                         type="text"
-                                        value={
-                                            form.prefaceMainHeading
-                                        }
-                                        onChange={
-                                            event =>
-                                                setForm(
-                                                    current => ({
-                                                        ...current,
-                                                        prefaceMainHeading:
-                                                            event
-                                                                .target
-                                                                .value,
-                                                    })
-                                                )
+                                        value={form.prefaceMainHeading}
+                                        onChange={event =>
+                                            setForm(current => ({
+                                                ...current,
+                                                prefaceMainHeading:
+                                                    event.target.value,
+                                            }))
                                         }
                                     />
                                 </div>
@@ -2148,20 +2201,13 @@ function Sermons() {
                                     <textarea
                                         id="preface-preamble"
                                         rows={5}
-                                        value={
-                                            form.prefacePreamble
-                                        }
-                                        onChange={
-                                            event =>
-                                                setForm(
-                                                    current => ({
-                                                        ...current,
-                                                        prefacePreamble:
-                                                            event
-                                                                .target
-                                                                .value,
-                                                    })
-                                                )
+                                        value={form.prefacePreamble}
+                                        onChange={event =>
+                                            setForm(current => ({
+                                                ...current,
+                                                prefacePreamble:
+                                                    event.target.value,
+                                            }))
                                         }
                                     />
                                 </div>
@@ -2174,20 +2220,13 @@ function Sermons() {
                                     <input
                                         id="preface-subheading"
                                         type="text"
-                                        value={
-                                            form.prefaceSubHeading
-                                        }
-                                        onChange={
-                                            event =>
-                                                setForm(
-                                                    current => ({
-                                                        ...current,
-                                                        prefaceSubHeading:
-                                                            event
-                                                                .target
-                                                                .value,
-                                                    })
-                                                )
+                                        value={form.prefaceSubHeading}
+                                        onChange={event =>
+                                            setForm(current => ({
+                                                ...current,
+                                                prefaceSubHeading:
+                                                    event.target.value,
+                                            }))
                                         }
                                     />
                                 </div>
@@ -2195,59 +2234,42 @@ function Sermons() {
 
                             <div className="sermon-form-section">
                                 <div className="sermon-form-section-heading sermon-section-with-action">
-                                    <span>
-                                        05
-                                    </span>
+                                    <span>05</span>
 
                                     <div>
                                         <h3>
-                                            Detailed
-                                            Lessons
+                                            Detailed Lessons
                                         </h3>
 
                                         <p>
-                                            Add lesson
-                                            headings and
-                                            their individual
-                                            teaching points.
+                                            Add lesson headings and their individual teaching points.
                                         </p>
                                     </div>
 
                                     <button
                                         type="button"
                                         className="admin-secondary-button"
-                                        onClick={
-                                            addDetailedLesson
-                                        }
+                                        onClick={addDetailedLesson}
                                     >
                                         ＋ Add Lesson
                                     </button>
                                 </div>
 
-                                {form.detailedLessons
-                                    .length === 0 ? (
+                                {form.detailedLessons.length === 0 ? (
                                     <div className="sermon-structured-empty">
-                                        No detailed
-                                        lessons added.
+                                        No detailed lessons added.
                                     </div>
                                 ) : (
                                     <div className="sermon-repeat-list">
                                         {form.detailedLessons.map(
-                                            (
-                                                lesson,
-                                                index
-                                            ) => (
+                                            (lesson, index) => (
                                                 <div
                                                     className="sermon-repeat-card"
-                                                    key={
-                                                        index
-                                                    }
+                                                    key={index}
                                                 >
                                                     <div className="sermon-repeat-heading">
                                                         <strong>
-                                                            Lesson{' '}
-                                                            {index +
-                                                                1}
+                                                            Lesson {index + 1}
                                                         </strong>
 
                                                         <button
@@ -2264,60 +2286,42 @@ function Sermons() {
 
                                                     <div className="admin-form-group">
                                                         <label>
-                                                            Lesson
-                                                            Title
+                                                            Lesson Title
                                                         </label>
 
                                                         <input
                                                             type="text"
-                                                            value={
-                                                                lesson.title
-                                                            }
-                                                            onChange={
-                                                                event =>
-                                                                    updateDetailedLesson(
-                                                                        index,
-                                                                        'title',
-                                                                        event
-                                                                            .target
-                                                                            .value
-                                                                    )
+                                                            value={lesson.title}
+                                                            onChange={event =>
+                                                                updateDetailedLesson(
+                                                                    index,
+                                                                    'title',
+                                                                    event.target.value
+                                                                )
                                                             }
                                                         />
                                                     </div>
 
                                                     <div className="admin-form-group">
                                                         <label>
-                                                            Teaching
-                                                            Points
+                                                            Teaching Points
                                                         </label>
 
                                                         <textarea
-                                                            rows={
-                                                                6
-                                                            }
-                                                            value={
-                                                                lesson.bullets
-                                                            }
-                                                            onChange={
-                                                                event =>
-                                                                    updateDetailedLesson(
-                                                                        index,
-                                                                        'bullets',
-                                                                        event
-                                                                            .target
-                                                                            .value
-                                                                    )
+                                                            rows={6}
+                                                            value={lesson.bullets}
+                                                            onChange={event =>
+                                                                updateDetailedLesson(
+                                                                    index,
+                                                                    'bullets',
+                                                                    event.target.value
+                                                                )
                                                             }
                                                             placeholder="Enter one teaching point per line"
                                                         />
 
                                                         <small>
-                                                            One
-                                                            teaching
-                                                            point
-                                                            per
-                                                            line.
+                                                            One teaching point per line.
                                                         </small>
                                                     </div>
                                                 </div>
@@ -2329,21 +2333,15 @@ function Sermons() {
 
                             <div className="sermon-form-section">
                                 <div className="sermon-form-section-heading">
-                                    <span>
-                                        06
-                                    </span>
+                                    <span>06</span>
 
                                     <div>
                                         <h3>
-                                            Closing &
-                                            Cover
+                                            Closing &amp; Cover
                                         </h3>
 
                                         <p>
-                                            Finish the
-                                            message and
-                                            optionally add
-                                            a cover image.
+                                            Finish the message and optionally add a cover image.
                                         </p>
                                     </div>
                                 </div>
@@ -2356,20 +2354,13 @@ function Sermons() {
                                     <textarea
                                         id="sermon-closing"
                                         rows={6}
-                                        value={
-                                            form.closingText
-                                        }
-                                        onChange={
-                                            event =>
-                                                setForm(
-                                                    current => ({
-                                                        ...current,
-                                                        closingText:
-                                                            event
-                                                                .target
-                                                                .value,
-                                                    })
-                                                )
+                                        value={form.closingText}
+                                        onChange={event =>
+                                            setForm(current => ({
+                                                ...current,
+                                                closingText:
+                                                    event.target.value,
+                                            }))
                                         }
                                     />
                                 </div>
@@ -2383,22 +2374,16 @@ function Sermons() {
                                         id="sermon-cover"
                                         type="file"
                                         accept="image/*"
-                                        onChange={
-                                            event =>
-                                                void handleCoverImage(
-                                                    event
-                                                        .target
-                                                        .files?.[0] ??
-                                                    null
-                                                )
+                                        onChange={event =>
+                                            void handleCoverImage(
+                                                event.target.files?.[0] ??
+                                                null
+                                            )
                                         }
                                     />
 
                                     <small>
-                                        Selecting a new
-                                        image replaces
-                                        the existing
-                                        sermon cover.
+                                        Selecting a new image replaces the existing sermon cover.
                                     </small>
                                 </div>
 
@@ -2417,12 +2402,8 @@ function Sermons() {
                                 <button
                                     type="button"
                                     className="admin-secondary-button"
-                                    onClick={
-                                        closeForm
-                                    }
-                                    disabled={
-                                        saving
-                                    }
+                                    onClick={closeForm}
+                                    disabled={saving}
                                 >
                                     Cancel
                                 </button>
@@ -2430,9 +2411,7 @@ function Sermons() {
                                 <button
                                     type="submit"
                                     className="admin-primary-button"
-                                    disabled={
-                                        saving
-                                    }
+                                    disabled={saving}
                                 >
                                     {saving
                                         ? 'Saving...'
@@ -2478,8 +2457,8 @@ function Sermons() {
                 loading={
                     actionPostId !== null
                 }
-                onConfirm={
-                    confirmAction
+                onConfirm={() =>
+                    void confirmAction()
                 }
                 onCancel={
                     closeConfirmation

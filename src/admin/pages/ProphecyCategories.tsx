@@ -6,7 +6,13 @@
     type FormEvent,
 } from 'react';
 
-import { apiFetch } from '../../api/api';
+import {
+    apiFetch,
+    getApiErrorDetails,
+    getNetworkErrorDetails,
+} from '../../api/api';
+import type { ApiErrorDetails } from '../../api/api';
+import ApiErrorState from '../../components/sections/ApiErrorState';
 import ConfirmDialog from '@/components/sections/ConfirmDialog';
 import AdminLayout from '../components/AdminLayout';
 import '../styles/admin.css';
@@ -48,25 +54,17 @@ const emptyForm: CategoryFormState = {
     displayOrder: '0',
 };
 
-async function readProblem(
-    response: Response,
-    fallback: string
-) {
-    try {
-        const problem = await response.json();
-
-        if (typeof problem?.detail === 'string') {
-            return problem.detail;
-        }
-
-        if (typeof problem?.title === 'string') {
-            return problem.title;
-        }
-    } catch {
-        // Keep the fallback message.
+function toApiErrorDetails(error: unknown): ApiErrorDetails {
+    if (
+        error &&
+        typeof error === 'object' &&
+        'status' in error &&
+        'message' in error
+    ) {
+        return error as ApiErrorDetails;
     }
 
-    return fallback;
+    return getNetworkErrorDetails(error);
 }
 
 function ProphecyCategories() {
@@ -83,6 +81,9 @@ function ProphecyCategories() {
         useState(true);
 
     const [loadingCategories, setLoadingCategories] =
+        useState(false);
+
+    const [retrying, setRetrying] =
         useState(false);
 
     const [formOpen, setFormOpen] =
@@ -109,6 +110,9 @@ function ProphecyCategories() {
 
     const [error, setError] =
         useState<string | null>(null);
+
+    const [loadError, setLoadError] =
+        useState<ApiErrorDetails | null>(null);
 
     const [successMessage, setSuccessMessage] =
         useState<string | null>(null);
@@ -139,21 +143,21 @@ function ProphecyCategories() {
         ) => {
             if (!prophecyYearId) {
                 setCategories([]);
-                return;
+                return true;
             }
 
             setLoadingCategories(true);
+            setLoadError(null);
 
             try {
-                setError(null);
-
                 const response = await apiFetch(
                     `/api/prophecies/admin/years/${prophecyYearId}/categories?activeOnly=false`,
                     { signal }
                 );
 
                 if (!response.ok) {
-                    throw new Error(
+                    throw await getApiErrorDetails(
+                        response,
                         `Failed to load prophecy categories (${response.status})`
                     );
                 }
@@ -171,17 +175,19 @@ function ProphecyCategories() {
                             )
                     )
                 );
+
+                return true;
             } catch (err) {
                 if (
                     (err as Error).name !==
                     'AbortError'
                 ) {
-                    setError(
-                        err instanceof Error
-                            ? err.message
-                            : 'Unable to load prophecy categories.'
+                    setLoadError(
+                        toApiErrorDetails(err)
                     );
                 }
+
+                return false;
             } finally {
                 if (!signal?.aborted) {
                     setLoadingCategories(false);
@@ -194,17 +200,17 @@ function ProphecyCategories() {
     const loadYears = useCallback(
         async (signal?: AbortSignal) => {
             setLoadingYears(true);
+            setLoadError(null);
 
             try {
-                setError(null);
-
                 const response = await apiFetch(
                     '/api/prophecies/admin/years',
                     { signal }
                 );
 
                 if (!response.ok) {
-                    throw new Error(
+                    throw await getApiErrorDetails(
+                        response,
                         `Failed to load prophecy years (${response.status})`
                     );
                 }
@@ -231,17 +237,19 @@ function ProphecyCategories() {
 
                     return ordered[0]?.id ?? '';
                 });
+
+                return true;
             } catch (err) {
                 if (
                     (err as Error).name !==
                     'AbortError'
                 ) {
-                    setError(
-                        err instanceof Error
-                            ? err.message
-                            : 'Unable to load prophecy years.'
+                    setLoadError(
+                        toApiErrorDetails(err)
                     );
                 }
+
+                return false;
             } finally {
                 if (!signal?.aborted) {
                     setLoadingYears(false);
@@ -282,6 +290,31 @@ function ProphecyCategories() {
         selectedYearId,
         loadCategories,
     ]);
+
+    async function retryLoad(): Promise<boolean> {
+        setRetrying(true);
+        setError(null);
+        setSuccessMessage(null);
+
+        try {
+            const yearsLoaded =
+                await loadYears();
+
+            if (!yearsLoaded) {
+                return false;
+            }
+
+            if (selectedYearId) {
+                return await loadCategories(
+                    selectedYearId
+                );
+            }
+
+            return true;
+        } finally {
+            setRetrying(false);
+        }
+    }
 
     function openAddForm() {
         if (!selectedYear) {
@@ -431,12 +464,12 @@ function ProphecyCategories() {
 
             if (!response.ok) {
                 throw new Error(
-                    await readProblem(
+                    (await getApiErrorDetails(
                         response,
                         editingCategory
                             ? 'Unable to update the category.'
                             : 'Unable to create the category.'
-                    )
+                    )).message
                 );
             }
 
@@ -514,10 +547,10 @@ function ProphecyCategories() {
 
             if (!response.ok) {
                 throw new Error(
-                    await readProblem(
+                    (await getApiErrorDetails(
                         response,
                         `Unable to ${action} the category.`
-                    )
+                    )).message
                 );
             }
 
@@ -602,271 +635,283 @@ function ProphecyCategories() {
                     </div>
                 )}
 
-                <div className="prophecy-category-year-panel admin-panel">
-                    <div>
-                        <span className="prophecy-category-year-label">
-                            Prophecy Year
-                        </span>
+                {loadError ? (
+                    <ApiErrorState
+                        status={loadError.status}
+                        title={loadError.title}
+                        message={loadError.message}
+                        onRetry={retryLoad}
+                        retrying={retrying}
+                    />
+                ) : (
+                    <>
+                        <div className="prophecy-category-year-panel admin-panel">
+                            <div>
+                                <span className="prophecy-category-year-label">
+                                    Prophecy Year
+                                </span>
 
-                        <p>
-                            Select the year whose
-                            categories you want to
-                            manage.
-                        </p>
-                    </div>
+                                <p>
+                                    Select the year whose
+                                    categories you want to
+                                    manage.
+                                </p>
+                            </div>
 
-                    <select
-                        value={
-                            selectedYearId
-                        }
-                        onChange={event => {
-                            setSelectedYearId(
-                                event.target.value
-                            );
-                            setSuccessMessage(
-                                null
-                            );
-                            setError(null);
-                        }}
-                        disabled={
-                            loadingYears ||
-                            years.length === 0
-                        }
-                        aria-label="Prophecy year"
-                    >
-                        {years.length === 0 && (
-                            <option value="">
-                                No prophecy years
-                            </option>
-                        )}
-
-                        {years.map(year => (
-                            <option
-                                key={year.id}
-                                value={year.id}
-                            >
-                                {year.year}
-                                {year.isPublished
-                                    ? ' • Published'
-                                    : ' • Unpublished'}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-                <div className="admin-panel prophecy-category-panel">
-                    <div className="prophecy-category-panel-heading">
-                        <div>
-                            <h2>
-                                Categories
-                            </h2>
-
-                            <p>
-                                {selectedYear
-                                    ? `${categories.length} ${categories.length === 1
-                                        ? 'category'
-                                        : 'categories'} for ${selectedYear.year}`
-                                    : 'No prophecy year selected'}
-                            </p>
-                        </div>
-
-                        <div className="prophecy-category-counts">
-                            <span>
-                                {activeCount} active
-                            </span>
-
-                            <span>
-                                {inactiveCount} inactive
-                            </span>
-                        </div>
-                    </div>
-
-                    {loadingYears ||
-                        loadingCategories ? (
-                        <div className="admin-empty-state">
-                            <div className="admin-loading-spinner" />
-                            <p>
-                                Loading prophecy
-                                categories...
-                            </p>
-                        </div>
-                    ) : !selectedYear ? (
-                        <div className="admin-empty-state">
-                            <h3>
-                                No prophecy years
-                            </h3>
-                            <p>
-                                Add a prophecy year
-                                from the Prophecies
-                                page first.
-                            </p>
-                        </div>
-                    ) : categories.length ===
-                        0 ? (
-                        <div className="admin-empty-state">
-                            <h3>
-                                No categories for{' '}
-                                {selectedYear.year}
-                            </h3>
-                            <p>
-                                Add the first
-                                category for this
-                                prophecy year.
-                            </p>
-
-                            <button
-                                type="button"
-                                className="admin-primary-button"
-                                onClick={
-                                    openAddForm
+                            <select
+                                value={
+                                    selectedYearId
                                 }
+                                onChange={event => {
+                                    setSelectedYearId(
+                                        event.target.value
+                                    );
+                                    setSuccessMessage(
+                                        null
+                                    );
+                                    setError(null);
+                                }}
+                                disabled={
+                                    loadingYears ||
+                                    years.length === 0
+                                }
+                                aria-label="Prophecy year"
                             >
-                                <span>＋</span>
-                                Add Category
-                            </button>
+                                {years.length === 0 && (
+                                    <option value="">
+                                        No prophecy years
+                                    </option>
+                                )}
+
+                                {years.map(year => (
+                                    <option
+                                        key={year.id}
+                                        value={year.id}
+                                    >
+                                        {year.year}
+                                        {year.isPublished
+                                            ? ' • Published'
+                                            : ' • Unpublished'}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
-                    ) : (
-                        <div className="admin-table-wrapper">
-                            <table className="admin-data-table prophecy-category-table">
-                                <thead>
-                                    <tr>
-                                        <th>
-                                            Category
-                                        </th>
-                                        <th>
-                                            Description
-                                        </th>
-                                        <th>
-                                            Order
-                                        </th>
-                                        <th>
-                                            Status
-                                        </th>
-                                        <th>
-                                            Prophecies
-                                        </th>
-                                        <th>
-                                            Actions
-                                        </th>
-                                    </tr>
-                                </thead>
 
-                                <tbody>
-                                    {categories.map(
-                                        category => (
-                                            <tr
-                                                key={
-                                                    category.id
-                                                }
-                                                className={
-                                                    category.isActive
-                                                        ? ''
-                                                        : 'inactive-row'
-                                                }
-                                            >
-                                                <td>
-                                                    <div className="prophecy-category-name">
-                                                        <span className="prophecy-category-symbol">
-                                                            ✦
-                                                        </span>
+                        <div className="admin-panel prophecy-category-panel">
+                            <div className="prophecy-category-panel-heading">
+                                <div>
+                                    <h2>
+                                        Categories
+                                    </h2>
 
-                                                        <strong>
-                                                            {
-                                                                category.name
-                                                            }
-                                                        </strong>
-                                                    </div>
-                                                </td>
+                                    <p>
+                                        {selectedYear
+                                            ? `${categories.length} ${categories.length === 1
+                                                ? 'category'
+                                                : 'categories'} for ${selectedYear.year}`
+                                            : 'No prophecy year selected'}
+                                    </p>
+                                </div>
 
-                                                <td>
-                                                    <span className="prophecy-category-description">
-                                                        {category.description ||
-                                                            '—'}
-                                                    </span>
-                                                </td>
+                                <div className="prophecy-category-counts">
+                                    <span>
+                                        {activeCount} active
+                                    </span>
 
-                                                <td>
-                                                    <span className="display-order-badge">
-                                                        {
-                                                            category.displayOrder
-                                                        }
-                                                    </span>
-                                                </td>
+                                    <span>
+                                        {inactiveCount} inactive
+                                    </span>
+                                </div>
+                            </div>
 
-                                                <td>
-                                                    <span
-                                                        className={`category-status ${category.isActive
-                                                            ? 'active'
-                                                            : 'inactive'
-                                                            }`}
-                                                    >
-                                                        <span>
-                                                            ●
-                                                        </span>
-                                                        {category.isActive
-                                                            ? 'Active'
-                                                            : 'Inactive'}
-                                                    </span>
-                                                </td>
+                            {loadingYears ||
+                                loadingCategories ? (
+                                <div className="admin-empty-state">
+                                    <div className="admin-loading-spinner" />
+                                    <p>
+                                        Loading prophecy
+                                        categories...
+                                    </p>
+                                </div>
+                            ) : !selectedYear ? (
+                                <div className="admin-empty-state">
+                                    <h3>
+                                        No prophecy years
+                                    </h3>
+                                    <p>
+                                        Add a prophecy year
+                                        from the Prophecies
+                                        page first.
+                                    </p>
+                                </div>
+                            ) : categories.length ===
+                                0 ? (
+                                <div className="admin-empty-state">
+                                    <h3>
+                                        No categories for{' '}
+                                        {selectedYear.year}
+                                    </h3>
+                                    <p>
+                                        Add the first
+                                        category for this
+                                        prophecy year.
+                                    </p>
 
-                                                <td>
-                                                    <span className="prophecy-category-prophecy-count">
-                                                        {category.prophecies?.length ??
-                                                            0}
-                                                    </span>
-                                                </td>
-
-                                                <td>
-                                                    <div className="admin-table-actions">
-                                                        <button
-                                                            type="button"
-                                                            className="admin-action-button edit"
-                                                            onClick={() =>
-                                                                openEditForm(
-                                                                    category
-                                                                )
-                                                            }
-                                                            disabled={
-                                                                actionCategoryId ===
-                                                                category.id
-                                                            }
-                                                        >
-                                                            Edit
-                                                        </button>
-
-                                                        <button
-                                                            type="button"
-                                                            className={`admin-action-button ${category.isActive
-                                                                ? 'deactivate'
-                                                                : 'activate'
-                                                                }`}
-                                                            onClick={() =>
-                                                                requestStatusChange(
-                                                                    category
-                                                                )
-                                                            }
-                                                            disabled={
-                                                                actionCategoryId ===
-                                                                category.id
-                                                            }
-                                                        >
-                                                            {actionCategoryId ===
-                                                                category.id
-                                                                ? 'Working...'
-                                                                : category.isActive
-                                                                    ? 'Deactivate'
-                                                                    : 'Activate'}
-                                                        </button>
-                                                    </div>
-                                                </td>
+                                    <button
+                                        type="button"
+                                        className="admin-primary-button"
+                                        onClick={
+                                            openAddForm
+                                        }
+                                    >
+                                        <span>＋</span>
+                                        Add Category
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="admin-table-wrapper">
+                                    <table className="admin-data-table prophecy-category-table">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    Category
+                                                </th>
+                                                <th>
+                                                    Description
+                                                </th>
+                                                <th>
+                                                    Order
+                                                </th>
+                                                <th>
+                                                    Status
+                                                </th>
+                                                <th>
+                                                    Prophecies
+                                                </th>
+                                                <th>
+                                                    Actions
+                                                </th>
                                             </tr>
-                                        )
-                                    )}
-                                </tbody>
-                            </table>
+                                        </thead>
+
+                                        <tbody>
+                                            {categories.map(
+                                                category => (
+                                                    <tr
+                                                        key={
+                                                            category.id
+                                                        }
+                                                        className={
+                                                            category.isActive
+                                                                ? ''
+                                                                : 'inactive-row'
+                                                        }
+                                                    >
+                                                        <td>
+                                                            <div className="prophecy-category-name">
+                                                                <span className="prophecy-category-symbol">
+                                                                    ✦
+                                                                </span>
+
+                                                                <strong>
+                                                                    {
+                                                                        category.name
+                                                                    }
+                                                                </strong>
+                                                            </div>
+                                                        </td>
+
+                                                        <td>
+                                                            <span className="prophecy-category-description">
+                                                                {category.description ||
+                                                                    '—'}
+                                                            </span>
+                                                        </td>
+
+                                                        <td>
+                                                            <span className="display-order-badge">
+                                                                {
+                                                                    category.displayOrder
+                                                                }
+                                                            </span>
+                                                        </td>
+
+                                                        <td>
+                                                            <span
+                                                                className={`category-status ${category.isActive
+                                                                    ? 'active'
+                                                                    : 'inactive'
+                                                                    }`}
+                                                            >
+                                                                <span>
+                                                                    ●
+                                                                </span>
+                                                                {category.isActive
+                                                                    ? 'Active'
+                                                                    : 'Inactive'}
+                                                            </span>
+                                                        </td>
+
+                                                        <td>
+                                                            <span className="prophecy-category-prophecy-count">
+                                                                {category.prophecies?.length ??
+                                                                    0}
+                                                            </span>
+                                                        </td>
+
+                                                        <td>
+                                                            <div className="admin-table-actions">
+                                                                <button
+                                                                    type="button"
+                                                                    className="admin-action-button edit"
+                                                                    onClick={() =>
+                                                                        openEditForm(
+                                                                            category
+                                                                        )
+                                                                    }
+                                                                    disabled={
+                                                                        actionCategoryId ===
+                                                                        category.id
+                                                                    }
+                                                                >
+                                                                    Edit
+                                                                </button>
+
+                                                                <button
+                                                                    type="button"
+                                                                    className={`admin-action-button ${category.isActive
+                                                                        ? 'deactivate'
+                                                                        : 'activate'
+                                                                        }`}
+                                                                    onClick={() =>
+                                                                        requestStatusChange(
+                                                                            category
+                                                                        )
+                                                                    }
+                                                                    disabled={
+                                                                        actionCategoryId ===
+                                                                        category.id
+                                                                    }
+                                                                >
+                                                                    {actionCategoryId ===
+                                                                        category.id
+                                                                        ? 'Working...'
+                                                                        : category.isActive
+                                                                            ? 'Deactivate'
+                                                                            : 'Activate'}
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                )
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
                         </div>
-                    )}
-                </div>
+                    </>
+                )}
             </section>
 
             {formOpen && (
