@@ -11,6 +11,9 @@ import ProphecyCategories from './admin/pages/ProphecyCategories';
 import Sermons from './admin/pages/Sermons';
 import Services from './admin/pages/Services';
 import ThemesOfTheYear from './admin/pages/ThemesOfTheYear';
+import Users from './admin/pages/Users';
+import Roles from './admin/pages/Roles';
+import VerifyEmail from './admin/pages/VerifyEmail';
 import HomePage from './pages/HomePage';
 
 import {
@@ -29,6 +32,10 @@ function App() {
             /\/+$/,
             ''
         ) || '/';
+
+    const isVerifyEmailRoute =
+        currentPath ===
+        '/verify-email';
 
     const isAdminRoute =
         currentPath === '/admin' ||
@@ -87,9 +94,17 @@ function App() {
         };
     }, [isAdminRoute]);
 
+    // ==================== Public Routes ====================
+
+    if (isVerifyEmailRoute) {
+        return <VerifyEmail />;
+    }
+
     if (!isAdminRoute) {
         return <HomePage />;
     }
+
+    // ==================== Admin Authentication ====================
 
     if (
         adminAuthState !==
@@ -122,6 +137,8 @@ function App() {
             </div>
         );
     }
+
+    // ==================== Admin Routes ====================
 
     switch (currentPath) {
         case '/admin':
@@ -159,6 +176,12 @@ function App() {
             return (
                 <ThemesOfTheYear />
             );
+
+        case '/admin/users':
+            return <Users />;
+
+        case '/admin/roles':
+            return <Roles />;
 
         default:
             return (

@@ -1,4 +1,12 @@
-﻿import { apiFetch } from '@/api/api';
+﻿import {
+    apiFetch,
+    getApiErrorDetails,
+    getNetworkErrorDetails,
+    type ApiErrorDetails,
+} from '@/api/api';
+
+import ApiErrorState from '@/components/sections/ApiErrorState';
+
 import {
     useEffect,
     useState,
@@ -23,13 +31,20 @@ export default function AdminLoginModal({
     isOpen,
     onClose,
 }: AdminLoginModalProps) {
-    const [email, setEmail] =
-        useState('');
+    const [
+        email,
+        setEmail,
+    ] = useState('');
 
-    const [password, setPassword] =
-        useState('');
+    const [
+        password,
+        setPassword,
+    ] = useState('');
 
-    const [status, setStatus] = useState<
+    const [
+        status,
+        setStatus,
+    ] = useState<
         | 'idle'
         | 'submitting'
         | 'success'
@@ -37,9 +52,12 @@ export default function AdminLoginModal({
     >('idle');
 
     const [
-        errorMessage,
-        setErrorMessage,
-    ] = useState<string | null>(null);
+        loginError,
+        setLoginError,
+    ] =
+        useState<ApiErrorDetails | null>(
+            null
+        );
 
     useEffect(() => {
         if (!isOpen) {
@@ -49,7 +67,9 @@ export default function AdminLoginModal({
         const handleEscape = (
             event: KeyboardEvent
         ) => {
-            if (event.key === 'Escape') {
+            if (
+                event.key === 'Escape'
+            ) {
                 onClose();
             }
         };
@@ -77,7 +97,7 @@ export default function AdminLoginModal({
         event.preventDefault();
 
         setStatus('submitting');
-        setErrorMessage(null);
+        setLoginError(null);
 
         try {
             const response =
@@ -89,20 +109,31 @@ export default function AdminLoginModal({
                             'Content-Type':
                                 'application/json',
                         },
-                        body: JSON.stringify({
-                            email,
-                            password,
-                        }),
+                        body:
+                            JSON.stringify({
+                                email:
+                                    email.trim(),
+                                password,
+                            }),
                     }
                 );
 
             if (!response.ok) {
-                setStatus('error');
+                const error =
+                    await getApiErrorDetails(
+                        response,
+                        response.status ===
+                            401
+                            ? 'Unable to sign in with the supplied credentials.'
+                            : 'Unable to sign in.'
+                    );
 
-                setErrorMessage(
-                    response.status === 401
-                        ? 'Invalid email or password.'
-                        : 'Something went wrong. Please try again.'
+                setLoginError(
+                    error
+                );
+
+                setStatus(
+                    'error'
                 );
 
                 return;
@@ -136,16 +167,20 @@ export default function AdminLoginModal({
                 data.email
             );
 
-            setStatus('success');
+            setStatus(
+                'success'
+            );
 
             window.location.assign(
                 '/admin'
             );
         } catch {
-            setStatus('error');
+            setLoginError(
+                getNetworkErrorDetails()
+            );
 
-            setErrorMessage(
-                'Could not reach the server. Please check your connection.'
+            setStatus(
+                'error'
             );
         }
     };
@@ -153,14 +188,16 @@ export default function AdminLoginModal({
     return (
         <div
             className="admin-modal-overlay"
-            onMouseDown={event => {
-                if (
-                    event.target ===
-                    event.currentTarget
-                ) {
-                    onClose();
+            onMouseDown={
+                event => {
+                    if (
+                        event.target ===
+                        event.currentTarget
+                    ) {
+                        onClose();
+                    }
                 }
-            }}
+            }
         >
             <div
                 className="admin-login-modal"
@@ -171,7 +208,9 @@ export default function AdminLoginModal({
                 <button
                     type="button"
                     className="admin-modal-close"
-                    onClick={onClose}
+                    onClick={
+                        onClose
+                    }
                     aria-label="Close admin login"
                     title="Close"
                 >
@@ -184,14 +223,16 @@ export default function AdminLoginModal({
                     </h2>
 
                     <p>
-                        Sign in to manage Hope House
-                        content
+                        Sign in to manage
+                        Hope House content
                     </p>
                 </div>
 
                 <form
                     className="admin-login-form"
-                    onSubmit={handleSubmit}
+                    onSubmit={
+                        handleSubmit
+                    }
                 >
                     <div className="admin-form-group">
                         <label htmlFor="admin-email">
@@ -201,12 +242,29 @@ export default function AdminLoginModal({
                         <input
                             id="admin-email"
                             type="email"
-                            value={email}
-                            onChange={event =>
-                                setEmail(
-                                    event.target
-                                        .value
-                                )
+                            value={
+                                email
+                            }
+                            onChange={
+                                event => {
+                                    setEmail(
+                                        event
+                                            .target
+                                            .value
+                                    );
+
+                                    if (
+                                        loginError
+                                    ) {
+                                        setLoginError(
+                                            null
+                                        );
+
+                                        setStatus(
+                                            'idle'
+                                        );
+                                    }
+                                }
                             }
                             autoComplete="username"
                             required
@@ -221,26 +279,50 @@ export default function AdminLoginModal({
                         <input
                             id="admin-password"
                             type="password"
-                            value={password}
-                            onChange={event =>
-                                setPassword(
-                                    event.target
-                                        .value
-                                )
+                            value={
+                                password
+                            }
+                            onChange={
+                                event => {
+                                    setPassword(
+                                        event
+                                            .target
+                                            .value
+                                    );
+
+                                    if (
+                                        loginError
+                                    ) {
+                                        setLoginError(
+                                            null
+                                        );
+
+                                        setStatus(
+                                            'idle'
+                                        );
+                                    }
+                                }
                             }
                             autoComplete="current-password"
                             required
                         />
                     </div>
 
-                    {status === 'error' &&
-                        errorMessage && (
-                            <p className="app-message app-message-error">
-                                ✕{' '}
-                                {
-                                    errorMessage
+                    {status ===
+                        'error' &&
+                        loginError && (
+                            <ApiErrorState
+                                status={
+                                    loginError.status
                                 }
-                            </p>
+                                title={
+                                    loginError.title
+                                }
+                                message={
+                                    loginError.message
+                                }
+                                compact
+                            />
                         )}
 
                     {status ===
@@ -273,7 +355,9 @@ export default function AdminLoginModal({
                     <button
                         type="button"
                         className="admin-cancel-btn"
-                        onClick={onClose}
+                        onClick={
+                            onClose
+                        }
                         disabled={
                             status ===
                             'submitting' ||

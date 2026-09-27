@@ -113,6 +113,11 @@ const navItems: NavigationItem[] = [
         children: [
             {
                 label: 'Users',
+                path: '/admin/users',
+            },
+            {
+                label: 'Roles',
+                path: '/admin/roles',
             },
             {
                 label: 'Members',

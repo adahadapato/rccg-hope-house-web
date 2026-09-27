@@ -1,13 +1,27 @@
-﻿
-import { useChurchServices, formatTimeRange } from '../../hooks/useChurchServices';
+﻿import {
+    useChurchServices,
+    formatTimeRange,
+} from '../../hooks/useChurchServices';
 
 export default function Hero() {
     // true = Hope House/local services rather than national services
     const { services } = useChurchServices(true);
 
-    const worship = services.find(s => s.name === 'Worship Service');
-    const fasting = services.find(s => s.name === 'Fasting and Prayer Day');
-    const vigil = services.find(s => s.name === 'End of Month Vigil');
+    const worship = services.find(
+        s => s.name === 'Worship Service'
+    );
+
+    const fasting = services.find(
+        s => s.name === 'Fasting and Prayer Day'
+    );
+
+    const vigil = services.find(
+        s => s.name === 'End of Month Vigil'
+    );
+
+    const evangelism = services.find(
+        s => s.name === 'Evangelism'
+    );
 
     // Wednesday and Vigil use the online Zoom details.
     // Prefer Wednesday's details and fall back to Vigil.
@@ -15,8 +29,11 @@ export default function Hero() {
         (fasting?.zoomId ? fasting : undefined) ??
         (vigil?.zoomId ? vigil : undefined);
 
-    const zoomId = onlineService?.zoomId ?? '';
-    const zoomPasscode = onlineService?.zoomPasscode ?? '';
+    const zoomId =
+        onlineService?.zoomId ?? '';
+
+    const zoomPasscode =
+        onlineService?.zoomPasscode ?? '';
 
     /**
      * Opens the Zoom meeting.
@@ -27,15 +44,20 @@ export default function Hero() {
      */
     const joinZoomService = async () => {
         if (!zoomId) {
-            window.location.assign('#monthly-services');
+            window.location.assign(
+                '#monthly-services'
+            );
             return;
         }
 
-        const cleanMeetingId = zoomId.replace(/\s+/g, '');
+        const cleanMeetingId =
+            zoomId.replace(/\s+/g, '');
 
         if (zoomPasscode) {
             try {
-                await navigator.clipboard.writeText(zoomPasscode);
+                await navigator.clipboard.writeText(
+                    zoomPasscode
+                );
             } catch {
                 // Some browsers may block clipboard access.
                 // The passcode is still displayed on the page.
@@ -50,9 +72,11 @@ export default function Hero() {
     };
 
     return (
-        <section id="home" className="hero-modern">
-
-            <div className="hero-overlay"></div>
+        <section
+            id="home"
+            className="hero-modern"
+        >
+            <div className="hero-overlay" />
 
             <div className="hero-content-modern">
 
@@ -71,12 +95,13 @@ export default function Hero() {
                 </p>
 
                 <p className="hero-description">
-                    It's with great joy that we welcome you to this
-                    information platform of Hope House Church, a parish
-                    of The Redeemed Christian Church of God. We are a
-                    bible believing Christian church promoting the
-                    unconditional love of God and gospel of our Lord
-                    Jesus Christ to all.
+                    It's with great joy that we welcome you
+                    to this information platform of Hope
+                    House Church, a parish of The Redeemed
+                    Christian Church of God. We are a bible
+                    believing Christian church promoting
+                    the unconditional love of God and gospel
+                    of our Lord Jesus Christ to all.
                 </p>
 
 
@@ -89,7 +114,8 @@ export default function Hero() {
                     <button
                         className="btn-primary btn-large"
                         onClick={() => {
-                            window.location.hash = 'services';
+                            window.location.hash =
+                                'services';
                         }}
                     >
                         Join Us This Sunday
@@ -98,7 +124,8 @@ export default function Hero() {
                     <button
                         className="btn-white btn-large"
                         onClick={() => {
-                            window.location.hash = 'monthly-services';
+                            window.location.hash =
+                                'monthly-services';
                         }}
                     >
                         <img
@@ -161,14 +188,12 @@ export default function Hero() {
                                 />
 
                                 <span className="time-nowrap">
-
                                     {worship
                                         ? formatTimeRange(
                                             worship.startTime,
                                             worship.endTime
                                         )
                                         : '11:00 AM - 12:40 PM'}
-
                                 </span>
 
                             </p>
@@ -177,7 +202,7 @@ export default function Hero() {
                     </div>
 
 
-                    <div className="service-time-divider"></div>
+                    <div className="service-time-divider" />
 
 
                     {/* =================================
@@ -221,14 +246,12 @@ export default function Hero() {
                                 />
 
                                 <span className="time-nowrap">
-
                                     {fasting
                                         ? formatTimeRange(
                                             fasting.startTime,
                                             fasting.endTime
                                         )
                                         : '7:00 PM - 7:30 PM'}
-
                                 </span>
 
                             </p>
@@ -237,7 +260,7 @@ export default function Hero() {
                     </div>
 
 
-                    <div className="service-time-divider"></div>
+                    <div className="service-time-divider" />
 
 
                     {/* =================================
@@ -272,7 +295,6 @@ export default function Hero() {
 
                             </div>
 
-
                             <div className="service-vigil-day">
 
                                 <img
@@ -282,11 +304,13 @@ export default function Hero() {
                                 />
 
                                 <span>
-                                    Last {vigil?.dayOfWeek ?? 'Friday'} of the Month
+                                    Last{' '}
+                                    {vigil?.dayOfWeek ??
+                                        'Friday'}{' '}
+                                    of the Month
                                 </span>
 
                             </div>
-
 
                             <p className="service-time">
 
@@ -297,14 +321,12 @@ export default function Hero() {
                                 />
 
                                 <span className="time-nowrap">
-
                                     {vigil
                                         ? formatTimeRange(
                                             vigil.startTime,
                                             vigil.endTime
                                         )
                                         : '10:00 PM - 1:00 AM'}
-
                                 </span>
 
                             </p>
@@ -313,7 +335,81 @@ export default function Hero() {
                     </div>
 
 
-                    <div className="service-time-divider"></div>
+                    <div className="service-time-divider" />
+
+
+                    {/* =================================
+                        EVANGELISM
+                       ================================= */}
+
+                    <div className="service-time-item">
+
+                        <img
+                            src="/icon-evangelism.png"
+                            alt=""
+                            className="service-main-icon"
+                        />
+
+                        <div className="service-time-content">
+
+                            <strong>
+                                Evangelism
+                            </strong>
+
+                            <div className="service-mode">
+
+                                <img
+                                    src="/icon-calendar.png"
+                                    alt=""
+                                    className="service-detail-icon"
+                                />
+
+                                <span>
+                                    Every Fortnight – Saturday
+                                </span>
+
+                            </div>
+
+                            {evangelism?.location && (
+                                <div className="service-mode">
+
+                                    <img
+                                        src="/icon-location.png"
+                                        alt=""
+                                        className="service-detail-icon"
+                                    />
+
+                                    <span>
+                                        {evangelism.location}
+                                    </span>
+
+                                </div>
+                            )}
+
+                            <p className="service-time">
+
+                                <img
+                                    src="/icon-clock.png"
+                                    alt=""
+                                    className="service-detail-icon"
+                                />
+
+                                <span className="time-nowrap">
+                                    {evangelism
+                                        ? formatTimeRange(
+                                            evangelism.startTime,
+                                            evangelism.endTime
+                                        )
+                                        : ''}
+                                </span>
+
+                            </p>
+
+                        </div>
+                    </div>
+
+
+                    <div className="service-time-divider" />
 
 
                     {/* =================================
@@ -340,39 +436,31 @@ export default function Hero() {
                         {zoomId ? (
                             <>
 
-                                {/* Meeting ID */}
                                 <p className="zoom-detail">
-
                                     Meeting ID:{' '}
-
                                     <strong>
                                         {zoomId}
                                     </strong>
-
                                 </p>
 
 
-                                {/* Passcode */}
                                 {zoomPasscode && (
                                     <p className="zoom-detail">
-
                                         Passcode:{' '}
-
                                         <strong>
                                             {zoomPasscode}
                                         </strong>
-
                                     </p>
                                 )}
 
 
-                                {/* Join Zoom Button */}
                                 <button
                                     type="button"
                                     className="zoom-join-button"
-                                    onClick={joinZoomService}
+                                    onClick={
+                                        joinZoomService
+                                    }
                                 >
-
                                     <img
                                         src="/icon-zoom.png"
                                         alt=""
@@ -382,22 +470,20 @@ export default function Hero() {
                                     <span>
                                         Join Zoom Service
                                     </span>
-
                                 </button>
 
 
-                                {/* Information */}
                                 <p className="zoom-note">
-
-                                    Same details for Wednesday and Vigil services.
+                                    Same details for Wednesday
+                                    and Vigil services.
 
                                     {zoomPasscode && (
                                         <>
                                             <br />
-                                            Passcode is copied when you join.
+                                            Passcode is copied
+                                            when you join.
                                         </>
                                     )}
-
                                 </p>
 
                             </>
@@ -405,9 +491,9 @@ export default function Hero() {
                             <>
 
                                 <p className="zoom-detail">
-                                    Join our Wednesday and Vigil services online.
+                                    Join our Wednesday and
+                                    Vigil services online.
                                 </p>
-
 
                                 <button
                                     type="button"
@@ -417,7 +503,6 @@ export default function Hero() {
                                             'monthly-services';
                                     }}
                                 >
-
                                     <img
                                         src="/icon-online.png"
                                         alt=""
@@ -425,9 +510,9 @@ export default function Hero() {
                                     />
 
                                     <span>
-                                        View Online Service Details
+                                        View Online Service
+                                        Details
                                     </span>
-
                                 </button>
 
                             </>
@@ -445,7 +530,7 @@ export default function Hero() {
                ===================================== */}
 
             <div className="scroll-indicator">
-                <span></span>
+                <span />
             </div>
 
         </section>

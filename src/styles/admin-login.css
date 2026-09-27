@@ -73,22 +73,39 @@
    MODAL HEADING
    ========================================= */
 
-.admin-modal-header {
-    padding-right: 3rem;
-    margin-bottom: 2rem;
+.admin-login-modal .admin-modal-header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 0.4rem;
+    width: 100%;
+    padding: 0 3rem 0 0;
+    margin: 0 0 2rem;
+    text-align: left;
+    box-sizing: border-box;
 }
 
-    .admin-modal-header h2 {
-        margin: 0 0 0.4rem;
+    .admin-login-modal .admin-modal-header h2 {
+        display: block;
+        width: 100%;
+        margin: 0;
+        padding: 0;
         color: #111827;
         font-size: 1.8rem;
         line-height: 1.2;
+        text-align: left;
     }
 
-    .admin-modal-header p {
+    .admin-login-modal .admin-modal-header p {
+        display: block;
+        width: 100%;
         margin: 0;
+        padding: 0;
         color: #6b7280;
         font-size: 0.95rem;
+        line-height: 1.5;
+        text-align: left;
     }
 
 
@@ -158,6 +175,12 @@
         box-shadow: 0 7px 18px rgba(224, 133, 38, 0.35);
     }
 
+    .admin-sign-in-btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.7;
+        transform: none;
+    }
+
 
 /* =========================================
    CANCEL
@@ -182,13 +205,17 @@
         border-color: #9ca3af;
     }
 
+    .admin-cancel-btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+
 
 /* =========================================
    MOBILE
    ========================================= */
 
 @media (max-width: 600px) {
-
     .admin-modal-overlay {
         padding: 1rem;
     }
@@ -199,14 +226,14 @@
         border-radius: 16px;
     }
 
-    .admin-modal-header {
-        padding-right: 2.5rem;
-        margin-bottom: 1.5rem;
-    }
-
-        .admin-modal-header h2 {
-            font-size: 1.5rem;
+        .admin-login-modal .admin-modal-header {
+            padding-right: 2.5rem;
+            margin-bottom: 1.5rem;
         }
+
+            .admin-login-modal .admin-modal-header h2 {
+                font-size: 1.5rem;
+            }
 
     .admin-modal-close {
         top: 0.75rem;

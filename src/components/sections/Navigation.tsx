@@ -1,11 +1,14 @@
-﻿
-import { useEffect, useState } from 'react';
+﻿import {
+    useEffect,
+    useState,
+} from 'react';
 import AdminLoginModal from './AdminLoginModal';
 import GiveOnlineModal from './GiveOnlineModal';
 
 interface MenuItem {
     label: string;
     href: string;
+    action?: 'give-online';
     children?: MenuItem[];
 }
 
@@ -14,20 +17,49 @@ const menuItems: MenuItem[] = [
         label: 'About',
         href: '#about',
         children: [
-            { label: 'About Us', href: '#about' },
-            { label: 'Our Family', href: '#welcome' },
-            { label: 'Gallery', href: '#photo-gallery' },
-            { label: 'Beliefs', href: '#beliefs' },
-            { label: 'Vision', href: '#vision-mission' },
+            {
+                label: 'About Us',
+                href: '#about',
+            },
+            {
+                label: 'Our Family',
+                href: '#welcome',
+            },
+            {
+                label: 'Gallery',
+                href: '#photo-gallery',
+            },
+            {
+                label: 'Beliefs',
+                href: '#beliefs',
+            },
+            {
+                label: 'Vision',
+                href: '#vision-mission',
+            },
         ],
     },
     {
         label: 'Ministries',
         href: '#services',
         children: [
-            { label: 'Services', href: '#services' },
-            { label: 'Devotional', href: '#devotional' },
-            { label: 'Pastors Corner', href: '#pastors-corner' },
+            {
+                label: 'Services',
+                href: '#services',
+            },
+            {
+                label: 'Devotional',
+                href: '#devotional',
+            },
+            {
+                label: 'Pastors Corner',
+                href: '#pastors-corner',
+            },
+            {
+                label: 'Give Online',
+                href: '#give-online',
+                action: 'give-online',
+            },
         ],
     },
     {
@@ -69,16 +101,24 @@ const menuItems: MenuItem[] = [
 ];
 
 export default function Navigation() {
-    const [isMenuOpen, setIsMenuOpen] =
-        useState(false);
+    const [
+        isMenuOpen,
+        setIsMenuOpen,
+    ] = useState(false);
 
-    const [activeDropdown, setActiveDropdown] =
-        useState<string | null>(null);
+    const [
+        activeDropdown,
+        setActiveDropdown,
+    ] = useState<string | null>(
+        null
+    );
 
     const [
         mobileOpenDropdown,
         setMobileOpenDropdown,
-    ] = useState<string | null>(null);
+    ] = useState<string | null>(
+        null
+    );
 
     const [
         isAdminLoginOpen,
@@ -89,7 +129,6 @@ export default function Navigation() {
         isGiveOnlineOpen,
         setIsGiveOnlineOpen,
     ] = useState(false);
-
 
     /* =========================================
        PREVENT BACKGROUND SCROLL
@@ -107,7 +146,6 @@ export default function Navigation() {
             document.body.style.overflow = '';
         };
     }, [isMenuOpen]);
-
 
     /* =========================================
        ESCAPE KEY
@@ -137,7 +175,6 @@ export default function Navigation() {
         };
     }, []);
 
-
     /* =========================================
        CLOSE MOBILE MENU WHEN RETURNING
        TO DESKTOP
@@ -163,7 +200,6 @@ export default function Navigation() {
             );
         };
     }, []);
-
 
     /* =========================================
        OPEN ADMIN
@@ -195,7 +231,6 @@ export default function Navigation() {
         setIsAdminLoginOpen(true);
     };
 
-
     /* =========================================
        CLOSE ADMIN LOGIN
        ========================================= */
@@ -203,7 +238,6 @@ export default function Navigation() {
     const handleLoginModalClose = () => {
         setIsAdminLoginOpen(false);
     };
-
 
     /* =========================================
        OPEN GIVE ONLINE
@@ -217,7 +251,6 @@ export default function Navigation() {
         setIsGiveOnlineOpen(true);
     };
 
-
     /* =========================================
        CLOSE GIVE ONLINE
        ========================================= */
@@ -226,6 +259,42 @@ export default function Navigation() {
         setIsGiveOnlineOpen(false);
     };
 
+    /* =========================================
+       MENU ITEM ACTION
+       ========================================= */
+
+    const handleMenuItemClick = (
+        item: MenuItem
+    ) => {
+        if (
+            item.action ===
+            'give-online'
+        ) {
+            handleGiveOnline();
+            return;
+        }
+
+        setActiveDropdown(null);
+    };
+
+    /* =========================================
+       MOBILE MENU ITEM ACTION
+       ========================================= */
+
+    const handleMobileMenuItemClick = (
+        item: MenuItem
+    ) => {
+        if (
+            item.action ===
+            'give-online'
+        ) {
+            handleGiveOnline();
+            return;
+        }
+
+        setIsMenuOpen(false);
+        setMobileOpenDropdown(null);
+    };
 
     return (
         <nav
@@ -260,7 +329,6 @@ export default function Navigation() {
                         </p>
                     </div>
                 </a>
-
 
                 {/* =================================
                     DESKTOP NAVIGATION
@@ -317,7 +385,6 @@ export default function Navigation() {
                                     </svg>
                                 </a>
 
-
                                 <div className="dropdown-content">
 
                                     {item.children.map(
@@ -331,11 +398,20 @@ export default function Navigation() {
                                                     child.href
                                                 }
                                                 className="dropdown-item"
-                                                onClick={() =>
-                                                    setActiveDropdown(
-                                                        null
-                                                    )
-                                                }
+                                                onClick={(
+                                                    event
+                                                ) => {
+                                                    if (
+                                                        child.action ===
+                                                        'give-online'
+                                                    ) {
+                                                        event.preventDefault();
+                                                    }
+
+                                                    handleMenuItemClick(
+                                                        child
+                                                    );
+                                                }}
                                             >
                                                 {
                                                     child.label
@@ -364,20 +440,6 @@ export default function Navigation() {
 
                 </div>
 
-
-                {/* =================================
-                    GIVE ONLINE
-                    ================================= */}
-
-                <button
-                    type="button"
-                    className="btn-primary desktop-give-btn"
-                    onClick={handleGiveOnline}
-                >
-                    Give Online
-                </button>
-
-
                 {/* =================================
                     ADMIN
                     ================================= */}
@@ -389,7 +451,6 @@ export default function Navigation() {
                 >
                     Admin
                 </button>
-
 
                 {/* =================================
                     MOBILE HAMBURGER
@@ -403,7 +464,7 @@ export default function Navigation() {
                         }`}
                     onClick={() =>
                         setIsMenuOpen(
-                            (previous) =>
+                            previous =>
                                 !previous
                         )
                     }
@@ -412,7 +473,9 @@ export default function Navigation() {
                             ? 'Close navigation menu'
                             : 'Open navigation menu'
                     }
-                    aria-expanded={isMenuOpen}
+                    aria-expanded={
+                        isMenuOpen
+                    }
                     aria-controls="mobile-menu"
                 >
                     <span className="hamburger-line" />
@@ -421,7 +484,6 @@ export default function Navigation() {
                 </button>
 
             </div>
-
 
             {/* =====================================
                 MOBILE NAVIGATION
@@ -485,7 +547,6 @@ export default function Navigation() {
                                     </svg>
                                 </button>
 
-
                                 <div
                                     id={`mobile-dropdown-${item.label}`}
                                     className={`mobile-dropdown-content ${mobileOpenDropdown ===
@@ -506,13 +567,18 @@ export default function Navigation() {
                                                     child.href
                                                 }
                                                 className="mobile-dropdown-item"
-                                                onClick={() => {
-                                                    setIsMenuOpen(
-                                                        false
-                                                    );
+                                                onClick={(
+                                                    event
+                                                ) => {
+                                                    if (
+                                                        child.action ===
+                                                        'give-online'
+                                                    ) {
+                                                        event.preventDefault();
+                                                    }
 
-                                                    setMobileOpenDropdown(
-                                                        null
+                                                    handleMobileMenuItemClick(
+                                                        child
                                                     );
                                                 }}
                                             >
@@ -550,20 +616,6 @@ export default function Navigation() {
                         )
                     )}
 
-
-                    {/* MOBILE GIVE */}
-
-                    <button
-                        type="button"
-                        className="mobile-give-btn"
-                        onClick={
-                            handleGiveOnline
-                        }
-                    >
-                        Give Online
-                    </button>
-
-
                     {/* MOBILE ADMIN */}
 
                     <button
@@ -578,7 +630,6 @@ export default function Navigation() {
 
             )}
 
-
             {/* =====================================
                 ADMIN LOGIN MODAL
                 ===================================== */}
@@ -591,7 +642,6 @@ export default function Navigation() {
                     handleLoginModalClose
                 }
             />
-
 
             {/* =====================================
                 GIVE ONLINE MODAL
