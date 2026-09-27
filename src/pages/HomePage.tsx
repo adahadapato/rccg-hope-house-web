@@ -1,6 +1,4 @@
-﻿
-
-import Navigation from '../components/sections/Navigation';
+﻿import Navigation from '../components/sections/Navigation';
 import Hero from '../components/sections/Hero';
 import About from '../components/sections/About';
 import Beliefs from '../components/sections/Beliefs';
@@ -21,6 +19,7 @@ import PastorsCorner from '../components/sections/PastorsCorner';
 import PrayerCta from '../components/sections/PrayerCta';
 import Contact from '../components/sections/Contact';
 import Footer from '../components/sections/Footer';
+import BackToTop from '../components/sections/BackToTop';
 
 export default function HomePage() {
     return (
@@ -29,23 +28,26 @@ export default function HomePage() {
             <Hero />
             <About />
             <Beliefs />
+
             {/*<Vision />
             <Mission />*/}
-            
+
             <VisionMission />
             <Welcome />
             <PhotoGallery />
-            <RegularServices /> 
-            <MonthlyServices /> 
+            <RegularServices />
+            <MonthlyServices />
             <DailyDevotional />
             <Events />
             <ThemeOfTheYear />
             <Prophecies />
-            <AnnualPrayerPoints /> 
+            <AnnualPrayerPoints />
             <PastorsCorner />
             <PrayerCta />
             <Contact />
             <Footer />
+
+            <BackToTop />
         </div>
     );
 }

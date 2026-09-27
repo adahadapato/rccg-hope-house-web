@@ -36,6 +36,27 @@ export default function Hero() {
         onlineService?.zoomPasscode ?? '';
 
     /**
+     * Scrolls smoothly to a section on the public homepage.
+     */
+    const scrollToSection = (
+        sectionId: string
+    ) => {
+        const section =
+            document.getElementById(
+                sectionId
+            );
+
+        if (!section) {
+            return;
+        }
+
+        section.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+        });
+    };
+
+    /**
      * Opens the Zoom meeting.
      *
      * The meeting ID and passcode come from the API.
@@ -44,8 +65,8 @@ export default function Hero() {
      */
     const joinZoomService = async () => {
         if (!zoomId) {
-            window.location.assign(
-                '#monthly-services'
+            scrollToSection(
+                'monthly-services'
             );
             return;
         }
@@ -112,21 +133,25 @@ export default function Hero() {
                 <div className="hero-buttons">
 
                     <button
+                        type="button"
                         className="btn-primary btn-large"
-                        onClick={() => {
-                            window.location.hash =
-                                'services';
-                        }}
+                        onClick={() =>
+                            scrollToSection(
+                                'services'
+                            )
+                        }
                     >
                         Join Us This Sunday
                     </button>
 
                     <button
+                        type="button"
                         className="btn-white btn-large"
-                        onClick={() => {
-                            window.location.hash =
-                                'monthly-services';
-                        }}
+                        onClick={() =>
+                            scrollToSection(
+                                'monthly-services'
+                            )
+                        }
                     >
                         <img
                             src="/icon-play.png"
@@ -498,10 +523,11 @@ export default function Hero() {
                                 <button
                                     type="button"
                                     className="zoom-join-button"
-                                    onClick={() => {
-                                        window.location.hash =
-                                            'monthly-services';
-                                    }}
+                                    onClick={() =>
+                                        scrollToSection(
+                                            'monthly-services'
+                                        )
+                                    }
                                 >
                                     <img
                                         src="/icon-online.png"
