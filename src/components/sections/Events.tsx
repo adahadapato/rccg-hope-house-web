@@ -1,4 +1,5 @@
 ﻿import { useEffect, useState } from 'react';
+import { apiFetch } from '@/api/api';
 
 interface ChurchEvent {
     id: string;
@@ -119,7 +120,7 @@ export default function Events() {
     useEffect(() => {
         const loadEvents = async () => {
             try {
-                const response = await fetch(
+                const response = await apiFetch(
                     '/api/events/upcoming'
                 );
 
