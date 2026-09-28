@@ -4,17 +4,20 @@ import {
 } from 'react';
 
 import AdminDashboard from './admin/pages/AdminDashboard';
+import AnnualPrayers from './admin/pages/AnnualPrayers';
 import GalleryCategory from './admin/pages/GalleryCategory';
 import GalleryImage from './admin/pages/GalleryImage';
 import Prophecies from './admin/pages/Prophecies';
 import ProphecyCategories from './admin/pages/ProphecyCategories';
 import Sermons from './admin/pages/Sermons';
+import Events from './admin/pages/AdminEvents';
 import Services from './admin/pages/Services';
 import ThemesOfTheYear from './admin/pages/ThemesOfTheYear';
 import Users from './admin/pages/Users';
 import Roles from './admin/pages/Roles';
 import VerifyEmail from './admin/pages/VerifyEmail';
 import HomePage from './pages/HomePage';
+import AdminSettings from './admin/pages/AdminSettings';
 
 import {
     clearAdminSession,
@@ -176,12 +179,22 @@ function App() {
             return (
                 <ThemesOfTheYear />
             );
+        case '/admin/annual-prayers':
+            return (
+                <AnnualPrayers />
+            );
 
         case '/admin/users':
             return <Users />;
 
         case '/admin/roles':
             return <Roles />;
+
+        case '/admin/events':
+            return <Events />;
+
+        case '/admin/adminsettings':
+            return <AdminSettings />;
 
         default:
             return (

@@ -2,6 +2,7 @@
     useEffect,
     useState,
 } from 'react';
+
 import AdminLoginModal from './AdminLoginModal';
 import GiveOnlineModal from './GiveOnlineModal';
 
@@ -9,6 +10,7 @@ interface MenuItem {
     label: string;
     href: string;
     action?: 'give-online';
+    dividerBefore?: boolean;
     children?: MenuItem[];
 }
 
@@ -28,10 +30,12 @@ const menuItems: MenuItem[] = [
             {
                 label: 'Gallery',
                 href: '#photo-gallery',
+                
             },
             {
                 label: 'Beliefs',
                 href: '#beliefs',
+                dividerBefore: true,
             },
             {
                 label: 'Vision',
@@ -59,6 +63,7 @@ const menuItems: MenuItem[] = [
                 label: 'Give Online',
                 href: '#give-online',
                 action: 'give-online',
+                dividerBefore: true,
             },
         ],
     },
@@ -81,6 +86,11 @@ const menuItems: MenuItem[] = [
             {
                 label: 'Prayer for the year',
                 href: '#prayer-for-the-year',
+            },
+            {
+                label: 'Upcoming Events',
+                href: '#events',
+                dividerBefore: true,
             },
         ],
     },
@@ -397,7 +407,10 @@ export default function Navigation() {
                                                 href={
                                                     child.href
                                                 }
-                                                className="dropdown-item"
+                                                className={`dropdown-item ${child.dividerBefore
+                                                        ? 'dropdown-item-separated'
+                                                        : ''
+                                                    }`}
                                                 onClick={(
                                                     event
                                                 ) => {
@@ -566,7 +579,10 @@ export default function Navigation() {
                                                 href={
                                                     child.href
                                                 }
-                                                className="mobile-dropdown-item"
+                                                className={`mobile-dropdown-item ${child.dividerBefore
+                                                        ? 'mobile-dropdown-item-separated'
+                                                        : ''
+                                                    }`}
                                                 onClick={(
                                                     event
                                                 ) => {

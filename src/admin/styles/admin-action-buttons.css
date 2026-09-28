@@ -1,0 +1,327 @@
+/* ============================================================
+   SHARED ADMIN ACTION BUTTONS
+
+   Actions:
+   - Edit
+   - Activate / Deactivate
+   - Feature / Unfeature
+   - Pin / Unpin
+   - Make Public / Make Private
+   - Delete
+   ============================================================ */
+
+.admin-action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    white-space: nowrap;
+}
+
+
+/* ============================================================
+   BASE
+   ============================================================ */
+
+.admin-action-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    padding: 0;
+    border: 1px solid #d0d5dd;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #344054;
+    font: inherit;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+}
+
+
+    .admin-action-icon:hover:not(:disabled) {
+        border-color: #98a2b3;
+        background: #f2f4f7;
+        transform: translateY(-1px);
+    }
+
+
+    .admin-action-icon:focus-visible {
+        outline: 3px solid rgba(71, 84, 103, 0.2);
+        outline-offset: 2px;
+    }
+
+
+/* ============================================================
+   SVG
+   ============================================================ */
+
+.admin-action-svg {
+    display: block;
+    width: 19px;
+    height: 19px;
+    flex: 0 0 auto;
+    pointer-events: none;
+}
+
+
+/* ============================================================
+   DEACTIVATE
+   Amber X
+   ============================================================ */
+
+.admin-action-icon.admin-action-warning {
+    border-color: #f5c26b;
+    background: #fffaeb;
+    color: #b54708;
+}
+
+
+    .admin-action-icon.admin-action-warning:hover:not(:disabled) {
+        border-color: #eaaa08;
+        background: #fef0c7;
+        color: #93370d;
+    }
+
+
+    .admin-action-icon.admin-action-warning:focus-visible {
+        outline: 3px solid rgba(181, 71, 8, 0.18);
+        outline-offset: 2px;
+    }
+
+
+/* ============================================================
+   ACTIVATE
+   Green tick
+   ============================================================ */
+
+.admin-action-icon.admin-action-success {
+    border-color: #86d3a0;
+    background: #ecfdf3;
+    color: #027a48;
+}
+
+
+    .admin-action-icon.admin-action-success:hover:not(:disabled) {
+        border-color: #6ce9a6;
+        background: #d1fadf;
+        color: #05603a;
+    }
+
+
+    .admin-action-icon.admin-action-success:focus-visible {
+        outline: 3px solid rgba(2, 122, 72, 0.18);
+        outline-offset: 2px;
+    }
+
+
+/* ============================================================
+   FEATURE
+   Outlined star
+   ============================================================ */
+
+.admin-action-icon.admin-action-feature {
+    border-color: #f5d680;
+    background: #fffdf5;
+    color: #b7791f;
+}
+
+
+    .admin-action-icon.admin-action-feature:hover:not(:disabled) {
+        border-color: #e6b94f;
+        background: #fff8db;
+        color: #975a16;
+    }
+
+
+    .admin-action-icon.admin-action-feature:focus-visible {
+        outline: 3px solid rgba(183, 121, 31, 0.18);
+        outline-offset: 2px;
+    }
+
+
+/* ============================================================
+   UNFEATURE
+   Filled star
+   ============================================================ */
+
+.admin-action-icon.admin-action-featured {
+    border-color: #e6b94f;
+    background: #fff4c2;
+    color: #a15c00;
+}
+
+
+    .admin-action-icon.admin-action-featured:hover:not(:disabled) {
+        border-color: #d69e2e;
+        background: #ffec99;
+        color: #854d0e;
+    }
+
+
+    .admin-action-icon.admin-action-featured:focus-visible {
+        outline: 3px solid rgba(161, 92, 0, 0.18);
+        outline-offset: 2px;
+    }
+
+
+/* ============================================================
+   PIN
+   ============================================================ */
+
+.admin-action-icon.admin-action-pin {
+    border-color: #cbd5e1;
+    background: #ffffff;
+    color: #64748b;
+}
+
+
+    .admin-action-icon.admin-action-pin:hover:not(:disabled) {
+        border-color: #f5c26b;
+        background: #fffaeb;
+        color: #b54708;
+    }
+
+
+    .admin-action-icon.admin-action-pin:focus-visible {
+        outline: 3px solid rgba(181, 71, 8, 0.18);
+        outline-offset: 2px;
+    }
+
+
+/* ============================================================
+   UNPIN
+   Highlighted because item is currently pinned
+   ============================================================ */
+
+.admin-action-icon.admin-action-pinned {
+    border-color: #f5c26b;
+    background: #fffaeb;
+    color: #b54708;
+}
+
+
+    .admin-action-icon.admin-action-pinned:hover:not(:disabled) {
+        border-color: #eaaa08;
+        background: #fef0c7;
+        color: #93370d;
+    }
+
+
+    .admin-action-icon.admin-action-pinned:focus-visible {
+        outline: 3px solid rgba(181, 71, 8, 0.18);
+        outline-offset: 2px;
+    }
+
+
+/* ============================================================
+   MAKE PUBLIC / PUBLISH
+   Globe
+   ============================================================ */
+
+.admin-action-icon.admin-action-public {
+    border-color: #84caff;
+    background: #eff8ff;
+    color: #175cd3;
+}
+
+
+    .admin-action-icon.admin-action-public:hover:not(:disabled) {
+        border-color: #53b1fd;
+        background: #d1e9ff;
+        color: #1849a9;
+    }
+
+
+    .admin-action-icon.admin-action-public:focus-visible {
+        outline: 3px solid rgba(23, 92, 211, 0.18);
+        outline-offset: 2px;
+    }
+
+
+/* ============================================================
+   MAKE PRIVATE / UNPUBLISH
+   Lock
+   ============================================================ */
+
+.admin-action-icon.admin-action-private {
+    border-color: #c7c9d9;
+    background: #f8f9fc;
+    color: #475467;
+}
+
+
+    .admin-action-icon.admin-action-private:hover:not(:disabled) {
+        border-color: #98a2b3;
+        background: #eaecf0;
+        color: #344054;
+    }
+
+
+    .admin-action-icon.admin-action-private:focus-visible {
+        outline: 3px solid rgba(71, 84, 103, 0.18);
+        outline-offset: 2px;
+    }
+
+
+/* ============================================================
+   DELETE
+   ============================================================ */
+
+.admin-action-icon.admin-action-danger {
+    border-color: #fda29b;
+    background: #fef3f2;
+    color: #b42318;
+}
+
+
+    .admin-action-icon.admin-action-danger:hover:not(:disabled) {
+        border-color: #f97066;
+        background: #fee4e2;
+        color: #912018;
+    }
+
+
+    .admin-action-icon.admin-action-danger:focus-visible {
+        outline: 3px solid rgba(180, 35, 24, 0.18);
+        outline-offset: 2px;
+    }
+
+
+/* ============================================================
+   DISABLED
+   ============================================================ */
+
+.admin-action-icon:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+    transform: none;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 600px) {
+
+    .admin-action-buttons {
+        gap: 0.35rem;
+    }
+
+
+    .admin-action-icon {
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+    }
+
+
+    .admin-action-svg {
+        width: 18px;
+        height: 18px;
+    }
+}

@@ -237,6 +237,27 @@
 
 
 /* =========================================
+   DROPDOWN SECTION SEPARATOR
+   ========================================= */
+
+.dropdown-item-separated {
+    position: relative;
+    margin-top: 0.5rem;
+    padding-top: 1rem;
+}
+
+    .dropdown-item-separated::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 1rem;
+        right: 1rem;
+        height: 1px;
+        background: #e5e7eb;
+    }
+
+
+/* =========================================
    PRIMARY BUTTON
    ========================================= */
 
@@ -457,6 +478,27 @@
 
 
 /* =========================================
+   MOBILE DROPDOWN SECTION SEPARATOR
+   ========================================= */
+
+.mobile-dropdown-item-separated {
+    position: relative;
+    margin-top: 0.4rem;
+    padding-top: 1rem;
+}
+
+    .mobile-dropdown-item-separated::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 1.25rem;
+        right: 1.25rem;
+        height: 1px;
+        background: #e5e7eb;
+    }
+
+
+/* =========================================
    LEGACY MOBILE GIVE BUTTON
 
    Give Online now lives inside Ministries.
@@ -471,7 +513,7 @@
    SMALLER DESKTOP / LAPTOP
    ========================================= */
 
-@media (max-width: 1300px) and (min-width: 1051px) {
+@media ( max-width: 1300px ) and ( min-width: 1051px ) {
 
     .nav-content {
         padding-left: 2rem;

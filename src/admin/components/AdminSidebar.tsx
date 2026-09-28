@@ -50,6 +50,7 @@ const navItems: NavigationItem[] = [
         children: [
             {
                 label: 'Events',
+                path: '/admin/events',
             },
             {
                 label: 'News & Updates',
@@ -90,6 +91,7 @@ const navItems: NavigationItem[] = [
             },
             {
                 label: 'Prayer for the Year',
+                path: '/admin/annual-prayers',
             },
         ],
     },
@@ -124,6 +126,7 @@ const navItems: NavigationItem[] = [
             },
             {
                 label: 'Settings',
+                path: '/admin/adminsettings',
             },
         ],
     },

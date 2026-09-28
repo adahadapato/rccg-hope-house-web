@@ -2,7 +2,9 @@
     apiFetch,
     getApiErrorDetails,
     getNetworkErrorDetails,
+    storeAdminSession,
     type ApiErrorDetails,
+    type AuthTokensResponse,
 } from '@/api/api';
 
 import ApiErrorState from '@/components/sections/ApiErrorState';
@@ -17,15 +19,9 @@ interface AdminLoginModalProps {
     onClose: () => void;
 }
 
-interface AdminLoginResponse {
-    accessToken: string;
-    refreshToken: string;
-    expiresAt: string;
-    role: string;
-    userName: string;
-    name: string;
-    email: string;
-}
+type LoginStep =
+    | 'credentials'
+    | 'two-factor';
 
 export default function AdminLoginModal({
     isOpen,
@@ -40,6 +36,30 @@ export default function AdminLoginModal({
         password,
         setPassword,
     ] = useState('');
+
+    const [
+        loginStep,
+        setLoginStep,
+    ] = useState<LoginStep>(
+        'credentials'
+    );
+
+    const [
+        twoFactorChallengeToken,
+        setTwoFactorChallengeToken,
+    ] = useState<string | null>(
+        null
+    );
+
+    const [
+        verificationCode,
+        setVerificationCode,
+    ] = useState('');
+
+    const [
+        useRecoveryCode,
+        setUseRecoveryCode,
+    ] = useState(false);
 
     const [
         status,
@@ -59,6 +79,33 @@ export default function AdminLoginModal({
             null
         );
 
+    function resetLoginForm() {
+        setEmail('');
+        setPassword('');
+        setLoginStep(
+            'credentials'
+        );
+        setTwoFactorChallengeToken(
+            null
+        );
+        setVerificationCode('');
+        setUseRecoveryCode(false);
+        setStatus('idle');
+        setLoginError(null);
+    }
+
+    function handleClose() {
+        if (
+            status === 'submitting' ||
+            status === 'success'
+        ) {
+            return;
+        }
+
+        resetLoginForm();
+        onClose();
+    }
+
     useEffect(() => {
         if (!isOpen) {
             return;
@@ -70,6 +117,21 @@ export default function AdminLoginModal({
             if (
                 event.key === 'Escape'
             ) {
+                /*
+                 * Do not close the modal while
+                 * authentication is being submitted
+                 * or after a successful login while
+                 * navigation is taking place.
+                 */
+                if (
+                    status ===
+                    'submitting' ||
+                    status ===
+                    'success'
+                ) {
+                    return;
+                }
+
                 onClose();
             }
         };
@@ -85,52 +147,161 @@ export default function AdminLoginModal({
                 handleEscape
             );
         };
-    }, [isOpen, onClose]);
+    }, [
+        isOpen,
+        onClose,
+        status,
+    ]);
 
     if (!isOpen) {
         return null;
     }
 
-    const handleSubmit = async (
-        event: React.FormEvent<HTMLFormElement>
-    ) => {
-        event.preventDefault();
+    function clearError() {
+        if (loginError) {
+            setLoginError(null);
+        }
 
-        setStatus('submitting');
-        setLoginError(null);
+        if (status === 'error') {
+            setStatus('idle');
+        }
+    }
 
-        try {
-            const response =
-                await apiFetch(
-                    '/api/auth/login',
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type':
-                                'application/json',
-                        },
-                        body:
-                            JSON.stringify({
-                                email:
-                                    email.trim(),
-                                password,
-                            }),
-                    }
-                );
+    function completeLogin(
+        data: AuthTokensResponse
+    ) {
+        storeAdminSession(data);
 
-            if (!response.ok) {
-                const error =
-                    await getApiErrorDetails(
-                        response,
-                        response.status ===
-                            401
-                            ? 'Unable to sign in with the supplied credentials.'
-                            : 'Unable to sign in.'
+        setStatus('success');
+
+        window.location.assign(
+            '/admin'
+        );
+    }
+
+    const handleCredentialSubmit =
+        async (
+            event:
+                React.FormEvent<HTMLFormElement>
+        ) => {
+            event.preventDefault();
+
+            setStatus('submitting');
+            setLoginError(null);
+
+            try {
+                const response =
+                    await apiFetch(
+                        '/api/auth/login',
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type':
+                                    'application/json',
+                            },
+                            body:
+                                JSON.stringify({
+                                    email:
+                                        email.trim(),
+                                    password,
+                                }),
+                        }
                     );
 
-                setLoginError(
-                    error
+                if (!response.ok) {
+                    const error =
+                        await getApiErrorDetails(
+                            response,
+                            response.status ===
+                                401
+                                ? 'Unable to sign in with the supplied credentials.'
+                                : 'Unable to sign in.'
+                        );
+
+                    setLoginError(
+                        error
+                    );
+
+                    setStatus(
+                        'error'
+                    );
+
+                    return;
+                }
+
+                const data =
+                    (await response.json()) as AuthTokensResponse;
+
+                if (
+                    data.requiresTwoFactor
+                ) {
+                    if (
+                        !data
+                            .twoFactorChallengeToken
+                    ) {
+                        setLoginError({
+                            status: null,
+                            title:
+                                'Unable to continue',
+                            message:
+                                'Two-factor authentication is required, but the server did not provide a login challenge.',
+                        });
+
+                        setStatus(
+                            'error'
+                        );
+
+                        return;
+                    }
+
+                    setTwoFactorChallengeToken(
+                        data
+                            .twoFactorChallengeToken
+                    );
+
+                    setVerificationCode('');
+                    setUseRecoveryCode(false);
+                    setLoginStep(
+                        'two-factor'
+                    );
+                    setStatus('idle');
+
+                    return;
+                }
+
+                completeLogin(
+                    data
                 );
+            } catch (error) {
+                setLoginError(
+                    getNetworkErrorDetails(
+                        error
+                    )
+                );
+
+                setStatus(
+                    'error'
+                );
+            }
+        };
+
+    const handleTwoFactorSubmit =
+        async (
+            event:
+                React.FormEvent<HTMLFormElement>
+        ) => {
+            event.preventDefault();
+
+            if (
+                !twoFactorChallengeToken
+            ) {
+                setLoginError({
+                    status: null,
+                    title:
+                        'Login challenge expired',
+                    message:
+                        'Please return to the sign-in form and enter your email and password again.',
+                });
 
                 setStatus(
                     'error'
@@ -139,51 +310,94 @@ export default function AdminLoginModal({
                 return;
             }
 
-            const data =
-                (await response.json()) as AdminLoginResponse;
+            setStatus('submitting');
+            setLoginError(null);
 
-            localStorage.setItem(
-                'adminAccessToken',
-                data.accessToken
-            );
+            try {
+                const response =
+                    await apiFetch(
+                        '/api/auth/two-factor',
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type':
+                                    'application/json',
+                            },
+                            body:
+                                JSON.stringify({
+                                    challengeToken:
+                                        twoFactorChallengeToken,
+                                    verificationCode:
+                                        verificationCode
+                                            .trim(),
+                                    useRecoveryCode,
+                                }),
+                        }
+                    );
 
-            localStorage.setItem(
-                'adminRefreshToken',
-                data.refreshToken
-            );
+                if (!response.ok) {
+                    const error =
+                        await getApiErrorDetails(
+                            response,
+                            response.status ===
+                                401
+                                ? useRecoveryCode
+                                    ? 'The recovery code is invalid or the login challenge has expired.'
+                                    : 'The authentication code is invalid or the login challenge has expired.'
+                                : 'Unable to complete two-factor authentication.'
+                        );
 
-            localStorage.setItem(
-                'adminRole',
-                data.role
-            );
+                    setLoginError(
+                        error
+                    );
 
-            localStorage.setItem(
-                'adminName',
-                data.name
-            );
+                    setStatus(
+                        'error'
+                    );
 
-            localStorage.setItem(
-                'adminEmail',
-                data.email
-            );
+                    return;
+                }
 
-            setStatus(
-                'success'
-            );
+                const data =
+                    (await response.json()) as AuthTokensResponse;
 
-            window.location.assign(
-                '/admin'
-            );
-        } catch {
-            setLoginError(
-                getNetworkErrorDetails()
-            );
+                completeLogin(
+                    data
+                );
+            } catch (error) {
+                setLoginError(
+                    getNetworkErrorDetails(
+                        error
+                    )
+                );
 
-            setStatus(
-                'error'
-            );
+                setStatus(
+                    'error'
+                );
+            }
+        };
+
+    function backToCredentials() {
+        if (
+            status === 'submitting'
+        ) {
+            return;
         }
-    };
+
+        setLoginStep(
+            'credentials'
+        );
+
+        setTwoFactorChallengeToken(
+            null
+        );
+
+        setVerificationCode('');
+        setUseRecoveryCode(false);
+        setPassword('');
+        setLoginError(null);
+        setStatus('idle');
+    }
 
     return (
         <div
@@ -194,7 +408,7 @@ export default function AdminLoginModal({
                         event.target ===
                         event.currentTarget
                     ) {
-                        onClose();
+                        handleClose();
                     }
                 }
             }
@@ -209,165 +423,303 @@ export default function AdminLoginModal({
                     type="button"
                     className="admin-modal-close"
                     onClick={
-                        onClose
+                        handleClose
                     }
                     aria-label="Close admin login"
                     title="Close"
+                    disabled={
+                        status ===
+                        'submitting' ||
+                        status ===
+                        'success'
+                    }
                 >
                     ×
                 </button>
 
                 <div className="admin-modal-header">
                     <h2 id="admin-login-title">
-                        Admin Login
+                        {loginStep ===
+                            'credentials'
+                            ? 'Admin Login'
+                            : 'Two-Factor Authentication'}
                     </h2>
 
                     <p>
-                        Sign in to manage
-                        Hope House content
+                        {loginStep ===
+                            'credentials'
+                            ? 'Sign in to manage Hope House content'
+                            : useRecoveryCode
+                                ? 'Enter one of your recovery codes to continue'
+                                : 'Enter the code from your authenticator app'}
                     </p>
                 </div>
 
-                <form
-                    className="admin-login-form"
-                    onSubmit={
-                        handleSubmit
-                    }
-                >
-                    <div className="admin-form-group">
-                        <label htmlFor="admin-email">
-                            Email
-                        </label>
+                {loginStep ===
+                    'credentials' ? (
+                    <form
+                        className="admin-login-form"
+                        onSubmit={
+                            handleCredentialSubmit
+                        }
+                    >
+                        <div className="admin-form-group">
+                            <label htmlFor="admin-email">
+                                Email
+                            </label>
 
-                        <input
-                            id="admin-email"
-                            type="email"
-                            value={
-                                email
-                            }
-                            onChange={
-                                event => {
-                                    setEmail(
-                                        event
-                                            .target
-                                            .value
-                                    );
-
-                                    if (
-                                        loginError
-                                    ) {
-                                        setLoginError(
-                                            null
+                            <input
+                                id="admin-email"
+                                type="email"
+                                value={
+                                    email
+                                }
+                                onChange={
+                                    event => {
+                                        setEmail(
+                                            event
+                                                .target
+                                                .value
                                         );
 
-                                        setStatus(
-                                            'idle'
-                                        );
+                                        clearError();
                                     }
                                 }
-                            }
-                            autoComplete="username"
-                            required
-                        />
-                    </div>
-
-                    <div className="admin-form-group">
-                        <label htmlFor="admin-password">
-                            Password
-                        </label>
-
-                        <input
-                            id="admin-password"
-                            type="password"
-                            value={
-                                password
-                            }
-                            onChange={
-                                event => {
-                                    setPassword(
-                                        event
-                                            .target
-                                            .value
-                                    );
-
-                                    if (
-                                        loginError
-                                    ) {
-                                        setLoginError(
-                                            null
-                                        );
-
-                                        setStatus(
-                                            'idle'
-                                        );
-                                    }
-                                }
-                            }
-                            autoComplete="current-password"
-                            required
-                        />
-                    </div>
-
-                    {status ===
-                        'error' &&
-                        loginError && (
-                            <ApiErrorState
-                                status={
-                                    loginError.status
-                                }
-                                title={
-                                    loginError.title
-                                }
-                                message={
-                                    loginError.message
-                                }
-                                compact
+                                autoComplete="username"
+                                required
                             />
-                        )}
+                        </div>
 
-                    {status ===
-                        'success' && (
-                            <p className="app-message app-message-success">
-                                ✓ Logged in
-                                successfully.
-                            </p>
-                        )}
+                        <div className="admin-form-group">
+                            <label htmlFor="admin-password">
+                                Password
+                            </label>
 
-                    <button
-                        type="submit"
-                        className="admin-sign-in-btn"
-                        disabled={
-                            status ===
-                            'submitting' ||
-                            status ===
-                            'success'
-                        }
-                    >
+                            <input
+                                id="admin-password"
+                                type="password"
+                                value={
+                                    password
+                                }
+                                onChange={
+                                    event => {
+                                        setPassword(
+                                            event
+                                                .target
+                                                .value
+                                        );
+
+                                        clearError();
+                                    }
+                                }
+                                autoComplete="current-password"
+                                required
+                            />
+                        </div>
+
                         {status ===
-                            'submitting'
-                            ? 'Signing in...'
-                            : status ===
-                                'success'
-                                ? 'Logged In'
-                                : 'Sign In'}
-                    </button>
+                            'error' &&
+                            loginError && (
+                                <ApiErrorState
+                                    status={
+                                        loginError.status
+                                    }
+                                    title={
+                                        loginError.title
+                                    }
+                                    message={
+                                        loginError.message
+                                    }
+                                    compact
+                                />
+                            )}
 
-                    <button
-                        type="button"
-                        className="admin-cancel-btn"
-                        onClick={
-                            onClose
-                        }
-                        disabled={
-                            status ===
-                            'submitting' ||
-                            status ===
-                            'success'
+                        {status ===
+                            'success' && (
+                                <p className="app-message app-message-success">
+                                    ✓ Logged in
+                                    successfully.
+                                </p>
+                            )}
+
+                        <button
+                            type="submit"
+                            className="admin-sign-in-btn"
+                            disabled={
+                                status ===
+                                'submitting' ||
+                                status ===
+                                'success'
+                            }
+                        >
+                            {status ===
+                                'submitting'
+                                ? 'Signing in...'
+                                : status ===
+                                    'success'
+                                    ? 'Logged In'
+                                    : 'Sign In'}
+                        </button>
+
+                        <button
+                            type="button"
+                            className="admin-cancel-btn"
+                            onClick={
+                                handleClose
+                            }
+                            disabled={
+                                status ===
+                                'submitting' ||
+                                status ===
+                                'success'
+                            }
+                        >
+                            Cancel
+                        </button>
+                    </form>
+                ) : (
+                    <form
+                        className="admin-login-form"
+                        onSubmit={
+                            handleTwoFactorSubmit
                         }
                     >
-                        Cancel
-                    </button>
-                </form>
+                        <div className="admin-form-group">
+                            <label htmlFor="admin-two-factor-code">
+                                {useRecoveryCode
+                                    ? 'Recovery Code'
+                                    : 'Authentication Code'}
+                            </label>
+
+                            <input
+                                id="admin-two-factor-code"
+                                type="text"
+                                value={
+                                    verificationCode
+                                }
+                                onChange={
+                                    event => {
+                                        setVerificationCode(
+                                            event
+                                                .target
+                                                .value
+                                        );
+
+                                        clearError();
+                                    }
+                                }
+                                autoComplete="one-time-code"
+                                inputMode={
+                                    useRecoveryCode
+                                        ? 'text'
+                                        : 'numeric'
+                                }
+                                placeholder={
+                                    useRecoveryCode
+                                        ? 'Enter recovery code'
+                                        : '000000'
+                                }
+                                required
+                                autoFocus
+                            />
+                        </div>
+
+                        {status ===
+                            'error' &&
+                            loginError && (
+                                <ApiErrorState
+                                    status={
+                                        loginError.status
+                                    }
+                                    title={
+                                        loginError.title
+                                    }
+                                    message={
+                                        loginError.message
+                                    }
+                                    compact
+                                />
+                            )}
+
+                        {status ===
+                            'success' && (
+                                <p className="app-message app-message-success">
+                                    ✓ Logged in
+                                    successfully.
+                                </p>
+                            )}
+
+                        <button
+                            type="submit"
+                            className="admin-sign-in-btn"
+                            disabled={
+                                status ===
+                                'submitting' ||
+                                status ===
+                                'success' ||
+                                !verificationCode
+                                    .trim()
+                            }
+                        >
+                            {status ===
+                                'submitting'
+                                ? 'Verifying...'
+                                : status ===
+                                    'success'
+                                    ? 'Verified'
+                                    : 'Verify & Sign In'}
+                        </button>
+
+                        <button
+                            type="button"
+                            className="admin-cancel-btn"
+                            onClick={() => {
+                                setUseRecoveryCode(
+                                    current =>
+                                        !current
+                                );
+
+                                setVerificationCode(
+                                    ''
+                                );
+
+                                setLoginError(
+                                    null
+                                );
+
+                                setStatus(
+                                    'idle'
+                                );
+                            }}
+                            disabled={
+                                status ===
+                                'submitting' ||
+                                status ===
+                                'success'
+                            }
+                        >
+                            {useRecoveryCode
+                                ? 'Use Authenticator Code'
+                                : 'Use Recovery Code'}
+                        </button>
+
+                        <button
+                            type="button"
+                            className="admin-cancel-btn"
+                            onClick={
+                                backToCredentials
+                            }
+                            disabled={
+                                status ===
+                                'submitting' ||
+                                status ===
+                                'success'
+                            }
+                        >
+                            Back to Sign In
+                        </button>
+                    </form>
+                )}
             </div>
         </div>
     );

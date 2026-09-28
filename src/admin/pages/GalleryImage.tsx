@@ -24,6 +24,7 @@ import {
 } from '../../hooks/useGalleryCategories';
 
 import AdminLayout from '../components/AdminLayout';
+import AdminActionButtons from '../components/AdminActionButtons';
 
 import '../styles/admin.css';
 import '../styles/gallery-images.css';
@@ -1651,69 +1652,43 @@ function GalleryImage() {
                                                         )}
 
                                                     <div className="gallery-admin-card-actions">
-                                                        <button
-                                                            type="button"
-                                                            className="gallery-card-action edit"
-                                                            onClick={() =>
-                                                                openEdit(
-                                                                    image
-                                                                )
-                                                            }
-                                                        >
-                                                            Edit
-                                                        </button>
-
-                                                        <button
-                                                            type="button"
-                                                            className="gallery-card-action"
-                                                            disabled={
-                                                                actionImageId ===
-                                                                image.id
-                                                            }
-                                                            onClick={() =>
-                                                                void toggleFeatured(
-                                                                    image
-                                                                )
-                                                            }
-                                                        >
-                                                            {image.isFeatured
-                                                                ? 'Unfeature'
-                                                                : 'Feature'}
-                                                        </button>
-
-                                                        <button
-                                                            type="button"
-                                                            className="gallery-card-action"
-                                                            disabled={
-                                                                actionImageId ===
-                                                                image.id
-                                                            }
-                                                            onClick={() =>
-                                                                void toggleVisibility(
-                                                                    image
-                                                                )
-                                                            }
-                                                        >
-                                                            {image.isPublic
-                                                                ? 'Make Private'
-                                                                : 'Publish'}
-                                                        </button>
-
-                                                        <button
-                                                            type="button"
-                                                            className="gallery-card-action delete"
-                                                            disabled={
-                                                                actionImageId ===
-                                                                image.id
-                                                            }
-                                                            onClick={() =>
-                                                                void deleteImage(
-                                                                    image
-                                                                )
-                                                            }
-                                                        >
-                                                            Delete
-                                                        </button>
+                                                        <div className="gallery-shared-actions">
+                                                            <AdminActionButtons
+                                                                itemName={image.title}
+                                                                isFeatured={image.isFeatured}
+                                                                isPublic={image.isPublic}
+                                                                onEdit={() =>
+                                                                    openEdit(
+                                                                        image
+                                                                    )
+                                                                }
+                                                                onFeatureToggle={() =>
+                                                                    void toggleFeatured(
+                                                                        image
+                                                                    )
+                                                                }
+                                                                onVisibilityToggle={() =>
+                                                                    void toggleVisibility(
+                                                                        image
+                                                                    )
+                                                                }
+                                                                onDelete={() =>
+                                                                    void deleteImage(
+                                                                        image
+                                                                    )
+                                                                }
+                                                                editTitle="Edit image"
+                                                                featureTitle="Feature image"
+                                                                unfeatureTitle="Unfeature image"
+                                                                makePublicTitle="Publish image"
+                                                                makePrivateTitle="Make image private"
+                                                                deleteTitle="Delete image"
+                                                                disabled={
+                                                                    actionImageId ===
+                                                                    image.id
+                                                                }
+                                                            />
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </article>

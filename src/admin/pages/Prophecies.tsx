@@ -15,6 +15,7 @@ import {
 import type { ApiErrorDetails } from '../../api/api';
 import ApiErrorState from '../../components/sections/ApiErrorState';
 import AdminLayout from '../components/AdminLayout';
+import AdminActionButtons from '../components/AdminActionButtons';
 import '../styles/admin.css';
 import '../styles/prophecies.css';
 
@@ -602,15 +603,18 @@ function Prophecies() {
                                             <p>{selectedYear.isPublished ? 'This year is available to visitors on the public website.' : 'This year is not yet visible on the public website.'}</p>
                                         </div>
                                         <div className="prophecy-year-actions">
-                                            <button type="button" className="admin-secondary-button" onClick={() => openEditYear(selectedYear)}>Edit Year</button>
-                                            <button
-                                                type="button"
-                                                className={`admin-action-button ${selectedYear.isPublished ? 'deactivate' : 'activate'}`}
+                                            <AdminActionButtons
+                                                itemName={`${selectedYear.year} prophecy year`}
+                                                isPublic={selectedYear.isPublished}
+                                                onEdit={() => openEditYear(selectedYear)}
+                                                onVisibilityToggle={() =>
+                                                    void toggleYearPublication(selectedYear)
+                                                }
+                                                editTitle="Edit year"
+                                                makePublicTitle="Publish year"
+                                                makePrivateTitle="Unpublish year"
                                                 disabled={actionKey === `year-${selectedYear.id}`}
-                                                onClick={() => void toggleYearPublication(selectedYear)}
-                                            >
-                                                {actionKey === `year-${selectedYear.id}` ? 'Working...' : selectedYear.isPublished ? 'Unpublish' : 'Publish'}
-                                            </button>
+                                            />
                                         </div>
                                     </div>
 
@@ -644,15 +648,18 @@ function Prophecies() {
                                                             </div>
                                                         </div>
                                                         <div className="prophecy-category-actions">
-                                                            <button type="button" className="admin-action-button edit" onClick={() => openEditCategory(category)}>Edit</button>
-                                                            <button
-                                                                type="button"
-                                                                className={`admin-action-button ${category.isActive ? 'deactivate' : 'activate'}`}
+                                                            <AdminActionButtons
+                                                                itemName={category.name}
+                                                                isActive={category.isActive}
+                                                                onEdit={() => openEditCategory(category)}
+                                                                onToggle={() =>
+                                                                    void toggleCategory(category)
+                                                                }
+                                                                editTitle="Edit category"
+                                                                activateTitle="Activate category"
+                                                                deactivateTitle="Deactivate category"
                                                                 disabled={actionKey === `category-${category.id}`}
-                                                                onClick={() => void toggleCategory(category)}
-                                                            >
-                                                                {actionKey === `category-${category.id}` ? 'Working...' : category.isActive ? 'Deactivate' : 'Activate'}
-                                                            </button>
+                                                            />
                                                             <button type="button" className="admin-primary-button prophecy-small-primary" onClick={() => openAddProphecy(category)}>＋ Add Prophecy</button>
                                                         </div>
                                                     </div>
@@ -672,15 +679,18 @@ function Prophecies() {
                                                                         </div>
                                                                     </div>
                                                                     <div className="prophecy-item-actions">
-                                                                        <button type="button" className="admin-action-button edit" onClick={() => openEditProphecy(prophecy)}>Edit</button>
-                                                                        <button
-                                                                            type="button"
-                                                                            className={`admin-action-button ${prophecy.isActive ? 'deactivate' : 'activate'}`}
+                                                                        <AdminActionButtons
+                                                                            itemName={`Prophecy ${index + 1}`}
+                                                                            isActive={prophecy.isActive}
+                                                                            onEdit={() => openEditProphecy(prophecy)}
+                                                                            onToggle={() =>
+                                                                                void toggleProphecy(prophecy)
+                                                                            }
+                                                                            editTitle="Edit prophecy"
+                                                                            activateTitle="Activate prophecy"
+                                                                            deactivateTitle="Deactivate prophecy"
                                                                             disabled={actionKey === `prophecy-${prophecy.id}`}
-                                                                            onClick={() => void toggleProphecy(prophecy)}
-                                                                        >
-                                                                            {actionKey === `prophecy-${prophecy.id}` ? 'Working...' : prophecy.isActive ? 'Deactivate' : 'Activate'}
-                                                                        </button>
+                                                                        />
                                                                     </div>
                                                                 </div>
                                                             ))}

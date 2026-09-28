@@ -1,0 +1,684 @@
+/* ============================================================
+   ADMIN EVENTS
+   ============================================================ */
+
+.events-admin {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.events-admin-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+
+    .events-admin-header h1 {
+        margin: 0.3rem 0 0.45rem;
+        font-size: 2rem;
+        line-height: 1.2;
+    }
+
+    .events-admin-header p {
+        margin: 0;
+        max-width: 720px;
+        color: #667085;
+        line-height: 1.6;
+    }
+
+.events-admin-eyebrow {
+    display: block;
+    color: #667085;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+
+/* ============================================================
+   ALERTS
+   ============================================================ */
+
+.events-admin-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid;
+    border-radius: 10px;
+}
+
+    .events-admin-alert > span {
+        display: grid;
+        flex: 0 0 auto;
+        width: 26px;
+        height: 26px;
+        place-items: center;
+        border-radius: 50%;
+        font-weight: 700;
+    }
+
+    .events-admin-alert > div {
+        flex: 1;
+    }
+
+    .events-admin-alert strong {
+        display: block;
+        margin-bottom: 0.2rem;
+    }
+
+    .events-admin-alert p {
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    .events-admin-alert > button {
+        padding: 0;
+        border: 0;
+        background: transparent;
+        font-size: 1.3rem;
+        cursor: pointer;
+    }
+
+.events-admin-alert-error {
+    border-color: #f1b7b7;
+    background: #fff4f4;
+    color: #8a1c1c;
+}
+
+    .events-admin-alert-error > span {
+        background: #f9d7d7;
+    }
+
+.events-admin-alert-success {
+    border-color: #b9dfc5;
+    background: #f1fbf4;
+    color: #236a38;
+}
+
+    .events-admin-alert-success > span {
+        background: #d9f2e1;
+    }
+
+
+/* ============================================================
+   STATISTICS
+   ============================================================ */
+
+.events-admin-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.events-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-width: 0;
+    padding: 1.2rem;
+    border: 1px solid #e4e7ec;
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.events-stat-icon {
+    display: grid;
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    place-items: center;
+    border-radius: 10px;
+    background: #f2f4f7;
+    font-size: 1.25rem;
+}
+
+.events-stat-card > div {
+    min-width: 0;
+}
+
+.events-stat-card strong {
+    display: block;
+    font-size: 1.45rem;
+    line-height: 1.2;
+}
+
+.events-stat-card div > span {
+    display: block;
+    margin-top: 0.2rem;
+    color: #667085;
+    font-size: 0.9rem;
+}
+
+
+/* ============================================================
+   PANEL
+   ============================================================ */
+
+.events-admin-panel {
+    overflow: hidden;
+    border: 1px solid #e4e7ec;
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.events-panel-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem 1.4rem;
+    border-bottom: 1px solid #e4e7ec;
+}
+
+    .events-panel-heading h2 {
+        margin: 0;
+        font-size: 1.15rem;
+    }
+
+    .events-panel-heading p {
+        margin: 0.3rem 0 0;
+        color: #667085;
+        font-size: 0.9rem;
+    }
+
+.events-upcoming-summary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem 0.65rem;
+    border-radius: 999px;
+    background: #ecfdf3;
+    color: #027a48;
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+
+/* ============================================================
+   EMPTY / LOADING
+   ============================================================ */
+
+.events-admin-empty {
+    display: grid;
+    min-height: 220px;
+    padding: 2rem;
+    place-items: center;
+    text-align: center;
+}
+
+    .events-admin-empty strong {
+        font-size: 1.05rem;
+    }
+
+    .events-admin-empty p {
+        margin: 0.4rem 0 1rem;
+        color: #667085;
+    }
+
+
+/* ============================================================
+   TABLE
+   ============================================================ */
+
+.events-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.events-table {
+    width: 100%;
+    min-width: 1100px;
+    border-collapse: collapse;
+}
+
+    .events-table th,
+    .events-table td {
+        padding: 0.9rem 1rem;
+        border-bottom: 1px solid #eaecf0;
+        text-align: left;
+        vertical-align: middle;
+    }
+
+    .events-table th {
+        background: #f9fafb;
+        color: #475467;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .events-table td {
+        color: #344054;
+        font-size: 0.9rem;
+    }
+
+    .events-table tbody tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .events-table tbody tr:hover {
+        background: #fcfcfd;
+    }
+
+.events-row-inactive {
+    opacity: 0.67;
+}
+
+.events-row-past {
+    background: #fcfcfd;
+}
+
+.events-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    min-width: 220px;
+}
+
+    .events-name-cell > div {
+        min-width: 0;
+    }
+
+    .events-name-cell strong {
+        display: block;
+        color: #101828;
+    }
+
+    .events-name-cell div > span {
+        display: block;
+        max-width: 220px;
+        margin-top: 0.2rem;
+        overflow: hidden;
+        color: #667085;
+        font-size: 0.82rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+.events-table-secondary {
+    color: #667085;
+    font-size: 0.84rem;
+}
+
+
+/* ============================================================
+   EVENT ICON
+   ============================================================ */
+
+.events-event-icon {
+    display: grid;
+    flex: 0 0 auto;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    border-radius: 10px;
+    background: #f2f4f7;
+    font-size: 1.2rem;
+}
+
+.events-event-icon-gold {
+    background: #fffaeb;
+}
+
+.events-event-icon-blue {
+    background: #eff8ff;
+}
+
+.events-event-icon-rose {
+    background: #fff1f3;
+}
+
+
+/* ============================================================
+   BADGES
+   ============================================================ */
+
+.events-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.28rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.events-badge-active {
+    background: #ecfdf3;
+    color: #027a48;
+}
+
+.events-badge-inactive {
+    background: #fef3f2;
+    color: #b42318;
+}
+
+.events-badge-past {
+    background: #fffaeb;
+    color: #b54708;
+}
+
+.events-badge-neutral {
+    background: #f2f4f7;
+    color: #475467;
+}
+
+.events-status-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+}
+
+
+/* ============================================================
+   REGISTRATION LINK
+   ============================================================ */
+
+.events-registration-link {
+    color: #175cd3;
+    font-size: 0.84rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+    .events-registration-link:hover {
+        text-decoration: underline;
+    }
+
+
+/* ============================================================
+   NOTE:
+   Shared Edit / Activate / Deactivate / Delete action-button
+   styles now live in:
+
+   src/admin/styles/admin-action-buttons.css
+
+   They are imported by AdminActionButtons.tsx.
+   ============================================================ */
+
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+
+.events-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: grid;
+    padding: 1.5rem;
+    overflow-y: auto;
+    place-items: center;
+    background: rgba(16, 24, 40, 0.55);
+}
+
+.events-modal {
+    width: min(680px, 100%);
+    max-height: calc(100vh - 3rem);
+    overflow-y: auto;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 24px 48px rgba(16, 24, 40, 0.2);
+}
+
+.events-modal-large {
+    width: min(820px, 100%);
+}
+
+.events-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.4rem 1.5rem;
+    border-bottom: 1px solid #e4e7ec;
+}
+
+    .events-modal-header span {
+        color: #667085;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    .events-modal-header h2 {
+        margin: 0.3rem 0 0;
+        color: #101828;
+    }
+
+    .events-modal-header > button {
+        width: 36px;
+        height: 36px;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        color: #667085;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+
+        .events-modal-header > button:hover {
+            background: #f2f4f7;
+        }
+
+        .events-modal-header > button:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+
+/* ============================================================
+   FORM
+   ============================================================ */
+
+.events-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    padding: 1.5rem;
+}
+
+.events-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-width: 0;
+}
+
+.events-field-wide {
+    grid-column: 1 / -1;
+}
+
+.events-field > span {
+    color: #344054;
+    font-size: 0.88rem;
+    font-weight: 600;
+}
+
+.events-field input,
+.events-field select,
+.events-field textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #d0d5dd;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #101828;
+    font: inherit;
+}
+
+.events-field input,
+.events-field select {
+    min-height: 42px;
+    padding: 0.65rem 0.75rem;
+}
+
+.events-field textarea {
+    min-height: 90px;
+    padding: 0.65rem 0.75rem;
+    line-height: 1.5;
+    resize: vertical;
+}
+
+    .events-field input:focus,
+    .events-field select:focus,
+    .events-field textarea:focus {
+        border-color: #667085;
+        outline: 2px solid rgba(102, 112, 133, 0.15);
+        outline-offset: 1px;
+    }
+
+    .events-field input::placeholder,
+    .events-field textarea::placeholder {
+        color: #98a2b3;
+    }
+
+
+/* ============================================================
+   FORM OPTIONS
+   ============================================================ */
+
+.events-form-options {
+    margin: 0 1.5rem;
+    padding: 1rem;
+    border: 1px solid #e4e7ec;
+    border-radius: 8px;
+    background: #f9fafb;
+}
+
+    .events-form-options label {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.7rem;
+        cursor: pointer;
+    }
+
+    .events-form-options input[type='checkbox'] {
+        width: 17px;
+        height: 17px;
+        margin-top: 0.15rem;
+    }
+
+    .events-form-options label > span {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .events-form-options strong {
+        color: #101828;
+        font-size: 0.88rem;
+    }
+
+    .events-form-options small {
+        margin-top: 0.2rem;
+        color: #667085;
+        font-size: 0.78rem;
+        line-height: 1.45;
+    }
+
+
+/* ============================================================
+   MODAL ACTIONS
+   ============================================================ */
+
+.events-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    padding: 1rem 1.5rem 1.5rem;
+    border-top: 1px solid #e4e7ec;
+}
+
+.events-secondary-button {
+    padding: 0.7rem 1rem;
+    border: 1px solid #d0d5dd;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #344054;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+    .events-secondary-button:hover {
+        background: #f9fafb;
+    }
+
+    .events-secondary-button:disabled,
+    .events-modal-actions .admin-primary-button:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1000px) {
+    .events-admin-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    .events-admin-header {
+        flex-direction: column;
+    }
+
+        .events-admin-header .admin-primary-button {
+            width: 100%;
+        }
+
+    .events-panel-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .events-form-grid {
+        grid-template-columns: 1fr;
+        padding: 1.2rem;
+    }
+
+    .events-field-wide {
+        grid-column: auto;
+    }
+
+    .events-form-options {
+        margin: 0 1.2rem;
+    }
+
+    .events-modal-actions {
+        flex-direction: column-reverse;
+    }
+
+        .events-modal-actions button {
+            width: 100%;
+        }
+}
+
+@media (max-width: 520px) {
+    .events-admin-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .events-modal-backdrop {
+        padding: 0.75rem;
+    }
+
+    .events-modal {
+        max-height: calc(100vh - 1.5rem);
+    }
+}

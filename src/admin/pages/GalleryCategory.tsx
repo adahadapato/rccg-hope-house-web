@@ -16,6 +16,7 @@ import {
 import type { ApiErrorDetails } from '../../api/api';
 import ApiErrorState from '../../components/sections/ApiErrorState';
 import AdminLayout from '../components/AdminLayout';
+import AdminActionButtons from '../components/AdminActionButtons';
 import '../styles/admin.css';
 
 interface GalleryCategory {
@@ -717,43 +718,27 @@ function GalleryCategory() {
                                                     </td>
 
                                                     <td>
-                                                        <div className="admin-table-actions">
-                                                            <button
-                                                                type="button"
-                                                                className="admin-action-button edit"
-                                                                onClick={() =>
-                                                                    openEditForm(
-                                                                        category
-                                                                    )
-                                                                }
-                                                            >
-                                                                Edit
-                                                            </button>
-
-                                                            <button
-                                                                type="button"
-                                                                className={`admin-action-button ${category.isActive
-                                                                    ? 'deactivate'
-                                                                    : 'activate'
-                                                                    }`}
-                                                                disabled={
-                                                                    actionCategoryId ===
-                                                                    category.id
-                                                                }
-                                                                onClick={() =>
-                                                                    void changeStatus(
-                                                                        category
-                                                                    )
-                                                                }
-                                                            >
-                                                                {actionCategoryId ===
-                                                                    category.id
-                                                                    ? 'Working...'
-                                                                    : category.isActive
-                                                                        ? 'Deactivate'
-                                                                        : 'Activate'}
-                                                            </button>
-                                                        </div>
+                                                        <AdminActionButtons
+                                                            itemName={category.name}
+                                                            isActive={category.isActive}
+                                                            onEdit={() =>
+                                                                openEditForm(
+                                                                    category
+                                                                )
+                                                            }
+                                                            onToggle={() =>
+                                                                void changeStatus(
+                                                                    category
+                                                                )
+                                                            }
+                                                            editTitle="Edit category"
+                                                            activateTitle="Activate category"
+                                                            deactivateTitle="Deactivate category"
+                                                            disabled={
+                                                                actionCategoryId ===
+                                                                category.id
+                                                            }
+                                                        />
                                                     </td>
                                                 </tr>
                                             )

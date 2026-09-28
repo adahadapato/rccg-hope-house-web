@@ -2,7 +2,7 @@ const API_BASE_URL = (
     import.meta.env.VITE_API_BASE_URL ?? ''
 ).replace(/\/$/, '');
 
-interface AuthTokensResponse {
+export interface AuthTokensResponse {
     accessToken: string;
     refreshToken: string;
     expiresAt: string;
@@ -10,6 +10,8 @@ interface AuthTokensResponse {
     userName: string;
     name: string;
     email: string;
+    requiresTwoFactor: boolean;
+    twoFactorChallengeToken: string | null;
 }
 
 export interface ApiErrorDetails {
@@ -36,7 +38,9 @@ export function clearAdminSession(): void {
     localStorage.removeItem('adminEmail');
 }
 
-function storeAdminSession(data: AuthTokensResponse): void {
+export function storeAdminSession(
+    data: AuthTokensResponse
+): void {
     localStorage.setItem(
         'adminAccessToken',
         data.accessToken
@@ -183,8 +187,6 @@ async function fetchWithAccessToken(
 /**
  * Validates the currently stored administrator session.
  *
- * The important rule here is:
- *
  * AUTHENTICATION FAILURE -> session may be cleared.
  * SERVER/NETWORK FAILURE -> session must be preserved.
  */
@@ -214,14 +216,6 @@ export async function validateAdminSession(): Promise<boolean> {
         /*
          * A response other than 401 is NOT proof that the
          * user's authentication has expired.
-         *
-         * For example:
-         * 500 = server error
-         * 502 = bad gateway
-         * 503 = service unavailable
-         * 504 = gateway timeout
-         *
-         * Preserve the user's session in those cases.
          */
         if (response.status !== 401) {
             return true;
@@ -235,14 +229,6 @@ export async function validateAdminSession(): Promise<boolean> {
             await refreshAdminSession();
 
         if (!refreshed) {
-            /*
-             * refreshAdminSession() only clears the session
-             * when the refresh token is genuinely rejected
-             * or is missing.
-             *
-             * If the API was temporarily unavailable, the
-             * stored session remains intact.
-             */
             return Boolean(
                 localStorage.getItem(
                     'adminAccessToken'
@@ -286,10 +272,6 @@ export async function validateAdminSession(): Promise<boolean> {
         /*
          * Network failure does not prove that authentication
          * is invalid.
-         *
-         * Keep the administrator signed in locally so that
-         * the requested admin page can display its
-         * centralised ApiErrorState instead.
          */
         return true;
     }
@@ -310,6 +292,9 @@ export async function apiFetch(
             '/api/auth/login'
         ) ||
         path.startsWith(
+            '/api/auth/two-factor'
+        ) ||
+        path.startsWith(
             '/api/auth/refresh'
         );
 
@@ -328,13 +313,6 @@ export async function apiFetch(
         await refreshAdminSession();
 
     if (!refreshed) {
-        /*
-         * Return the original 401.
-         *
-         * If refresh failed because of a temporary server
-         * or network problem, refreshAdminSession() will
-         * NOT have destroyed the stored session.
-         */
         return response;
     }
 

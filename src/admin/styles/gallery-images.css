@@ -360,46 +360,29 @@
     border-top: 1px solid #edf0f4;
 }
 
-.gallery-card-action {
-    min-height: 31px;
-    padding: 0 9px;
-    border: 1px solid #d9dfeb;
-    border-radius: 7px;
-    background: #fff;
-    color: #53617a;
-    font: inherit;
-    font-size: 10px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-    .gallery-card-action:hover {
-        background: #f5f7fa;
+    .gallery-admin-card-actions .gallery-shared-actions {
+        width: 100%;
     }
 
-    .gallery-card-action.edit {
-        border-color: #cddaf3;
-        color: #315fb9;
-    }
-
-        .gallery-card-action.edit:hover {
-            background: #eef4ff;
+        .gallery-admin-card-actions .gallery-shared-actions .admin-action-buttons {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
-    .gallery-card-action.delete {
-        margin-left: auto;
-        border-color: #efc9c9;
-        color: #b83a3a;
-    }
-
-        .gallery-card-action.delete:hover {
-            background: #fff3f3;
+        /*
+     * Keep Edit, Feature/Unfeature and Public/Private together on the left.
+     * Delete is the final action rendered by AdminActionButtons, so pushing
+     * only the danger button to the right reproduces the original card layout
+     * without changing the shared component for other admin pages.
+     */
+        .gallery-admin-card-actions .gallery-shared-actions .admin-action-danger {
+            margin-left: auto;
         }
 
-    .gallery-card-action:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
+
 
 
 /* =========================================================

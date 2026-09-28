@@ -15,6 +15,7 @@ import {
 import ApiErrorState from '@/components/sections/ApiErrorState';
 import ConfirmDialog from '@/components/sections/ConfirmDialog';
 import AdminLayout from '../components/AdminLayout';
+import AdminActionButtons from '../components/AdminActionButtons';
 
 import '../styles/admin.css';
 import '../styles/sermons.css';
@@ -1570,87 +1571,48 @@ function Sermons() {
                                                         </td>
 
                                                         <td>
-                                                            <div className="admin-table-actions sermon-actions">
-                                                                <button
-                                                                    type="button"
-                                                                    className="admin-action-button edit"
-                                                                    onClick={() =>
-                                                                        openEditForm(
-                                                                            post
-                                                                        )
-                                                                    }
-                                                                    disabled={
-                                                                        actionPostId ===
-                                                                        post.id
-                                                                    }
-                                                                >
-                                                                    Edit
-                                                                </button>
-
-                                                                <button
-                                                                    type="button"
-                                                                    className={`admin-action-button ${post.isPublished
-                                                                        ? 'deactivate'
-                                                                        : 'activate'
-                                                                        }`}
-                                                                    onClick={() =>
-                                                                        requestAction(
-                                                                            post,
-                                                                            post.isPublished
-                                                                                ? 'unpublish'
-                                                                                : 'publish'
-                                                                        )
-                                                                    }
-                                                                    disabled={
-                                                                        actionPostId ===
-                                                                        post.id
-                                                                    }
-                                                                >
-                                                                    {post.isPublished
-                                                                        ? 'Unpublish'
-                                                                        : 'Publish'}
-                                                                </button>
-
-                                                                {post.isPublished && (
-                                                                    <button
-                                                                        type="button"
-                                                                        className="admin-action-button sermon-pin-button"
-                                                                        onClick={() =>
+                                                            <AdminActionButtons
+                                                                itemName={post.title}
+                                                                isPinned={post.isPinned}
+                                                                isPublic={post.isPublished}
+                                                                onEdit={() =>
+                                                                    openEditForm(post)
+                                                                }
+                                                                onPinToggle={
+                                                                    post.isPublished
+                                                                        ? () =>
                                                                             requestAction(
                                                                                 post,
                                                                                 post.isPinned
                                                                                     ? 'unpin'
                                                                                     : 'pin'
                                                                             )
-                                                                        }
-                                                                        disabled={
-                                                                            actionPostId ===
-                                                                            post.id
-                                                                        }
-                                                                    >
-                                                                        {post.isPinned
-                                                                            ? 'Unpin'
-                                                                            : 'Pin'}
-                                                                    </button>
-                                                                )}
-
-                                                                <button
-                                                                    type="button"
-                                                                    className="admin-action-button sermon-delete-button"
-                                                                    onClick={() =>
-                                                                        requestAction(
-                                                                            post,
-                                                                            'delete'
-                                                                        )
-                                                                    }
-                                                                    disabled={
-                                                                        actionPostId ===
-                                                                        post.id
-                                                                    }
-                                                                >
-                                                                    Delete
-                                                                </button>
-                                                            </div>
+                                                                        : undefined
+                                                                }
+                                                                onVisibilityToggle={() =>
+                                                                    requestAction(
+                                                                        post,
+                                                                        post.isPublished
+                                                                            ? 'unpublish'
+                                                                            : 'publish'
+                                                                    )
+                                                                }
+                                                                onDelete={() =>
+                                                                    requestAction(
+                                                                        post,
+                                                                        'delete'
+                                                                    )
+                                                                }
+                                                                editTitle="Edit sermon"
+                                                                pinTitle="Pin sermon"
+                                                                unpinTitle="Unpin sermon"
+                                                                makePublicTitle="Publish sermon"
+                                                                makePrivateTitle="Unpublish sermon"
+                                                                deleteTitle="Delete sermon"
+                                                                disabled={
+                                                                    actionPostId === post.id
+                                                                }
+                                                            />
                                                         </td>
                                                     </tr>
                                                 )

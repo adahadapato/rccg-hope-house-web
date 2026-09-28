@@ -186,27 +186,6 @@
         color: #92400e;
     }
 
-.sermon-actions {
-    flex-wrap: wrap;
-    min-width: 260px;
-}
-
-.sermon-pin-button {
-    color: #92400e;
-    border-color: #fde68a;
-    background: #fffbeb;
-}
-
-.sermon-delete-button {
-    color: #b91c1c;
-    border-color: #fecaca;
-    background: #fff;
-}
-
-    .sermon-delete-button:hover {
-        background: #fef2f2;
-    }
-
 .sermon-modal-backdrop {
     padding: 1.5rem;
     overflow-y: auto;

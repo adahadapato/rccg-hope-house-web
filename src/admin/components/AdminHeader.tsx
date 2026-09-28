@@ -4,44 +4,221 @@
     useState,
 } from 'react';
 
-function AdminHeader() {
-    const [isUserMenuOpen, setIsUserMenuOpen] =
-        useState(false);
+import {
+    apiFetch,
+    clearAdminSession,
+} from '@/api/api';
 
-    const userMenuRef =
-        useRef<HTMLDivElement>(null);
+interface AccountProfile {
+    firstName: string;
+    lastName: string;
+    email: string;
+    profileImagePath: string | null;
+}
 
-    /*
-     * Get the authenticated administrator
-     * information saved during login.
-     */
-    const adminName =
-        localStorage.getItem('adminName') ||
-        'Administrator';
+function resolveProfileImageUrl(
+    imagePath: string | null
+): string | null {
+    if (!imagePath) {
+        return null;
+    }
 
-    const adminEmail =
-        localStorage.getItem('adminEmail') ||
-        '';
+    if (
+        imagePath.startsWith('http://') ||
+        imagePath.startsWith('https://') ||
+        imagePath.startsWith('data:')
+    ) {
+        return imagePath;
+    }
 
-    /*
-     * Automatically generate initials
-     * from the administrator's name.
-     *
-     * Examples:
-     * Admin User       -> AU
-     * Enobong Adahada  -> EA
-     * John             -> J
-     */
-    const adminInitials = adminName
+    const baseUrl = (
+        import.meta.env.VITE_API_BASE_URL ??
+        ''
+    ).replace(/\/$/, '');
+
+    const normalizedPath =
+        imagePath.startsWith('/')
+            ? imagePath
+            : `/${imagePath}`;
+
+    return `${baseUrl}${normalizedPath}`;
+}
+
+function getInitials(
+    name: string
+): string {
+    const initials = name
         .trim()
         .split(/\s+/)
         .filter(Boolean)
         .slice(0, 2)
-        .map((part) =>
-            part.charAt(0).toUpperCase()
+        .map(part =>
+            part
+                .charAt(0)
+                .toUpperCase()
         )
         .join('');
 
+    return initials || 'A';
+}
+
+function AdminHeader() {
+    const [
+        isUserMenuOpen,
+        setIsUserMenuOpen,
+    ] = useState(false);
+
+    const [
+        adminName,
+        setAdminName,
+    ] = useState(
+        localStorage.getItem(
+            'adminName'
+        ) || 'Administrator'
+    );
+
+    const [
+        adminEmail,
+        setAdminEmail,
+    ] = useState(
+        localStorage.getItem(
+            'adminEmail'
+        ) || ''
+    );
+
+    const [
+        profileImagePath,
+        setProfileImagePath,
+    ] =
+        useState<string | null>(
+            null
+        );
+
+    const [
+        imageFailed,
+        setImageFailed,
+    ] = useState(false);
+
+    const userMenuRef =
+        useRef<HTMLDivElement>(null);
+
+    const adminInitials =
+        getInitials(
+            adminName
+        );
+
+    const profileImageUrl =
+        resolveProfileImageUrl(
+            profileImagePath
+        );
+
+    const showProfileImage =
+        Boolean(
+            profileImageUrl
+        ) &&
+        !imageFailed;
+
+    /* =========================================
+       LOAD CURRENT ADMINISTRATOR PROFILE
+       ========================================= */
+
+    useEffect(() => {
+        const controller =
+            new AbortController();
+
+        const loadProfile =
+            async () => {
+                try {
+                    const response =
+                        await apiFetch(
+                            '/api/account/profile',
+                            {
+                                signal:
+                                    controller
+                                        .signal,
+                            }
+                        );
+
+                    if (!response.ok) {
+                        return;
+                    }
+
+                    const profile =
+                        (await response.json()) as AccountProfile;
+
+                    if (
+                        controller
+                            .signal
+                            .aborted
+                    ) {
+                        return;
+                    }
+
+                    const fullName = [
+                        profile.firstName,
+                        profile.lastName,
+                    ]
+                        .filter(Boolean)
+                        .join(' ')
+                        .trim();
+
+                    const resolvedName =
+                        fullName ||
+                        profile.email ||
+                        'Administrator';
+
+                    setAdminName(
+                        resolvedName
+                    );
+
+                    setAdminEmail(
+                        profile.email
+                    );
+
+                    setProfileImagePath(
+                        profile.profileImagePath
+                    );
+
+                    setImageFailed(
+                        false
+                    );
+
+                    /*
+                     * Keep the existing local-storage
+                     * values synchronised with the
+                     * authoritative account profile.
+                     */
+                    localStorage.setItem(
+                        'adminName',
+                        resolvedName
+                    );
+
+                    localStorage.setItem(
+                        'adminEmail',
+                        profile.email
+                    );
+                } catch (error) {
+                    /*
+                     * The header can continue using the
+                     * locally stored name/email if the
+                     * profile request temporarily fails.
+                     */
+                    if (
+                        error instanceof DOMException &&
+                        error.name ===
+                        'AbortError'
+                    ) {
+                        return;
+                    }
+                }
+            };
+
+        void loadProfile();
+
+        return () => {
+            controller.abort();
+        };
+    }, []);
 
     /* =========================================
        CLOSE USER MENU WHEN CLICKING OUTSIDE
@@ -57,7 +234,9 @@ function AdminHeader() {
                     event.target as Node
                 )
             ) {
-                setIsUserMenuOpen(false);
+                setIsUserMenuOpen(
+                    false
+                );
             }
         };
 
@@ -74,44 +253,58 @@ function AdminHeader() {
         };
     }, []);
 
+    /* =========================================
+       ACCOUNT SETTINGS
+       ========================================= */
+
+    const handleAccountSettings =
+        () => {
+            setIsUserMenuOpen(
+                false
+            );
+
+            window.location.assign(
+                '/admin/adminsettings'
+            );
+        };
 
     /* =========================================
        LOGOUT
        ========================================= */
 
     const handleLogout = () => {
-        /*
-         * Remove authentication tokens.
-         */
-        localStorage.removeItem(
-            'adminAccessToken'
-        );
+        clearAdminSession();
 
-        localStorage.removeItem(
-            'adminRefreshToken'
+        window.location.replace(
+            '/'
         );
-
-        /*
-         * Remove administrator information.
-         */
-        localStorage.removeItem(
-            'adminRole'
-        );
-
-        localStorage.removeItem(
-            'adminName'
-        );
-
-        localStorage.removeItem(
-            'adminEmail'
-        );
-
-        /*
-         * Return to the public website.
-         */
-        window.location.replace('/');
     };
 
+    /* =========================================
+       AVATAR
+       ========================================= */
+
+    const renderAvatar = () => (
+        <div className="admin-avatar">
+            {showProfileImage ? (
+                <img
+                    src={
+                        profileImageUrl ??
+                        undefined
+                    }
+                    alt=""
+                    className="admin-avatar-image"
+                    onError={() =>
+                        setImageFailed(
+                            true
+                        )
+                    }
+                />
+            ) : (
+                adminInitials
+            )}
+        </div>
+    );
 
     return (
         <header className="admin-header">
@@ -128,7 +321,6 @@ function AdminHeader() {
                 />
             </div>
 
-
             {/* HEADER ACTIONS */}
 
             <div className="admin-header-actions">
@@ -144,19 +336,20 @@ function AdminHeader() {
                     <span>3</span>
                 </button>
 
-
                 {/* ADMIN USER MENU */}
 
                 <div
                     className="admin-user-menu-wrapper"
-                    ref={userMenuRef}
+                    ref={
+                        userMenuRef
+                    }
                 >
                     <button
                         type="button"
                         className="admin-user"
                         onClick={() =>
                             setIsUserMenuOpen(
-                                (previous) =>
+                                previous =>
                                     !previous
                             )
                         }
@@ -165,9 +358,7 @@ function AdminHeader() {
                         }
                         aria-haspopup="menu"
                     >
-                        <div className="admin-avatar">
-                            {adminInitials}
-                        </div>
+                        {renderAvatar()}
 
                         <div className="admin-user-details">
                             <strong>
@@ -189,7 +380,6 @@ function AdminHeader() {
                         </span>
                     </button>
 
-
                     {/* USER DROPDOWN */}
 
                     {isUserMenuOpen && (
@@ -198,9 +388,7 @@ function AdminHeader() {
                             role="menu"
                         >
                             <div className="admin-user-dropdown-header">
-                                <div className="admin-avatar">
-                                    {adminInitials}
-                                </div>
+                                {renderAvatar()}
 
                                 <div>
                                     <strong>
@@ -218,9 +406,14 @@ function AdminHeader() {
                             <button
                                 type="button"
                                 className="admin-user-dropdown-item"
+                                onClick={
+                                    handleAccountSettings
+                                }
                                 role="menuitem"
                             >
-                                <span>⚙</span>
+                                <span>
+                                    ⚙
+                                </span>
                                 Account Settings
                             </button>
 
@@ -229,17 +422,19 @@ function AdminHeader() {
                             <button
                                 type="button"
                                 className="admin-user-dropdown-item admin-logout-item"
-                                onClick={handleLogout}
+                                onClick={
+                                    handleLogout
+                                }
                                 role="menuitem"
                             >
-                                <span>↪</span>
+                                <span>
+                                    ↪
+                                </span>
                                 Logout
                             </button>
                         </div>
                     )}
-
                 </div>
-
             </div>
         </header>
     );

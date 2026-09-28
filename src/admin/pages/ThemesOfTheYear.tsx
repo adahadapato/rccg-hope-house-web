@@ -14,6 +14,7 @@ import {
 import type { ApiErrorDetails } from '@/api/api';
 import ApiErrorState from '@/components/sections/ApiErrorState';
 import AdminLayout from '../components/AdminLayout';
+import AdminActionButtons from '../components/AdminActionButtons';
 
 import '../styles/admin.css';
 import '../styles/themes-of-the-year.css';
@@ -674,17 +675,15 @@ function ThemesOfTheYear() {
                                                             </td>
 
                                                             <td>
-                                                                <button
-                                                                    type="button"
-                                                                    className="admin-action-button edit"
-                                                                    onClick={() =>
+                                                                <AdminActionButtons
+                                                                    itemName={theme.themeTitle}
+                                                                    onEdit={() =>
                                                                         openEditForm(
                                                                             theme
                                                                         )
                                                                     }
-                                                                >
-                                                                    Edit
-                                                                </button>
+                                                                    editTitle={`Edit ${theme.year} theme`}
+                                                                />
                                                             </td>
                                                         </tr>
                                                     );

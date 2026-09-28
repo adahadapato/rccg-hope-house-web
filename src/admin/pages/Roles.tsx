@@ -16,6 +16,7 @@ import {
 import ApiErrorState from '@/components/sections/ApiErrorState';
 import ConfirmDialog from '@/components/sections/ConfirmDialog';
 import AdminLayout from '../components/AdminLayout';
+import AdminActionButtons from '../components/AdminActionButtons';
 
 import '../styles/admin.css';
 import '../styles/roles.css';
@@ -899,37 +900,21 @@ function Roles() {
                                                         </td>
 
                                                         <td>
-                                                            <div className="roles-actions">
-
-                                                                <button
-                                                                    type="button"
-                                                                    className="roles-action-icon"
-                                                                    onClick={() =>
-                                                                        openEditRole(
-                                                                            role
-                                                                        )
-                                                                    }
-                                                                    aria-label={`Edit ${role.name}`}
-                                                                    title="Edit role"
-                                                                >
-                                                                    ✎
-                                                                </button>
-
-                                                                <button
-                                                                    type="button"
-                                                                    className="roles-action-icon danger"
-                                                                    onClick={() =>
-                                                                        requestDeleteRole(
-                                                                            role
-                                                                        )
-                                                                    }
-                                                                    aria-label={`Delete ${role.name}`}
-                                                                    title="Delete role"
-                                                                >
-                                                                    🗑
-                                                                </button>
-
-                                                            </div>
+                                                            <AdminActionButtons
+                                                                itemName={role.name}
+                                                                onEdit={() =>
+                                                                    openEditRole(
+                                                                        role
+                                                                    )
+                                                                }
+                                                                onDelete={() =>
+                                                                    requestDeleteRole(
+                                                                        role
+                                                                    )
+                                                                }
+                                                                editTitle="Edit role"
+                                                                deleteTitle="Delete role"
+                                                            />
                                                         </td>
                                                     </tr>
                                                 )

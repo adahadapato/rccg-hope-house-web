@@ -15,6 +15,7 @@ import {
 import ApiErrorState from '@/components/sections/ApiErrorState';
 import ConfirmDialog from '@/components/sections/ConfirmDialog';
 import AdminLayout from '../components/AdminLayout';
+import AdminActionButtons from '../components/AdminActionButtons';
 
 import '../styles/admin.css';
 import '../styles/services.css';
@@ -621,7 +622,19 @@ function Services() {
                                                         <td><span className={`services-badge ${service.showInMonthlyServices ? 'services-badge-monthly' : 'services-badge-neutral'}`}>{service.showInMonthlyServices ? 'Shown' : 'No'}</span></td>
                                                         <td>{service.displayOrder}</td>
                                                         <td><span className={`services-badge ${service.isActive ? 'services-badge-active' : 'services-badge-inactive'}`}>{service.isActive ? 'Active' : 'Inactive'}</span></td>
-                                                        <td><div className="services-actions"><button type="button" onClick={() => openEditService(service)}>Edit</button><button type="button" className={service.isActive ? 'warning' : 'success'} onClick={() => requestToggle(service)}>{service.isActive ? 'Deactivate' : 'Activate'}</button><button type="button" className="danger" onClick={() => requestDeleteService(service)}>Delete</button></div></td>
+                                                        <td>
+                                                            <AdminActionButtons
+                                                                itemName={service.name}
+                                                                isActive={service.isActive}
+                                                                onEdit={() => openEditService(service)}
+                                                                onToggle={() => requestToggle(service)}
+                                                                onDelete={() => requestDeleteService(service)}
+                                                                editTitle="Edit service"
+                                                                activateTitle="Activate service"
+                                                                deactivateTitle="Deactivate service"
+                                                                deleteTitle="Delete service"
+                                                            />
+                                                        </td>
                                                     </tr>
                                                 ))}
                                             </tbody>
@@ -647,7 +660,15 @@ function Services() {
                                                         <td>{broadcast.theme || '—'}</td>
                                                         <td><span className={`services-badge ${broadcast.isLive ? 'services-badge-live' : 'services-badge-neutral'}`}>{broadcast.isLive ? 'Live' : 'Recorded'}</span></td>
                                                         <td><a className="services-video-link" href={broadcast.videoUrl} target="_blank" rel="noreferrer">▶ Watch</a></td>
-                                                        <td><div className="services-actions"><button type="button" onClick={() => openEditBroadcast(broadcast)}>Edit</button><button type="button" className="danger" onClick={() => requestDeleteBroadcast(broadcast)}>Delete</button></div></td>
+                                                        <td>
+                                                            <AdminActionButtons
+                                                                itemName={broadcast.title}
+                                                                onEdit={() => openEditBroadcast(broadcast)}
+                                                                onDelete={() => requestDeleteBroadcast(broadcast)}
+                                                                editTitle="Edit broadcast"
+                                                                deleteTitle="Delete broadcast"
+                                                            />
+                                                        </td>
                                                     </tr>
                                                 ))}
                                             </tbody>

@@ -344,49 +344,6 @@
 }
 
 
-/* =========================================
-   ACTION BUTTONS
-   ========================================= */
-
-.roles-actions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 0.45rem;
-}
-
-.roles-action-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    padding: 0;
-    border: 1px solid #dfe4eb;
-    border-radius: 9px;
-    background: #ffffff;
-    color: #344054;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
-}
-
-    .roles-action-icon:hover {
-        border-color: #b9c7db;
-        background: #f5f8fc;
-        color: #244a87;
-        transform: translateY(-1px);
-    }
-
-    .roles-action-icon.danger {
-        color: #b42318;
-    }
-
-        .roles-action-icon.danger:hover {
-            border-color: #f5b7b1;
-            background: #fff3f2;
-            color: #912018;
-        }
 
 
 /* =========================================
