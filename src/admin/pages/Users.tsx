@@ -30,6 +30,7 @@ interface AdminUser {
     twoFactorEnabled: boolean;
     isActive: boolean;
     lastLoginAt: string | null;
+    profileImagePath: string | null;
     roles: string[];
 }
 
@@ -118,6 +119,59 @@ function getDisplayName(
         .trim();
 
     return name || user.email;
+}
+
+function getUserInitials(
+    user: AdminUser
+) {
+    const initials = [
+        user.firstName,
+        user.lastName,
+    ]
+        .filter(Boolean)
+        .map(value =>
+            value.trim().charAt(0)
+        )
+        .join('')
+        .toUpperCase();
+
+    return (
+        initials ||
+        user.email
+            .trim()
+            .charAt(0)
+            .toUpperCase() ||
+        'U'
+    );
+}
+
+function resolveProfileImageUrl(
+    path: string | null
+) {
+    if (!path) {
+        return null;
+    }
+
+    if (
+        path.startsWith('http://') ||
+        path.startsWith('https://')
+    ) {
+        return path;
+    }
+
+    const apiBaseUrl =
+        (
+            import.meta.env
+                .VITE_API_BASE_URL ??
+            ''
+        ).replace(/\/$/, '');
+
+    const normalisedPath =
+        path.startsWith('/')
+            ? path
+            : `/${path}`;
+
+    return `${apiBaseUrl}${normalisedPath}`;
 }
 
 function Users() {
@@ -1143,7 +1197,56 @@ function Users() {
                                                     >
                                                         <td>
                                                             <div className="users-name-cell">
-                                                                <div>
+                                                                <div className="users-avatar">
+                                                                    {user.profileImagePath ? (
+                                                                        <img
+                                                                            src={
+                                                                                resolveProfileImageUrl(
+                                                                                    user.profileImagePath
+                                                                                ) ??
+                                                                                undefined
+                                                                            }
+                                                                            alt=""
+                                                                            className="users-avatar-image"
+                                                                            onError={
+                                                                                event => {
+                                                                                    event.currentTarget.style.display =
+                                                                                        'none';
+
+                                                                                    const fallback =
+                                                                                        event.currentTarget
+                                                                                            .nextElementSibling as
+                                                                                        | HTMLElement
+                                                                                        | null;
+
+                                                                                    if (
+                                                                                        fallback
+                                                                                    ) {
+                                                                                        fallback.style.display =
+                                                                                            'grid';
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        />
+                                                                    ) : null}
+
+                                                                    <span
+                                                                        className="users-avatar-fallback"
+                                                                        style={{
+                                                                            display:
+                                                                                user.profileImagePath
+                                                                                    ? 'none'
+                                                                                    : 'grid',
+                                                                        }}
+                                                                        aria-hidden="true"
+                                                                    >
+                                                                        {getUserInitials(
+                                                                            user
+                                                                        )}
+                                                                    </span>
+                                                                </div>
+
+                                                                <div className="users-name-details">
                                                                     <strong>
                                                                         {getDisplayName(
                                                                             user

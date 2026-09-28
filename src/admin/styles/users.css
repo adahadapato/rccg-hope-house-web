@@ -238,19 +238,66 @@
 }
 
 .users-name-cell {
-    min-width: 190px;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 240px;
 }
 
-    .users-name-cell strong {
+.users-avatar {
+    position: relative;
+    display: grid;
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    overflow: hidden;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #e7a978, #77462f);
+}
+
+.users-avatar-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 50%;
+}
+
+.users-avatar-fallback {
+    position: absolute;
+    inset: 0;
+    place-items: center;
+    margin: 0 !important;
+    border-radius: 50%;
+    color: #ffffff !important;
+    font-size: 0.76rem !important;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.users-name-details {
+    min-width: 0;
+}
+
+    .users-name-details strong {
         display: block;
+        overflow: hidden;
         color: #101828;
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 
-    .users-name-cell span {
+    .users-name-details > span {
         display: block;
+        max-width: 220px;
+        overflow: hidden;
         margin-top: 0.2rem;
         color: #667085;
         font-size: 0.82rem;
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 
 .users-table-secondary {
