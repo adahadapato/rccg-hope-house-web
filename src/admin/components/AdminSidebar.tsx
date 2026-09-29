@@ -36,6 +36,7 @@ const navItems: NavigationItem[] = [
             },
             {
                 label: 'Devotionals',
+                path: '/admin/devotionals',
             },
             {
                 label: "Pastor's Corner",

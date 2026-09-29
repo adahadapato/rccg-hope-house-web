@@ -1,7 +1,31 @@
-﻿
-import { useState } from 'react';
+﻿import {
+    useEffect,
+    useState,
+} from 'react';
 
-type BibleTranslation = 'KJV' | 'NKJV' | 'NIV' | 'NLT';
+import {
+    apiFetch,
+} from '@/api/api';
+
+type BibleTranslation =
+    | 'KJV'
+    | 'NKJV'
+    | 'NIV'
+    | 'NLT';
+
+interface Devotional {
+    id: string;
+    devotionalDate: string;
+    theme: string;
+    scriptureReference: string;
+    passageId: string;
+    thought: string;
+    commentaryPoints: string[];
+    prayerPoints: string[];
+    declaration: string;
+    isPublished: boolean;
+    publishedAt: string | null;
+}
 
 interface ApiBibleTranslation {
     code: string;
@@ -21,10 +45,6 @@ interface TranslationOption {
     apiAbbreviation: string;
     enabled: boolean;
 }
-
-const API_BASE_URL =
-    import.meta.env.VITE_API_BASE_URL ||
-    'https://adahadapato-003-site2.dtempurl.com';
 
 const translationOptions: TranslationOption[] = [
     {
@@ -49,74 +69,180 @@ const translationOptions: TranslationOption[] = [
     },
 ];
 
+function formatDevotionalDate(
+    value: string
+) {
+    const parts =
+        value.split('-');
+
+    if (parts.length !== 3) {
+        return value;
+    }
+
+    const year =
+        Number(parts[0]);
+
+    const month =
+        Number(parts[1]);
+
+    const day =
+        Number(parts[2]);
+
+    const date =
+        new Date(
+            year,
+            month - 1,
+            day
+        );
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+        return value;
+    }
+
+    return new Intl.DateTimeFormat(
+        'en-GB',
+        {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+        }
+    ).format(date);
+}
+
 export default function DailyDevotional() {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState('devotional');
+    const [
+        devotional,
+        setDevotional,
+    ] =
+        useState<Devotional | null>(
+            null
+        );
 
-    const [activeTranslation, setActiveTranslation] =
-        useState<BibleTranslation>('KJV');
+    const [
+        isLoadingDevotional,
+        setIsLoadingDevotional,
+    ] = useState(true);
 
-    const [bibleText, setBibleText] = useState('');
-    const [bibleCopyright, setBibleCopyright] = useState('');
-    const [isLoadingBible, setIsLoadingBible] = useState(false);
-    const [bibleError, setBibleError] = useState('');
+    const [
+        devotionalError,
+        setDevotionalError,
+    ] = useState('');
+
+    const [
+        isModalOpen,
+        setIsModalOpen,
+    ] = useState(false);
+
+    const [
+        activeTab,
+        setActiveTab,
+    ] =
+        useState<
+            'devotional' | 'bible'
+        >('devotional');
+
+    const [
+        activeTranslation,
+        setActiveTranslation,
+    ] =
+        useState<BibleTranslation>(
+            'KJV'
+        );
+
+    const [
+        bibleText,
+        setBibleText,
+    ] = useState('');
+
+    const [
+        bibleCopyright,
+        setBibleCopyright,
+    ] = useState('');
+
+    const [
+        isLoadingBible,
+        setIsLoadingBible,
+    ] = useState(false);
+
+    const [
+        bibleError,
+        setBibleError,
+    ] = useState('');
 
     // =========================================================
-    // DEVOTIONAL DATA
+    // LOAD DAILY DEVOTIONAL
     //
-    // This data is currently local to the component.
-    // In production, the devotional content will eventually
-    // come from the Hope House backend.
+    // The Hope House backend determines which published
+    // devotional should be shown publicly.
+    //
+    // If today's devotional is unavailable, the backend may
+    // return the most recent published devotional dated today
+    // or earlier.
     // =========================================================
 
-    const devotional = {
-        date: 'June 6, 2026',
+    useEffect(() => {
+        let cancelled = false;
 
-        theme: 'DIVINE REPOSITIONING',
+        const loadDevotional =
+            async () => {
+                setIsLoadingDevotional(
+                    true
+                );
 
-        scripture: 'Exodus 14:1-4',
+                setDevotionalError('');
 
-        // API.Bible uses USFM-style passage identifiers.
-        passageId: 'EXO.14.1-EXO.14.4',
+                try {
+                    const response =
+                        await apiFetch(
+                            '/api/devotionals/latest'
+                        );
 
-        thought:
-            'Beloved, divine repositioning is a strategic move by God to place you in a position where His glory will be manifested. What looks like a dead end is actually a setup for your breakthrough.',
+                    if (!response.ok) {
+                        throw new Error(
+                            `Unable to retrieve devotional (${response.status}).`
+                        );
+                    }
 
-        fullCommentary: `
-            <p>
-                Beloved, divine repositioning is a strategic move by God to place
-                you in a position where His glory will be manifested in your life.
-                Just as God instructed the children of Israel to change their
-                direction and encamp by the sea, He may ask you to make seemingly
-                unusual decisions that will ultimately lead to your breakthrough.
-            </p>
+                    const data =
+                        (await response.json()) as Devotional;
 
-            <p>
-                The Israelites appeared to be trapped and confused, but God had
-                a greater plan. What looks like a dead end to you is actually a
-                setup for God's mighty deliverance. Your current position is not
-                your final destination.
-            </p>
+                    if (cancelled) {
+                        return;
+                    }
 
-            <p>
-                When God repositions you, He does so for a purpose: to display
-                His power, to confound your enemies, and to bring you into a new
-                season of victory. Trust His leading even when it doesn't make
-                sense to your natural understanding.
-            </p>
-        `,
+                    setDevotional(
+                        data
+                    );
+                } catch (error) {
+                    console.error(
+                        'Unable to load daily devotional:',
+                        error
+                    );
 
-        prayerPoints: [
-            'Father, thank You for Your divine repositioning in my life.',
-            'Lord, give me the grace to follow Your instructions precisely.',
-            'Father, reposition me for breakthrough and divine manifestation.',
-            "Lord, confuse every Pharaoh pursuing my destiny in Jesus' name.",
-            'Father, let my life be a testimony of Your power and deliverance.',
-        ],
+                    if (!cancelled) {
+                        setDevotionalError(
+                            'Unable to load the daily devotional. Please try again later.'
+                        );
+                    }
+                } finally {
+                    if (!cancelled) {
+                        setIsLoadingDevotional(
+                            false
+                        );
+                    }
+                }
+            };
 
-        declaration:
-            "I am divinely repositioned for breakthrough. My enemies shall be confounded, and the glory of God shall be manifested in my life. In Jesus' name!",
-    };
+        void loadDevotional();
+
+        return () => {
+            cancelled = true;
+        };
+    }, []);
 
     // =========================================================
     // GET BIBLE RESOURCE
@@ -131,19 +257,26 @@ export default function DailyDevotional() {
     const getBibleResource = async (
         translation: BibleTranslation
     ): Promise<ApiBibleTranslation> => {
-        const option = translationOptions.find(
-            (item) => item.label === translation
-        );
+        const option =
+            translationOptions.find(
+                item =>
+                    item.label ===
+                    translation
+            );
 
-        if (!option || !option.enabled) {
+        if (
+            !option ||
+            !option.enabled
+        ) {
             throw new Error(
                 `${translation} is not currently available.`
             );
         }
 
-        const response = await fetch(
-            `${API_BASE_URL}/api/bible/bibles`
-        );
+        const response =
+            await apiFetch(
+                '/api/bible/bibles'
+            );
 
         if (!response.ok) {
             throw new Error(
@@ -154,11 +287,14 @@ export default function DailyDevotional() {
         const translations =
             (await response.json()) as ApiBibleTranslation[];
 
-        const bible = translations.find(
-            (item) =>
-                item.abbreviation.toLowerCase() ===
-                option.apiAbbreviation.toLowerCase()
-        );
+        const bible =
+            translations.find(
+                item =>
+                    item.abbreviation
+                        .toLowerCase() ===
+                    option.apiAbbreviation
+                        .toLowerCase()
+            );
 
         if (!bible) {
             throw new Error(
@@ -182,12 +318,20 @@ export default function DailyDevotional() {
     const fetchBibleText = async (
         translation: BibleTranslation
     ) => {
-        const option = translationOptions.find(
-            (item) => item.label === translation
-        );
+        if (!devotional) {
+            return;
+        }
+
+        const option =
+            translationOptions.find(
+                item =>
+                    item.label ===
+                    translation
+            );
 
         // NKJV remains visible in the interface but is disabled
         // until it becomes available through our API.Bible account.
+
         if (!option?.enabled) {
             return;
         }
@@ -196,7 +340,9 @@ export default function DailyDevotional() {
         setBibleError('');
         setBibleText('');
         setBibleCopyright('');
-        setActiveTranslation(translation);
+        setActiveTranslation(
+            translation
+        );
 
         try {
             // -------------------------------------------------
@@ -204,24 +350,31 @@ export default function DailyDevotional() {
             //    translation from our own backend.
             // -------------------------------------------------
 
-            const bible = await getBibleResource(translation);
+            const bible =
+                await getBibleResource(
+                    translation
+                );
 
             // -------------------------------------------------
             // 2. Build the query for our passage endpoint.
             // -------------------------------------------------
 
-            const query = new URLSearchParams({
-                bibleId: bible.code,
-                passageId: devotional.passageId,
-            });
+            const query =
+                new URLSearchParams({
+                    bibleId:
+                        bible.code,
+                    passageId:
+                        devotional.passageId,
+                });
 
             // -------------------------------------------------
             // 3. Request the scripture from the Hope House API.
             // -------------------------------------------------
 
-            const response = await fetch(
-                `${API_BASE_URL}/api/bible/passage?${query.toString()}`
-            );
+            const response =
+                await apiFetch(
+                    `/api/bible/passage?${query.toString()}`
+                );
 
             if (!response.ok) {
                 throw new Error(
@@ -234,14 +387,15 @@ export default function DailyDevotional() {
 
             // -------------------------------------------------
             // 4. Store scripture and copyright separately.
-            //
-            // This is important because API.Bible returns
-            // translation/licensing information that must not
-            // appear as though it is part of the scripture.
             // -------------------------------------------------
 
-            setBibleText(passage.content);
-            setBibleCopyright(passage.copyright);
+            setBibleText(
+                passage.content
+            );
+
+            setBibleCopyright(
+                passage.copyright
+            );
         } catch (error) {
             console.error(
                 'Unable to load Bible passage:',
@@ -252,9 +406,90 @@ export default function DailyDevotional() {
                 'Unable to load scripture. Please check your connection and try again.'
             );
         } finally {
-            setIsLoadingBible(false);
+            setIsLoadingBible(
+                false
+            );
         }
     };
+
+    // =========================================================
+    // LOADING STATE
+    // =========================================================
+
+    if (isLoadingDevotional) {
+        return (
+            <section
+                id="devotional"
+                className="section daily-devotional-section"
+            >
+                <div className="container">
+
+                    <div className="devotional-header">
+
+                        <span className="devotional-tag">
+                            📖 DAILY BREAD
+                        </span>
+
+                        <h2 className="devotional-main-title">
+                            Open Heavens Devotional
+                        </h2>
+
+                        <div className="title-divider-center"></div>
+
+                        <p className="devotional-subtitle">
+                            Loading daily devotional...
+                        </p>
+
+                    </div>
+
+                </div>
+            </section>
+        );
+    }
+
+    // =========================================================
+    // ERROR / NO DEVOTIONAL
+    // =========================================================
+
+    if (
+        devotionalError ||
+        !devotional
+    ) {
+        return (
+            <section
+                id="devotional"
+                className="section daily-devotional-section"
+            >
+                <div className="container">
+
+                    <div className="devotional-header">
+
+                        <span className="devotional-tag">
+                            📖 DAILY BREAD
+                        </span>
+
+                        <h2 className="devotional-main-title">
+                            Open Heavens Devotional
+                        </h2>
+
+                        <div className="title-divider-center"></div>
+
+                        <p className="devotional-subtitle">
+                            {devotionalError ||
+                                'No devotional is currently available.'}
+                        </p>
+
+                    </div>
+
+                </div>
+            </section>
+        );
+    }
+
+    const devotionalDate =
+        formatDevotionalDate(
+            devotional.devotionalDate
+        );
 
     return (
         <>
@@ -299,14 +534,17 @@ export default function DailyDevotional() {
                     <div className="devotional-showcase">
 
                         {/* Left Highlight Panel */}
+
                         <div className="devotional-highlight">
 
                             <div className="highlight-date">
+
                                 <span className="date-icon"></span>
 
                                 <span>
-                                    {devotional.date}
+                                    {devotionalDate}
                                 </span>
+
                             </div>
 
 
@@ -324,14 +562,24 @@ export default function DailyDevotional() {
 
 
                             {/* Clickable Scripture */}
+
                             <div
                                 className="highlight-scripture clickable"
                                 onClick={() => {
-                                    setIsModalOpen(true);
-                                    setActiveTab('bible');
+                                    setIsModalOpen(
+                                        true
+                                    );
 
-                                    if (!bibleText) {
-                                        void fetchBibleText('KJV');
+                                    setActiveTab(
+                                        'bible'
+                                    );
+
+                                    if (
+                                        !bibleText
+                                    ) {
+                                        void fetchBibleText(
+                                            'KJV'
+                                        );
                                     }
                                 }}
                             >
@@ -340,7 +588,9 @@ export default function DailyDevotional() {
                                 </span>
 
                                 <p className="scripture-text">
-                                    {devotional.scripture}
+                                    {
+                                        devotional.scriptureReference
+                                    }
                                 </p>
 
                             </div>
@@ -349,6 +599,7 @@ export default function DailyDevotional() {
 
 
                         {/* Right Content Panel */}
+
                         <div className="devotional-content">
 
                             <div className="thought-block">
@@ -367,9 +618,15 @@ export default function DailyDevotional() {
                             <button
                                 type="button"
                                 className="btn-read-devotional"
-                                onClick={() =>
-                                    setIsModalOpen(true)
-                                }
+                                onClick={() => {
+                                    setActiveTab(
+                                        'devotional'
+                                    );
+
+                                    setIsModalOpen(
+                                        true
+                                    );
+                                }}
                             >
                                 Read Full Devotional{' '}
 
@@ -395,13 +652,15 @@ export default function DailyDevotional() {
                 <div
                     className="devotional-modal-overlay"
                     onClick={() =>
-                        setIsModalOpen(false)
+                        setIsModalOpen(
+                            false
+                        )
                     }
                 >
 
                     <div
                         className="devotional-modal"
-                        onClick={(event) =>
+                        onClick={event =>
                             event.stopPropagation()
                         }
                     >
@@ -419,7 +678,7 @@ export default function DailyDevotional() {
                                 </h2>
 
                                 <span className="modal-date">
-                                    {devotional.date}
+                                    {devotionalDate}
                                 </span>
 
                             </div>
@@ -427,20 +686,15 @@ export default function DailyDevotional() {
 
                             {/* =========================
                                 CLOSE BUTTON
-
-                                This button stays inside
-                                the modal header.
-
-                                The × is deliberately
-                                included as visible content
-                                instead of relying on CSS.
                             ========================== */}
 
                             <button
                                 type="button"
                                 className="modal-close-btn"
                                 onClick={() =>
-                                    setIsModalOpen(false)
+                                    setIsModalOpen(
+                                        false
+                                    )
                                 }
                                 aria-label="Close devotional"
                                 title="Close"
@@ -459,12 +713,15 @@ export default function DailyDevotional() {
 
                             <button
                                 type="button"
-                                className={`tab-btn ${activeTab === 'devotional'
+                                className={`tab-btn ${activeTab ===
+                                        'devotional'
                                         ? 'active'
                                         : ''
                                     }`}
                                 onClick={() =>
-                                    setActiveTab('devotional')
+                                    setActiveTab(
+                                        'devotional'
+                                    )
                                 }
                             >
                                 📖 Devotional
@@ -473,14 +730,19 @@ export default function DailyDevotional() {
 
                             <button
                                 type="button"
-                                className={`tab-btn ${activeTab === 'bible'
+                                className={`tab-btn ${activeTab ===
+                                        'bible'
                                         ? 'active'
                                         : ''
                                     }`}
                                 onClick={() => {
-                                    setActiveTab('bible');
+                                    setActiveTab(
+                                        'bible'
+                                    );
 
-                                    if (!bibleText) {
+                                    if (
+                                        !bibleText
+                                    ) {
                                         void fetchBibleText(
                                             activeTranslation
                                         );
@@ -504,248 +766,289 @@ export default function DailyDevotional() {
                                 DEVOTIONAL TAB
                             ================================================== */}
 
-                            {activeTab === 'devotional' && (
+                            {activeTab ===
+                                'devotional' && (
 
-                                <div className="tab-content devotional-tab">
+                                    <div className="tab-content devotional-tab">
 
 
-                                    {/* =========================
+                                        {/* =========================
                                         SCRIPTURE READING
                                     ========================== */}
 
-                                    <div className="modal-section">
+                                        <div className="modal-section">
 
-                                        <h3>
-                                            📜 Scripture Reading
-                                        </h3>
+                                            <h3>
+                                                📜 Scripture Reading
+                                            </h3>
 
-                                        <p
-                                            className="modal-scripture-ref"
-                                            onClick={() => {
-                                                setActiveTab('bible');
-
-                                                if (!bibleText) {
-                                                    void fetchBibleText(
-                                                        activeTranslation
+                                            <p
+                                                className="modal-scripture-ref"
+                                                onClick={() => {
+                                                    setActiveTab(
+                                                        'bible'
                                                     );
+
+                                                    if (
+                                                        !bibleText
+                                                    ) {
+                                                        void fetchBibleText(
+                                                            activeTranslation
+                                                        );
+                                                    }
+                                                }}
+                                            >
+                                                {
+                                                    devotional.scriptureReference
                                                 }
-                                            }}
-                                        >
-                                            {devotional.scripture}
 
-                                            <span className="click-hint">
-                                                {' '}
-                                                (Click to read)
-                                            </span>
+                                                <span className="click-hint">
+                                                    {' '}
+                                                    (Click to read)
+                                                </span>
 
-                                        </p>
+                                            </p>
 
-                                    </div>
+                                        </div>
 
 
-                                    {/* =========================
+                                        {/* =========================
                                         COMMENTARY
                                     ========================== */}
 
-                                    <div className="modal-section">
+                                        <div className="modal-section">
 
-                                        <h3>
-                                            💡 Commentary
-                                        </h3>
+                                            <h3>
+                                                💡 Commentary
+                                            </h3>
 
-                                        <div
-                                            className="commentary-body"
-                                            dangerouslySetInnerHTML={{
-                                                __html:
-                                                    devotional.fullCommentary,
-                                            }}
-                                        />
+                                            <div className="commentary-body">
 
-                                    </div>
+                                                {devotional.commentaryPoints.map(
+                                                    (
+                                                        point,
+                                                        index
+                                                    ) => (
+                                                        <p
+                                                            key={
+                                                                index
+                                                            }
+                                                        >
+                                                            {
+                                                                point
+                                                            }
+                                                        </p>
+                                                    )
+                                                )}
+
+                                            </div>
+
+                                        </div>
 
 
-                                    {/* =========================
+                                        {/* =========================
                                         PRAYER POINTS
                                     ========================== */}
 
-                                    <div className="modal-section prayer-section">
+                                        <div className="modal-section prayer-section">
 
-                                        <h3>
-                                            🙏 Prayer Points
-                                        </h3>
+                                            <h3>
+                                                🙏 Prayer Points
+                                            </h3>
 
-                                        <ul className="modal-prayer-list">
+                                            <ul className="modal-prayer-list">
 
-                                            {devotional.prayerPoints.map(
-                                                (point, index) => (
+                                                {devotional.prayerPoints.map(
+                                                    (
+                                                        point,
+                                                        index
+                                                    ) => (
 
-                                                    <li key={index}>
+                                                        <li
+                                                            key={
+                                                                index
+                                                            }
+                                                        >
 
-                                                        <span className="prayer-num">
-                                                            {index + 1}
-                                                        </span>
+                                                            <span className="prayer-num">
+                                                                {
+                                                                    index +
+                                                                    1
+                                                                }
+                                                            </span>
 
-                                                        <span>
-                                                            {point}
-                                                        </span>
+                                                            <span>
+                                                                {point}
+                                                            </span>
 
-                                                    </li>
+                                                        </li>
 
-                                                )
-                                            )}
+                                                    )
+                                                )}
 
-                                        </ul>
+                                            </ul>
 
-                                    </div>
+                                        </div>
 
 
-                                    {/* =========================
+                                        {/* =========================
                                         DECLARATION
                                     ========================== */}
 
-                                    <div className="modal-section declaration-section">
+                                        <div className="modal-section declaration-section">
 
-                                        <h3>
-                                            📢 Declaration
-                                        </h3>
+                                            <h3>
+                                                📢 Declaration
+                                            </h3>
 
-                                        <p className="declaration-text">
-                                            "{devotional.declaration}"
-                                        </p>
+                                            <p className="declaration-text">
+                                                "
+                                                {
+                                                    devotional.declaration
+                                                }
+                                                "
+                                            </p>
+
+                                        </div>
 
                                     </div>
 
-                                </div>
-
-                            )}
+                                )}
 
 
                             {/* =================================================
                                 BIBLE READING TAB
                             ================================================== */}
 
-                            {activeTab === 'bible' && (
+                            {activeTab ===
+                                'bible' && (
 
-                                <div className="tab-content bible-tab">
-
-
-                                    {/* =========================
-                                        TRANSLATION SELECTOR
-                                    ========================== */}
-
-                                    <div className="translation-selector">
-
-                                        {translationOptions.map(
-                                            (translation) => (
-
-                                                <button
-                                                    type="button"
-                                                    key={
-                                                        translation.label
-                                                    }
-                                                    className={`trans-btn ${activeTranslation ===
-                                                            translation.label
-                                                            ? 'active'
-                                                            : ''
-                                                        } ${!translation.enabled
-                                                            ? 'disabled'
-                                                            : ''
-                                                        }`}
-                                                    disabled={
-                                                        !translation.enabled
-                                                    }
-                                                    title={
-                                                        translation.enabled
-                                                            ? `Read in ${translation.label}`
-                                                            : `${translation.label} coming soon`
-                                                    }
-                                                    onClick={() =>
-                                                        void fetchBibleText(
-                                                            translation.label
-                                                        )
-                                                    }
-                                                >
-                                                    {translation.label}
-                                                </button>
-
-                                            )
-                                        )}
-
-                                    </div>
-
-
-                                    {/* =========================
-                                        SCRIPTURE CARD
-                                    ========================== */}
-
-                                    <div className="bible-text-display">
+                                    <div className="tab-content bible-tab">
 
 
                                         {/* =========================
-                                            SCRIPTURE HEADER
-                                        ========================== */}
+                                        TRANSLATION SELECTOR
+                                    ========================== */}
 
-                                        <div className="bible-header">
+                                        <div className="translation-selector">
 
-                                            <h3>
-                                                {devotional.scripture}
-                                            </h3>
+                                            {translationOptions.map(
+                                                translation => (
 
-                                            <span className="trans-badge">
-                                                {activeTranslation}
-                                            </span>
+                                                    <button
+                                                        type="button"
+                                                        key={
+                                                            translation.label
+                                                        }
+                                                        className={`trans-btn ${activeTranslation ===
+                                                                translation.label
+                                                                ? 'active'
+                                                                : ''
+                                                            } ${!translation.enabled
+                                                                ? 'disabled'
+                                                                : ''
+                                                            }`}
+                                                        disabled={
+                                                            !translation.enabled
+                                                        }
+                                                        title={
+                                                            translation.enabled
+                                                                ? `Read in ${translation.label}`
+                                                                : `${translation.label} coming soon`
+                                                        }
+                                                        onClick={() =>
+                                                            void fetchBibleText(
+                                                                translation.label
+                                                            )
+                                                        }
+                                                    >
+                                                        {
+                                                            translation.label
+                                                        }
+                                                    </button>
+
+                                                )
+                                            )}
 
                                         </div>
 
 
                                         {/* =========================
-                                            LOADING STATE
+                                        SCRIPTURE CARD
+                                    ========================== */}
+
+                                        <div className="bible-text-display">
+
+
+                                            {/* =========================
+                                            SCRIPTURE HEADER
                                         ========================== */}
 
-                                        {isLoadingBible ? (
+                                            <div className="bible-header">
 
-                                            <div className="loading-spinner">
+                                                <h3>
+                                                    {
+                                                        devotional.scriptureReference
+                                                    }
+                                                </h3>
 
-                                                <div className="spinner"></div>
-
-                                                <p>
-                                                    Fetching the Word...
-                                                </p>
+                                                <span className="trans-badge">
+                                                    {
+                                                        activeTranslation
+                                                    }
+                                                </span>
 
                                             </div>
 
-                                        ) : bibleError ? (
+
+                                            {/* =========================
+                                            LOADING STATE
+                                        ========================== */}
+
+                                            {isLoadingBible ? (
+
+                                                <div className="loading-spinner">
+
+                                                    <div className="spinner"></div>
+
+                                                    <p>
+                                                        Fetching the Word...
+                                                    </p>
+
+                                                </div>
+
+                                            ) : bibleError ? (
 
 
-                                            /* =========================
-                                                ERROR STATE
-                                            ========================== */
+                                                /* =========================
+                                                    ERROR STATE
+                                                ========================== */
 
-                                            <p className="actual-bible-text">
-                                                {bibleError}
-                                            </p>
-
-                                        ) : (
-
-
-                                            /* =========================
-                                                SCRIPTURE CONTENT
-                                            ========================== */
-
-                                            <>
-
-                                                <p
-                                                    className="actual-bible-text"
-                                                    style={{
-                                                        whiteSpace:
-                                                            'pre-line',
-                                                    }}
-                                                >
-                                                    {bibleText}
+                                                <p className="actual-bible-text">
+                                                    {bibleError}
                                                 </p>
 
+                                            ) : (
 
-                                                {/* =================================
+
+                                                /* =========================
+                                                    SCRIPTURE CONTENT
+                                                ========================== */
+
+                                                <>
+
+                                                    <p
+                                                        className="actual-bible-text"
+                                                        style={{
+                                                            whiteSpace:
+                                                                'pre-line',
+                                                        }}
+                                                    >
+                                                        {bibleText}
+                                                    </p>
+
+
+                                                    {/* =================================
                                                     TRANSLATION COPYRIGHT
 
                                                     Copyright/licensing information
@@ -759,33 +1062,33 @@ export default function DailyDevotional() {
                                                     the actual Bible passage.
                                                 ================================== */}
 
-                                                {bibleCopyright && (
+                                                    {bibleCopyright && (
 
-                                                    <div className="bible-attribution">
+                                                        <div className="bible-attribution">
 
-                                                        <span className="bible-attribution-label">
-                                                            Translation Copyright
-                                                        </span>
+                                                            <span className="bible-attribution-label">
+                                                                Translation Copyright
+                                                            </span>
 
-                                                        <p className="bible-copyright">
-                                                            {
-                                                                bibleCopyright
-                                                            }
-                                                        </p>
+                                                            <p className="bible-copyright">
+                                                                {
+                                                                    bibleCopyright
+                                                                }
+                                                            </p>
 
-                                                    </div>
+                                                        </div>
 
-                                                )}
+                                                    )}
 
-                                            </>
+                                                </>
 
-                                        )}
+                                            )}
+
+                                        </div>
 
                                     </div>
 
-                                </div>
-
-                            )}
+                                )}
 
                         </div>
 

@@ -1,0 +1,890 @@
+/* =========================================================
+   RCCG HOPE HOUSE
+   ADMIN - DAILY DEVOTIONALS
+   ========================================================= */
+
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.devotionals-admin {
+    width: 100%;
+    min-width: 0;
+}
+
+.devotionals-admin-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 26px;
+}
+
+    .devotionals-admin-header > div:first-child {
+        min-width: 0;
+    }
+
+.devotionals-admin-eyebrow {
+    display: inline-block;
+    margin-bottom: 6px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #6f42c1;
+}
+
+.devotionals-admin-header h1 {
+    margin: 0;
+    font-size: clamp(1.7rem, 3vw, 2.2rem);
+    font-weight: 800;
+    line-height: 1.15;
+    color: #172033;
+}
+
+.devotionals-admin-header p {
+    max-width: 680px;
+    margin: 9px 0 0;
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: #697386;
+}
+
+
+/* =========================================================
+   PRIMARY BUTTON
+   ========================================================= */
+
+.devotionals-admin .admin-primary-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 42px;
+    padding: 10px 17px;
+    border: 0;
+    border-radius: 9px;
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    color: #ffffff;
+    background: #6f42c1;
+    box-shadow: 0 5px 14px rgba(111, 66, 193, 0.2);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+    .devotionals-admin .admin-primary-button:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 18px rgba(111, 66, 193, 0.25);
+    }
+
+    .devotionals-admin .admin-primary-button:disabled {
+        opacity: 0.58;
+        cursor: not-allowed;
+    }
+
+
+/* =========================================================
+   ALERTS
+   ========================================================= */
+
+.devotionals-admin-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding: 14px 16px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+}
+
+    .devotionals-admin-alert > span {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 27px;
+        width: 27px;
+        height: 27px;
+        border-radius: 50%;
+        font-size: 0.82rem;
+        font-weight: 900;
+    }
+
+    .devotionals-admin-alert > div {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .devotionals-admin-alert strong {
+        display: block;
+        margin-bottom: 2px;
+        font-size: 0.9rem;
+    }
+
+    .devotionals-admin-alert p {
+        margin: 0;
+        font-size: 0.85rem;
+        line-height: 1.5;
+    }
+
+    .devotionals-admin-alert > button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        padding: 0;
+        border: 0;
+        border-radius: 6px;
+        font-size: 1.15rem;
+        cursor: pointer;
+        color: inherit;
+        background: transparent;
+    }
+
+.devotionals-admin-alert-error {
+    border-color: #f2c9ce;
+    color: #842029;
+    background: #fff1f2;
+}
+
+    .devotionals-admin-alert-error > span {
+        color: #ffffff;
+        background: #c0392b;
+    }
+
+.devotionals-admin-alert-success {
+    border-color: #badbcc;
+    color: #0f5132;
+    background: #edf9f2;
+}
+
+    .devotionals-admin-alert-success > span {
+        color: #ffffff;
+        background: #198754;
+    }
+
+
+/* =========================================================
+   SUMMARY CARDS
+   ========================================================= */
+
+.devotionals-admin-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.devotionals-stat-card {
+    position: relative;
+    overflow: hidden;
+    min-width: 0;
+    padding: 18px 20px;
+    border: 1px solid #e6e9ef;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+}
+
+    .devotionals-stat-card::before {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        content: "";
+        background: #6f42c1;
+    }
+
+    .devotionals-stat-card > div {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .devotionals-stat-card strong {
+        font-size: 1.55rem;
+        line-height: 1;
+        color: #172033;
+    }
+
+    .devotionals-stat-card span {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #778195;
+    }
+
+
+/* =========================================================
+   PANEL
+   ========================================================= */
+
+.devotionals-admin-panel {
+    overflow: hidden;
+    width: 100%;
+    border: 1px solid #e5e9f0;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.045);
+}
+
+.devotionals-panel-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 19px 21px;
+    border-bottom: 1px solid #edf0f4;
+}
+
+    .devotionals-panel-heading h2 {
+        margin: 0;
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: #172033;
+    }
+
+    .devotionals-panel-heading p {
+        margin: 4px 0 0;
+        font-size: 0.8rem;
+        color: #7a8495;
+    }
+
+
+/* =========================================================
+   LOADING / EMPTY
+   ========================================================= */
+
+.devotionals-admin-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 220px;
+    padding: 35px 20px;
+    text-align: center;
+}
+
+    .devotionals-admin-empty strong {
+        margin-bottom: 6px;
+        font-size: 1rem;
+        color: #293347;
+    }
+
+    .devotionals-admin-empty p {
+        margin: 0 0 17px;
+        font-size: 0.88rem;
+        color: #788296;
+    }
+
+.admin-loading-spinner {
+    width: 31px;
+    height: 31px;
+    margin-bottom: 13px;
+    border: 3px solid #e8e1f4;
+    border-top-color: #6f42c1;
+    border-radius: 50%;
+    animation: devotional-admin-spin 0.75s linear infinite;
+}
+
+@keyframes devotional-admin-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.devotionals-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.devotionals-table {
+    width: 100%;
+    min-width: 960px;
+    border-collapse: collapse;
+    table-layout: auto;
+}
+
+    .devotionals-table th {
+        padding: 12px 15px;
+        border-bottom: 1px solid #e9edf2;
+        text-align: left;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.045em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        color: #747f91;
+        background: #f8f9fb;
+    }
+
+    .devotionals-table td {
+        padding: 15px;
+        border-bottom: 1px solid #edf0f4;
+        vertical-align: middle;
+        font-size: 0.85rem;
+        color: #354052;
+    }
+
+    .devotionals-table tbody tr {
+        transition: background-color 0.15s ease;
+    }
+
+        .devotionals-table tbody tr:hover {
+            background: #fbfaff;
+        }
+
+        .devotionals-table tbody tr:last-child td {
+            border-bottom: 0;
+        }
+
+    .devotionals-table th:first-child,
+    .devotionals-table td:first-child {
+        padding-left: 21px;
+    }
+
+    .devotionals-table th:last-child,
+    .devotionals-table td:last-child {
+        padding-right: 21px;
+    }
+
+
+/* =========================================================
+   TABLE CONTENT
+   ========================================================= */
+
+.devotionals-theme-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 210px;
+    max-width: 330px;
+}
+
+    .devotionals-theme-cell strong {
+        overflow: hidden;
+        font-size: 0.87rem;
+        color: #273144;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .devotionals-theme-cell span {
+        display: -webkit-box;
+        overflow: hidden;
+        font-size: 0.77rem;
+        line-height: 1.45;
+        color: #7a8495;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+
+.devotionals-scripture-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 150px;
+}
+
+    .devotionals-scripture-cell strong {
+        font-size: 0.82rem;
+        color: #3d4758;
+    }
+
+    .devotionals-scripture-cell span {
+        font-size: 0.7rem;
+        color: #8b94a4;
+    }
+
+
+/* =========================================================
+   BADGES
+   ========================================================= */
+
+.devotionals-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 66px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    font-size: 0.69rem;
+    font-weight: 800;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.devotionals-badge-published {
+    color: #157347;
+    background: #dff5e8;
+}
+
+.devotionals-badge-draft {
+    color: #6b7280;
+    background: #eceff3;
+}
+
+.devotionals-badge-today {
+    color: #5a2ea6;
+    background: #eee6fa;
+}
+
+.devotionals-badge-future {
+    color: #8a6116;
+    background: #fff2cf;
+}
+
+.devotionals-badge-past {
+    color: #526070;
+    background: #edf1f5;
+}
+
+
+/* =========================================================
+   MODAL BACKDROP
+   ========================================================= */
+
+.devotionals-modal-backdrop {
+    position: fixed;
+    z-index: 1500;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    overflow-y: auto;
+    background: rgba(16, 24, 40, 0.58);
+    backdrop-filter: blur(2px);
+}
+
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+
+.devotionals-modal {
+    width: min(920px, 100%);
+    max-height: calc(100vh - 64px);
+    overflow-y: auto;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.22);
+}
+
+.devotionals-modal-header {
+    position: sticky;
+    z-index: 4;
+    top: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px 23px;
+    border-bottom: 1px solid #e9edf2;
+    background: #ffffff;
+}
+
+    .devotionals-modal-header > div > span {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 0.69rem;
+        font-weight: 800;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        color: #6f42c1;
+    }
+
+    .devotionals-modal-header h2 {
+        margin: 0;
+        font-size: 1.25rem;
+        color: #172033;
+    }
+
+    .devotionals-modal-header > button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 34px;
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        border: 1px solid #e3e7ed;
+        border-radius: 8px;
+        font-size: 1.3rem;
+        line-height: 1;
+        cursor: pointer;
+        color: #687386;
+        background: #f8f9fb;
+    }
+
+        .devotionals-modal-header > button:hover:not(:disabled) {
+            color: #273144;
+            background: #eef1f5;
+        }
+
+        .devotionals-modal-header > button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.devotionals-modal form {
+    padding: 23px;
+}
+
+.devotionals-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.devotionals-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
+    margin-bottom: 18px;
+}
+
+.devotionals-field-wide {
+    grid-column: 1 / -1;
+}
+
+.devotionals-field > span {
+    font-size: 0.79rem;
+    font-weight: 800;
+    color: #3a4557;
+}
+
+.devotionals-field input,
+.devotionals-field select,
+.devotionals-field textarea,
+.devotionals-point-row textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    border: 1px solid #d7dce4;
+    border-radius: 8px;
+    outline: none;
+    font: inherit;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: #283345;
+    background: #ffffff;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.devotionals-field input,
+.devotionals-field select {
+    min-height: 42px;
+}
+
+.devotionals-field select {
+    cursor: pointer;
+}
+
+    .devotionals-field select:disabled {
+        cursor: not-allowed;
+        color: #8b94a4;
+        background: #f4f6f8;
+    }
+
+.devotionals-field textarea,
+.devotionals-point-row textarea {
+    resize: vertical;
+}
+
+    .devotionals-field input:focus,
+    .devotionals-field select:focus,
+    .devotionals-field textarea:focus,
+    .devotionals-point-row textarea:focus {
+        border-color: #8b63cf;
+        box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.11);
+    }
+
+.devotionals-field small {
+    margin-top: -2px;
+    font-size: 0.7rem;
+    line-height: 1.45;
+    color: #8892a2;
+}
+
+
+
+/* =========================================================
+   SCRIPTURE SELECTION
+   ========================================================= */
+
+.devotionals-scripture-preview {
+    grid-column: 1 / -1;
+    margin: 0 0 18px;
+    padding: 14px 16px;
+    border: 1px solid #ded3f0;
+    border-radius: 10px;
+    background: #faf7ff;
+}
+
+    .devotionals-scripture-preview > span {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 0.7rem;
+        font-weight: 800;
+        letter-spacing: 0.055em;
+        text-transform: uppercase;
+        color: #6f42c1;
+    }
+
+    .devotionals-scripture-preview strong {
+        display: block;
+        font-size: 0.95rem;
+        line-height: 1.45;
+        color: #293347;
+    }
+
+    .devotionals-scripture-preview small {
+        display: block;
+        margin-top: 4px;
+        font-size: 0.7rem;
+        line-height: 1.45;
+        color: #8892a2;
+    }
+
+
+/* =========================================================
+   COMMENTARY / PRAYER POINTS
+   ========================================================= */
+
+.devotionals-points-section {
+    margin: 3px 0 22px;
+    padding: 18px;
+    border: 1px solid #e5e9ef;
+    border-radius: 11px;
+    background: #fafbfc;
+}
+
+.devotionals-points-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 15px;
+}
+
+    .devotionals-points-heading h3 {
+        margin: 0;
+        font-size: 0.95rem;
+        color: #293447;
+    }
+
+    .devotionals-points-heading p {
+        margin: 4px 0 0;
+        font-size: 0.74rem;
+        line-height: 1.45;
+        color: #7d8797;
+    }
+
+.devotionals-add-point-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 34px;
+    padding: 7px 11px;
+    border: 1px solid #d8c9ef;
+    border-radius: 7px;
+    font: inherit;
+    font-size: 0.74rem;
+    font-weight: 800;
+    white-space: nowrap;
+    cursor: pointer;
+    color: #6337aa;
+    background: #f5f0fc;
+}
+
+    .devotionals-add-point-button:hover {
+        background: #eee5fa;
+    }
+
+.devotionals-point-row {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) 34px;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 11px;
+}
+
+    .devotionals-point-row:last-child {
+        margin-bottom: 0;
+    }
+
+.devotionals-point-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    margin-top: 5px;
+    border-radius: 50%;
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #ffffff;
+    background: #6f42c1;
+}
+
+.devotionals-remove-point {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    margin-top: 4px;
+    padding: 0;
+    border: 1px solid #efc8cd;
+    border-radius: 7px;
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    color: #b42332;
+    background: #fff5f6;
+}
+
+    .devotionals-remove-point:hover {
+        color: #ffffff;
+        background: #b42332;
+    }
+
+
+/* =========================================================
+   MODAL ACTIONS
+   ========================================================= */
+
+.devotionals-modal-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 5px;
+    padding-top: 19px;
+    border-top: 1px solid #e9edf2;
+}
+
+.devotionals-secondary-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 9px 16px;
+    border: 1px solid #d8dde5;
+    border-radius: 8px;
+    font: inherit;
+    font-size: 0.84rem;
+    font-weight: 700;
+    cursor: pointer;
+    color: #4b5668;
+    background: #ffffff;
+}
+
+    .devotionals-secondary-button:hover:not(:disabled) {
+        background: #f4f6f8;
+    }
+
+    .devotionals-secondary-button:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+    }
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1050px) {
+
+    .devotionals-admin-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+
+@media (max-width: 760px) {
+
+    .devotionals-admin-header {
+        flex-direction: column;
+    }
+
+        .devotionals-admin-header
+        .admin-primary-button {
+            width: 100%;
+        }
+
+    .devotionals-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .devotionals-field-wide {
+        grid-column: auto;
+    }
+
+    .devotionals-modal-backdrop {
+        padding: 16px 10px;
+    }
+
+    .devotionals-modal {
+        max-height: calc(100vh - 32px);
+        border-radius: 11px;
+    }
+
+        .devotionals-modal-header,
+        .devotionals-modal form {
+            padding: 17px;
+        }
+
+    .devotionals-points-heading {
+        flex-direction: column;
+    }
+}
+
+
+@media (max-width: 520px) {
+
+    .devotionals-admin-stats {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .devotionals-stat-card {
+        padding: 15px;
+    }
+
+        .devotionals-stat-card strong {
+            font-size: 1.3rem;
+        }
+
+    .devotionals-point-row {
+        grid-template-columns: 27px minmax(0, 1fr);
+    }
+
+    .devotionals-remove-point {
+        grid-column: 2;
+        margin-top: -4px;
+    }
+
+    .devotionals-modal-actions {
+        flex-direction: column-reverse;
+    }
+
+        .devotionals-modal-actions button {
+            width: 100%;
+        }
+}

@@ -18,6 +18,8 @@ import Roles from './admin/pages/Roles';
 import VerifyEmail from './admin/pages/VerifyEmail';
 import HomePage from './pages/HomePage';
 import AdminSettings from './admin/pages/AdminSettings';
+import Devotionals from './admin/pages/Devotionals';
+
 
 import {
     clearAdminSession,
@@ -195,6 +197,9 @@ function App() {
 
         case '/admin/adminsettings':
             return <AdminSettings />;
+
+        case '/admin/devotionals':
+            return <Devotionals />;
 
         default:
             return (
