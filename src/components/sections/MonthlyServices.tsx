@@ -5,8 +5,7 @@ import {
 } from '../../hooks/useChurchServices';
 import { useServiceBroadcasts } from '../../hooks/useServiceBroadcasts';
 
-const CHURCH_LOCATION =
-    'RCCG Hope House Parish, Burnt Oak, Edgware, London';
+const CHURCH_LOCATION = 'RCCG Hope House Parish, Burnt Oak, Edgware, London';
 
 function startOfDay(date: Date) {
     const result = new Date(date);
@@ -22,13 +21,9 @@ function getNthWeekdayOfMonth(
 ) {
     const firstDay = new Date(year, month, 1);
 
-    const offset =
-        (dayOfWeek - firstDay.getDay() + 7) % 7;
+    const offset =   (dayOfWeek - firstDay.getDay() + 7) % 7;
 
-    return new Date(
-        year,
-        month,
-        1 + offset + (occurrence - 1) * 7
+    return new Date(year, month,  1 + offset + (occurrence - 1) * 7
     );
 }
 
@@ -385,9 +380,7 @@ function getCalendarLink(
             CHURCH_LOCATION,
     });
 
-    return (
-        'https://calendar.google.com/calendar/render?' +
-        params.toString()
+    return ('https://calendar.google.com/calendar/render?' +  params.toString()
     );
 }
 
@@ -421,8 +414,8 @@ export default function MonthlyServices() {
         return services
             .filter(
                 (service) =>
-                    service.isActive &&
-                    service.showInMonthlyServices
+                    service.showInMonthlyServices &&
+                    service.isBroadcastEnabled
             )
             .sort(
                 (a, b) =>

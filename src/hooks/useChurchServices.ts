@@ -33,6 +33,7 @@ export interface ChurchServiceFeed {
 
     icon: string | null;
     showInMonthlyServices: boolean;
+    isBroadcastEnabled: boolean;
 }
 
 export function useChurchServices(
