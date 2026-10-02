@@ -82,6 +82,7 @@ interface ServiceFormState {
     displayOrder: string;
     icon: string;
     showInMonthlyServices: boolean;
+    isBroadcastEnabled: boolean;
 }
 
 interface BroadcastFormState {
@@ -142,6 +143,7 @@ const emptyServiceForm: ServiceFormState = {
     displayOrder: '0',
     icon: '',
     showInMonthlyServices: false,
+    isBroadcastEnabled: false,
 };
 
 const emptyBroadcastForm: BroadcastFormState = {
@@ -234,20 +236,15 @@ function formatMonth(
 
 function Services() {
     const {
-        categories:
-        serviceCategories,
-        loading:
-        serviceCategoriesLoading,
-        error:
-        serviceCategoriesError,
+        categories: serviceCategories,
+        loading: serviceCategoriesLoading,
+        error:  serviceCategoriesError,
     } = useServiceCategory();
 
     const [
         activeTab,
         setActiveTab,
-    ] = useState<AdminTab>(
-        'schedule'
-    );
+    ] = useState<AdminTab>('schedule');
 
     const [
         services,
@@ -283,10 +280,7 @@ function Services() {
         setConfirming,
     ] = useState(false);
 
-    const [
-        loadError,
-        setLoadError,
-    ] =
+    const [loadError, setLoadError,] =
         useState<ApiErrorDetails | null>(
             null
         );
@@ -371,22 +365,22 @@ function Services() {
             [services]
         );
 
+    /**
+     * Services eligible for the Add Broadcast dropdown.
+     *
+     * Broadcast eligibility is controlled only by
+     * IsBroadcastEnabled. A service does not need to be
+     * active in order for an administrator to manage its
+     * broadcast records.
+     */
     const broadcastEnabledServices =
-        useMemo(
-            () =>
-                sortedServices.filter(
-                    service =>
-                        service.isActive &&
+        useMemo(() =>  sortedServices.filter( service =>
                         service.isBroadcastEnabled
-                ),
-            [sortedServices]
+                ), [sortedServices]
         );
 
     const monthlyServices =
-        useMemo(
-            () =>
-                sortedServices.filter(
-                    service =>
+        useMemo(() => sortedServices.filter(service =>
                         service.isActive &&
                         service.showInMonthlyServices
                 ),
@@ -684,51 +678,24 @@ function Services() {
 
         setServiceForm({
             name: service.name,
-            category:
-                service.category,
-            dayOfWeek:
-                service.dayOfWeek,
-            startTime:
-                service.startTime?.slice(
-                    0,
-                    5
-                ) ?? '',
-            endTime:
-                service.endTime?.slice(
-                    0,
-                    5
-                ) ?? '',
-            description:
-                service.description ??
-                '',
-            location:
-                service.location ??
-                '',
-            zoomId:
-                service.zoomId ??
-                '',
-            zoomPasscode:
-                service.zoomPasscode ??
-                '',
-            recurrence:
-                service.recurrence,
-            dayOfMonth:
-                service.dayOfMonth?.toString() ??
-                '',
-            isLocal:
-                service.isLocal,
-            displayOrder:
-                service.displayOrder.toString(),
-            icon:
-                service.icon ??
-                '',
-            showInMonthlyServices:
-                service.showInMonthlyServices,
+            category: service.category,
+            dayOfWeek: service.dayOfWeek,
+            startTime: service.startTime?.slice(0, 5) ?? '',
+            endTime: service.endTime?.slice(0, 5) ?? '',
+            description: service.description ?? '',
+            location: service.location ?? '',
+            zoomId: service.zoomId ?? '',
+            zoomPasscode: service.zoomPasscode ?? '',
+            recurrence: service.recurrence,
+            dayOfMonth: service.dayOfMonth?.toString() ?? '',
+            isLocal: service.isLocal,
+            displayOrder:  service.displayOrder.toString(),
+            icon: service.icon ?? '',
+            showInMonthlyServices: service.showInMonthlyServices,
+            isBroadcastEnabled: service.isBroadcastEnabled,
         });
 
-        setServiceFormOpen(
-            true
-        );
+        setServiceFormOpen(true);
 
         setActionError(null);
     }
@@ -806,12 +773,8 @@ function Services() {
                 icon:
                     serviceForm.icon.trim() ||
                     null,
-                showInMonthlyServices:
-                    serviceForm.showInMonthlyServices,
-                isBroadcastEnabled:
-                    editingService
-                        ?.isBroadcastEnabled ??
-                    false,
+                showInMonthlyServices: serviceForm.showInMonthlyServices,
+                isBroadcastEnabled: serviceForm.isBroadcastEnabled,
             };
 
             const response =
@@ -1347,8 +1310,7 @@ function Services() {
                     </div>
                 )}
 
-                {successMessage && (
-                    <div className="services-admin-alert services-admin-alert-success">
+                {successMessage && (<div className="services-admin-alert services-admin-alert-success">
                         <span>
                             ✓
                         </span>
@@ -2012,9 +1974,7 @@ function Services() {
                                                         current => ({
                                                             ...current,
                                                             name:
-                                                                e
-                                                                    .target
-                                                                    .value,
+                                                                e.target.value,
                                                         })
                                                     )
                                             }
@@ -2040,9 +2000,7 @@ function Services() {
                                                         current => ({
                                                             ...current,
                                                             category:
-                                                                e
-                                                                    .target
-                                                                    .value,
+                                                                e.target.value,
                                                         })
                                                     )
                                             }
@@ -2095,9 +2053,7 @@ function Services() {
                                                         current => ({
                                                             ...current,
                                                             dayOfWeek:
-                                                                e
-                                                                    .target
-                                                                    .value,
+                                                                e.target.value,
                                                         })
                                                     )
                                             }
@@ -2137,9 +2093,7 @@ function Services() {
                                                         current => ({
                                                             ...current,
                                                             startTime:
-                                                                e
-                                                                    .target
-                                                                    .value,
+                                                                e.target.value,
                                                         })
                                                     )
                                             }
@@ -2162,9 +2116,7 @@ function Services() {
                                                         current => ({
                                                             ...current,
                                                             endTime:
-                                                                e
-                                                                    .target
-                                                                    .value,
+                                                                e.target.value,
                                                         })
                                                     )
                                             }
@@ -2186,9 +2138,7 @@ function Services() {
                                                         current => ({
                                                             ...current,
                                                             recurrence:
-                                                                e
-                                                                    .target
-                                                                    .value as RecurrencePattern,
+                                                                e.target.value as RecurrencePattern,
                                                         })
                                                     )
                                             }
@@ -2222,8 +2172,7 @@ function Services() {
                                             min="1"
                                             max="31"
                                             disabled={
-                                                serviceForm.recurrence !==
-                                                'Monthly'
+                                                serviceForm.recurrence !== 'Monthly'
                                             }
                                             value={
                                                 serviceForm.dayOfMonth
@@ -2234,9 +2183,7 @@ function Services() {
                                                         current => ({
                                                             ...current,
                                                             dayOfMonth:
-                                                                e
-                                                                    .target
-                                                                    .value,
+                                                                e.target.value,
                                                         })
                                                     )
                                             }
@@ -2266,9 +2213,7 @@ function Services() {
                                                         current => ({
                                                             ...current,
                                                             displayOrder:
-                                                                e
-                                                                    .target
-                                                                    .value,
+                                                                e.target.value,
                                                         })
                                                     )
                                             }
@@ -2293,9 +2238,7 @@ function Services() {
                                                         current => ({
                                                             ...current,
                                                             icon:
-                                                                e
-                                                                    .target
-                                                                    .value,
+                                                                e.target.value,
                                                         })
                                                     )
                                             }
@@ -2321,9 +2264,7 @@ function Services() {
                                                         current => ({
                                                             ...current,
                                                             description:
-                                                                e
-                                                                    .target
-                                                                    .value,
+                                                                e.target.value,
                                                         })
                                                     )
                                             }
@@ -2345,9 +2286,7 @@ function Services() {
                                                         current => ({
                                                             ...current,
                                                             location:
-                                                                e
-                                                                    .target
-                                                                    .value,
+                                                                e.target.value,
                                                         })
                                                     )
                                             }
@@ -2369,9 +2308,7 @@ function Services() {
                                                         current => ({
                                                             ...current,
                                                             zoomId:
-                                                                e
-                                                                    .target
-                                                                    .value,
+                                                                e.target.value,
                                                         })
                                                     )
                                             }
@@ -2393,9 +2330,7 @@ function Services() {
                                                         current => ({
                                                             ...current,
                                                             zoomPasscode:
-                                                                e
-                                                                    .target
-                                                                    .value,
+                                                                e.target.value,
                                                         })
                                                     )
                                             }
@@ -2416,9 +2351,7 @@ function Services() {
                                                         current => ({
                                                             ...current,
                                                             isLocal:
-                                                                e
-                                                                    .target
-                                                                    .checked,
+                                                                e.target.checked,
                                                         })
                                                     )
                                             }
@@ -2447,9 +2380,7 @@ function Services() {
                                                         current => ({
                                                             ...current,
                                                             showInMonthlyServices:
-                                                                e
-                                                                    .target
-                                                                    .checked,
+                                                                e.target.checked,
                                                         })
                                                     )
                                             }
@@ -2462,6 +2393,35 @@ function Services() {
 
                                             <small>
                                                 Include this service on the public monthly services section.
+                                            </small>
+                                        </span>
+                                    </label>
+
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            checked={
+                                                serviceForm.isBroadcastEnabled
+                                            }
+                                            onChange={
+                                                e =>
+                                                    setServiceForm(
+                                                        current => ({
+                                                            ...current,
+                                                            isBroadcastEnabled:
+                                                                e.target.checked,
+                                                        })
+                                                    )
+                                            }
+                                        />
+
+                                        <span>
+                                            <strong>
+                                                Enable broadcasts
+                                            </strong>
+
+                                            <small>
+                                                Allow broadcasts to be added for this service.
                                             </small>
                                         </span>
                                     </label>
@@ -2573,9 +2533,7 @@ function Services() {
                                                         current => ({
                                                             ...current,
                                                             churchServiceId:
-                                                                e
-                                                                    .target
-                                                                    .value,
+                                                                e.target.value,
                                                         })
                                                     )
                                             }
@@ -2635,9 +2593,7 @@ function Services() {
                                                         current => ({
                                                             ...current,
                                                             title:
-                                                                e
-                                                                    .target
-                                                                    .value,
+                                                                e.target.value,
                                                         })
                                                     )
                                             }
@@ -2660,9 +2616,7 @@ function Services() {
                                                         current => ({
                                                             ...current,
                                                             youtubeUrl:
-                                                                e
-                                                                    .target
-                                                                    .value,
+                                                                e.target.value,
                                                         })
                                                     )
                                             }
@@ -2689,9 +2643,7 @@ function Services() {
                                                         current => ({
                                                             ...current,
                                                             serviceMonth:
-                                                                e
-                                                                    .target
-                                                                    .value,
+                                                                e.target.value,
                                                         })
                                                     )
                                             }
@@ -2713,9 +2665,7 @@ function Services() {
                                                         current => ({
                                                             ...current,
                                                             theme:
-                                                                e
-                                                                    .target
-                                                                    .value,
+                                                                e.target.value,
                                                         })
                                                     )
                                             }
@@ -2740,9 +2690,7 @@ function Services() {
                                                         current => ({
                                                             ...current,
                                                             description:
-                                                                e
-                                                                    .target
-                                                                    .value,
+                                                                e.target.value,
                                                         })
                                                     )
                                             }
@@ -2763,9 +2711,7 @@ function Services() {
                                                         current => ({
                                                             ...current,
                                                             isLive:
-                                                                e
-                                                                    .target
-                                                                    .checked,
+                                                                e.target.checked,
                                                         })
                                                     )
                                             }
