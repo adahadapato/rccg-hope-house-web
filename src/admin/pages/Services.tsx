@@ -50,6 +50,7 @@ interface ChurchService {
     icon: string | null;
     showInMonthlyServices: boolean;
     isBroadcastEnabled: boolean;
+    currentTheme: string | null;
 }
 
 interface ServiceBroadcast {
@@ -83,6 +84,7 @@ interface ServiceFormState {
     icon: string;
     showInMonthlyServices: boolean;
     isBroadcastEnabled: boolean;
+    currentTheme: string;
 }
 
 interface BroadcastFormState {
@@ -144,6 +146,7 @@ const emptyServiceForm: ServiceFormState = {
     icon: '',
     showInMonthlyServices: false,
     isBroadcastEnabled: false,
+    currentTheme: '',
 };
 
 const emptyBroadcastForm: BroadcastFormState = {
@@ -238,7 +241,7 @@ function Services() {
     const {
         categories: serviceCategories,
         loading: serviceCategoriesLoading,
-        error:  serviceCategoriesError,
+        error: serviceCategoriesError,
     } = useServiceCategory();
 
     const [
@@ -374,16 +377,16 @@ function Services() {
      * broadcast records.
      */
     const broadcastEnabledServices =
-        useMemo(() =>  sortedServices.filter( service =>
-                        service.isBroadcastEnabled
-                ), [sortedServices]
+        useMemo(() => sortedServices.filter(service =>
+            service.isBroadcastEnabled
+        ), [sortedServices]
         );
 
     const monthlyServices =
         useMemo(() => sortedServices.filter(service =>
-                        service.isActive &&
-                        service.showInMonthlyServices
-                ),
+            service.isActive &&
+            service.showInMonthlyServices
+        ),
             [sortedServices]
         );
 
@@ -689,10 +692,11 @@ function Services() {
             recurrence: service.recurrence,
             dayOfMonth: service.dayOfMonth?.toString() ?? '',
             isLocal: service.isLocal,
-            displayOrder:  service.displayOrder.toString(),
+            displayOrder: service.displayOrder.toString(),
             icon: service.icon ?? '',
             showInMonthlyServices: service.showInMonthlyServices,
             isBroadcastEnabled: service.isBroadcastEnabled,
+            currentTheme: service.currentTheme ?? '',
         });
 
         setServiceFormOpen(true);
@@ -775,6 +779,7 @@ function Services() {
                     null,
                 showInMonthlyServices: serviceForm.showInMonthlyServices,
                 isBroadcastEnabled: serviceForm.isBroadcastEnabled,
+                currentTheme: serviceForm.currentTheme.trim() || null,
             };
 
             const response =
@@ -1311,22 +1316,22 @@ function Services() {
                 )}
 
                 {successMessage && (<div className="services-admin-alert services-admin-alert-success">
-                        <span>
-                            ✓
-                        </span>
+                    <span>
+                        ✓
+                    </span>
 
-                        <div>
-                            <strong>
-                                Success
-                            </strong>
+                    <div>
+                        <strong>
+                            Success
+                        </strong>
 
-                            <p>
-                                {
-                                    successMessage
-                                }
-                            </p>
-                        </div>
+                        <p>
+                            {
+                                successMessage
+                            }
+                        </p>
                     </div>
+                </div>
                 )}
 
                 {loading ? (
@@ -1640,8 +1645,8 @@ function Services() {
                                                             <td>
                                                                 <span
                                                                     className={`services-badge ${service.showInMonthlyServices
-                                                                            ? 'services-badge-monthly'
-                                                                            : 'services-badge-neutral'
+                                                                        ? 'services-badge-monthly'
+                                                                        : 'services-badge-neutral'
                                                                         }`}
                                                                 >
                                                                     {service.showInMonthlyServices
@@ -1659,8 +1664,8 @@ function Services() {
                                                             <td>
                                                                 <span
                                                                     className={`services-badge ${service.isActive
-                                                                            ? 'services-badge-active'
-                                                                            : 'services-badge-inactive'
+                                                                        ? 'services-badge-active'
+                                                                        : 'services-badge-inactive'
                                                                         }`}
                                                                 >
                                                                     {service.isActive
@@ -1839,8 +1844,8 @@ function Services() {
                                                                 <td>
                                                                     <span
                                                                         className={`services-badge ${broadcast.isLive
-                                                                                ? 'services-badge-live'
-                                                                                : 'services-badge-neutral'
+                                                                            ? 'services-badge-live'
+                                                                            : 'services-badge-neutral'
                                                                             }`}
                                                                     >
                                                                         {broadcast.isLive
@@ -2269,6 +2274,36 @@ function Services() {
                                                     )
                                             }
                                         />
+                                    </label>
+
+                                    <label className="services-field services-field-wide">
+                                        <span>
+                                            Current / Upcoming Theme
+                                        </span>
+
+                                        <input
+                                            maxLength={
+                                                200
+                                            }
+                                            value={
+                                                serviceForm.currentTheme
+                                            }
+                                            onChange={
+                                                e =>
+                                                    setServiceForm(
+                                                        current => ({
+                                                            ...current,
+                                                            currentTheme:
+                                                                e.target.value,
+                                                        })
+                                                    )
+                                            }
+                                            placeholder="e.g. The King Is Coming"
+                                        />
+
+                                        <small>
+                                            Theme for the upcoming or currently occurring service. Previous broadcast themes remain in the broadcast history.
+                                        </small>
                                     </label>
 
                                     <label className="services-field services-field-wide">

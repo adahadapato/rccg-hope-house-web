@@ -9,6 +9,10 @@ export type RecurrencePattern =
     | 'Monthly'
     | 'OneTime';
 
+/**
+ * Public church-service information returned by
+ * the church services feed.
+ */
 export interface ChurchServiceFeed {
     id: string;
     name: string;
@@ -32,10 +36,35 @@ export interface ChurchServiceFeed {
     displayOrder: number;
 
     icon: string | null;
+
+    /**
+     * Determines whether the service is eligible
+     * for the public Special Monthly Services section.
+     */
     showInMonthlyServices: boolean;
+
+    /**
+     * Determines whether the service is enabled
+     * for public broadcast presentation.
+     */
     isBroadcastEnabled: boolean;
+
+    /**
+     * Theme for the upcoming or currently occurring
+     * instance of this service.
+     *
+     * This is deliberately separate from the theme
+     * stored on historical ServiceBroadcast records.
+     */
+    currentTheme: string | null;
 }
 
+/**
+ * Loads church services from the public services API.
+ *
+ * When isLocal is supplied, the request is filtered
+ * by the corresponding local/HQ service classification.
+ */
 export function useChurchServices(
     isLocal?: boolean
 ) {
@@ -106,7 +135,10 @@ export function useChurchServices(
     };
 }
 
-/** "19:00:00" → "7:00 PM" */
+/**
+ * Converts a 24-hour API time such as
+ * "19:00:00" to "7:00 PM".
+ */
 export function formatTime(
     time: string
 ): string {
@@ -129,8 +161,12 @@ export function formatTime(
 }
 
 /**
+ * Converts two API time values into a
+ * human-readable time range.
+ *
+ * Example:
  * "19:00:00", "19:40:00"
- * → "7:00 PM - 7:40 PM"
+ * becomes "7:00 PM - 7:40 PM".
  */
 export function formatTimeRange(
     start: string,
@@ -139,6 +175,10 @@ export function formatTimeRange(
     return `${formatTime(start)} - ${formatTime(end)}`;
 }
 
+/**
+ * Maps JavaScript day names to the numeric
+ * values used by Date.getDay().
+ */
 const DAY_NAME_TO_NUMBER:
     Record<string, number> = {
     Sunday: 0,
@@ -150,6 +190,10 @@ const DAY_NAME_TO_NUMBER:
     Saturday: 6,
 };
 
+/**
+ * Converts a day name to its JavaScript
+ * numeric day-of-week value.
+ */
 export function dayNameToNumber(
     day: string
 ): number {

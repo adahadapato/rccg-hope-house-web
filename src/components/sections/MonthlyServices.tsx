@@ -21,9 +21,9 @@ function getNthWeekdayOfMonth(
 ) {
     const firstDay = new Date(year, month, 1);
 
-    const offset =   (dayOfWeek - firstDay.getDay() + 7) % 7;
+    const offset = (dayOfWeek - firstDay.getDay() + 7) % 7;
 
-    return new Date(year, month,  1 + offset + (occurrence - 1) * 7
+    return new Date(year, month, 1 + offset + (occurrence - 1) * 7
     );
 }
 
@@ -321,6 +321,220 @@ function getCountdown(
         }`;
 }
 
+
+function isSameCalendarDay(
+    first: Date,
+    second: Date
+) {
+    return (
+        first.getFullYear() === second.getFullYear() &&
+        first.getMonth() === second.getMonth() &&
+        first.getDate() === second.getDate()
+    );
+}
+
+function createServiceWindow(
+    serviceDate: Date,
+    startTime: string,
+    endTime: string
+) {
+    const [startHour, startMinute] =
+        startTime.split(':').map(Number);
+
+    const [endHour, endMinute] =
+        endTime.split(':').map(Number);
+
+    const start = new Date(serviceDate);
+
+    start.setHours(
+        startHour || 0,
+        startMinute || 0,
+        0,
+        0
+    );
+
+    const end = new Date(serviceDate);
+
+    end.setHours(
+        endHour || 0,
+        endMinute || 0,
+        0,
+        0
+    );
+
+    /*
+     * An end time equal to or earlier than the start
+     * time represents a service that finishes after
+     * midnight on the following day.
+     */
+    if (end <= start) {
+        end.setDate(
+            end.getDate() + 1
+        );
+    }
+
+    return {
+        start,
+        end,
+    };
+}
+
+function getServiceTiming(
+    recurrence: string,
+    dayOfWeek: number,
+    dayOfMonth: number | null | undefined,
+    startTime: string,
+    endTime: string,
+    now: Date
+) {
+    /*
+     * First check yesterday. This is required for
+     * services that start late in the evening and
+     * continue beyond midnight.
+     */
+    const yesterday = startOfDay(now);
+
+    yesterday.setDate(
+        yesterday.getDate() - 1
+    );
+
+    const yesterdayOccurrence =
+        getNextServiceDate(
+            recurrence,
+            dayOfWeek,
+            dayOfMonth,
+            yesterday
+        );
+
+    if (
+        yesterdayOccurrence &&
+        isSameCalendarDay(
+            yesterdayOccurrence,
+            yesterday
+        )
+    ) {
+        const yesterdayWindow =
+            createServiceWindow(
+                yesterdayOccurrence,
+                startTime,
+                endTime
+            );
+
+        if (
+            now >= yesterdayWindow.start &&
+            now < yesterdayWindow.end
+        ) {
+            return {
+                isHappening: true,
+                serviceDate:
+                    yesterdayOccurrence,
+                start:
+                    yesterdayWindow.start,
+                end:
+                    yesterdayWindow.end,
+            };
+        }
+    }
+
+    /*
+     * Next check today's occurrence. getNextServiceDate
+     * works at calendar-day level, so the time window is
+     * evaluated separately here.
+     */
+    const today = startOfDay(now);
+
+    const todayOccurrence =
+        getNextServiceDate(
+            recurrence,
+            dayOfWeek,
+            dayOfMonth,
+            today
+        );
+
+    if (
+        todayOccurrence &&
+        isSameCalendarDay(
+            todayOccurrence,
+            today
+        )
+    ) {
+        const todayWindow =
+            createServiceWindow(
+                todayOccurrence,
+                startTime,
+                endTime
+            );
+
+        if (
+            now >= todayWindow.start &&
+            now < todayWindow.end
+        ) {
+            return {
+                isHappening: true,
+                serviceDate:
+                    todayOccurrence,
+                start:
+                    todayWindow.start,
+                end:
+                    todayWindow.end,
+            };
+        }
+
+        if (now < todayWindow.start) {
+            return {
+                isHappening: false,
+                serviceDate:
+                    todayOccurrence,
+                start:
+                    todayWindow.start,
+                end:
+                    todayWindow.end,
+            };
+        }
+    }
+
+    /*
+     * Today's service has finished, or today is not a
+     * service day. Start tomorrow when looking for the
+     * next occurrence so a completed service is not
+     * presented as "Starting Soon".
+     */
+    const tomorrow = startOfDay(now);
+
+    tomorrow.setDate(
+        tomorrow.getDate() + 1
+    );
+
+    const nextOccurrence =
+        getNextServiceDate(
+            recurrence,
+            dayOfWeek,
+            dayOfMonth,
+            tomorrow
+        );
+
+    if (!nextOccurrence) {
+        return null;
+    }
+
+    const nextWindow =
+        createServiceWindow(
+            nextOccurrence,
+            startTime,
+            endTime
+        );
+
+    return {
+        isHappening: false,
+        serviceDate:
+            nextOccurrence,
+        start:
+            nextWindow.start,
+        end:
+            nextWindow.end,
+    };
+}
+
 function formatCalendarDate(date: Date) {
     return date
         .toISOString()
@@ -380,7 +594,7 @@ function getCalendarLink(
             CHURCH_LOCATION,
     });
 
-    return ('https://calendar.google.com/calendar/render?' +  params.toString()
+    return ('https://calendar.google.com/calendar/render?' + params.toString()
     );
 }
 
@@ -423,6 +637,12 @@ export default function MonthlyServices() {
                     b.displayOrder
             )
             .map((service) => {
+                /*
+                 * The latest broadcast is historical unless
+                 * it is explicitly marked live. Its Theme is
+                 * therefore never used as the upcoming/current
+                 * service theme.
+                 */
                 const broadcast =
                     broadcasts.find(
                         (item) =>
@@ -435,17 +655,44 @@ export default function MonthlyServices() {
                         service.dayOfWeek
                     );
 
-                const nextDate =
-                    getNextServiceDate(
+                const timing =
+                    getServiceTiming(
                         service.recurrence,
                         dayOfWeek,
                         service.dayOfMonth,
+                        service.startTime,
+                        service.endTime,
                         now
                     );
 
+                const serviceDate =
+                    timing?.serviceDate ??
+                    null;
+
+                const isHappening =
+                    timing?.isHappening ??
+                    false;
+
+                const isLive =
+                    Boolean(
+                        isHappening &&
+                        broadcast?.isLive
+                    );
+
+                const previousBroadcast =
+                    broadcast &&
+                        !broadcast.isLive
+                        ? broadcast
+                        : null;
+
+                const liveBroadcast =
+                    isLive
+                        ? broadcast
+                        : null;
+
                 const dayName =
-                    nextDate
-                        ? nextDate.toLocaleDateString(
+                    serviceDate
+                        ? serviceDate.toLocaleDateString(
                             'en-GB',
                             {
                                 weekday:
@@ -462,8 +709,8 @@ export default function MonthlyServices() {
                     );
 
                 const formattedDate =
-                    nextDate
-                        ? nextDate.toLocaleDateString(
+                    serviceDate
+                        ? serviceDate.toLocaleDateString(
                             'en-GB',
                             {
                                 weekday:
@@ -481,37 +728,44 @@ export default function MonthlyServices() {
 
                 return {
                     ...service,
-                    broadcast,
+
+                    currentTheme:
+                        service.currentTheme?.trim() ??
+                        '',
 
                     featured:
                         Boolean(
-                            broadcast?.theme
+                            service.currentTheme?.trim()
                         ),
 
-                    theme:
-                        broadcast?.theme ?? '',
+                    isHappening,
+                    isLive,
+                    liveBroadcast,
+                    previousBroadcast,
 
                     recurrenceLabel,
 
                     formattedDate,
 
                     countdown:
-                        nextDate
+                        timing &&
+                            !isHappening
                             ? getCountdown(
-                                nextDate,
+                                timing.serviceDate,
                                 service.startTime,
                                 now
                             )
                             : null,
 
                     calendarLink:
-                        nextDate
+                        timing &&
+                            !isHappening
                             ? getCalendarLink(
                                 service.name,
                                 description,
                                 service.startTime,
                                 service.endTime,
-                                nextDate,
+                                timing.serviceDate,
                                 service.location
                             )
                             : null,
@@ -561,17 +815,18 @@ export default function MonthlyServices() {
                             <div
                                 key={service.id}
                                 className={`service-card ${service.featured
-                                        ? 'featured'
-                                        : ''
+                                    ? 'featured'
+                                    : ''
                                     }`}
                             >
-                                {service.featured && (
-                                    <div className="featured-badge">
-                                        {
-                                            service.theme
-                                        }
-                                    </div>
-                                )}
+                                <div className="featured-badge">
+                                    {service.isLive
+                                        ? 'LIVE NOW'
+                                        : service.isHappening
+                                            ? 'HAPPENING NOW'
+                                            : service.currentTheme ||
+                                            'NEXT SERVICE'}
+                                </div>
 
                                 <div className="service-day-badge">
                                     <span className="day-name">
@@ -593,73 +848,88 @@ export default function MonthlyServices() {
                                     {service.name}
                                 </h3>
 
-                                {service.broadcast && (
-                                    <a
-                                        href={
-                                            service
-                                                .broadcast
-                                                .videoUrl
-                                        }
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="youtube-preview-link"
-                                    >
-                                        <div className="video-thumbnail-container">
-                                            <img
-                                                src={
-                                                    service
-                                                        .broadcast
-                                                        .thumbnailUrl
-                                                }
-                                                alt={
-                                                    service
-                                                        .broadcast
-                                                        .title
-                                                }
-                                                className="video-thumbnail"
-                                            />
+                                {service.currentTheme &&
+                                    service.isHappening && (
+                                        <div className="countdown-badge">
+                                            {
+                                                service.currentTheme
+                                            }
+                                        </div>
+                                    )}
 
-                                            {service
-                                                .broadcast
-                                                .isLive && (
-                                                    <div className="live-badge">
-                                                        <span className="live-dot"></span>
-                                                        LIVE
+                                {service.liveBroadcast && (
+                                    <>
+                                        <p className="video-meta">
+                                            <strong>
+                                                Watch Live
+                                            </strong>
+                                        </p>
+
+                                        <a
+                                            href={
+                                                service
+                                                    .liveBroadcast
+                                                    .videoUrl
+                                            }
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="youtube-preview-link"
+                                        >
+                                            <div className="video-thumbnail-container">
+                                                <img
+                                                    src={
+                                                        service
+                                                            .liveBroadcast
+                                                            .thumbnailUrl
+                                                    }
+                                                    alt={
+                                                        service
+                                                            .liveBroadcast
+                                                            .title
+                                                    }
+                                                    className="video-thumbnail"
+                                                />
+
+                                                <div className="live-badge">
+                                                    <span className="live-dot"></span>
+                                                    LIVE
+                                                </div>
+
+                                                <div className="play-overlay">
+                                                    <div className="play-button">
+                                                        ▶
                                                     </div>
-                                                )}
-
-                                            <div className="play-overlay">
-                                                <div className="play-button">
-                                                    ▶
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        <div className="video-info">
-                                            <p className="video-title">
-                                                {
-                                                    service
-                                                        .broadcast
-                                                        .title
-                                                }
-                                            </p>
+                                            <div className="video-info">
+                                                <p className="video-title">
+                                                    {
+                                                        service
+                                                            .liveBroadcast
+                                                            .title
+                                                    }
+                                                </p>
 
-                                            {service
-                                                .broadcast
-                                                .description && (
-                                                    <p className="video-meta">
-                                                        <span>
-                                                            {
-                                                                service
-                                                                    .broadcast
-                                                                    .description
-                                                            }
-                                                        </span>
-                                                    </p>
-                                                )}
-                                        </div>
-                                    </a>
+                                                {service
+                                                    .liveBroadcast
+                                                    .description && (
+                                                        <p className="video-meta">
+                                                            <span>
+                                                                {
+                                                                    service
+                                                                        .liveBroadcast
+                                                                        .description
+                                                                }
+                                                            </span>
+                                                        </p>
+                                                    )}
+                                            </div>
+                                        </a>
+                                    </>
                                 )}
+
+
 
                                 <div className="service-datetime">
                                     {service.formattedDate && (
@@ -689,14 +959,24 @@ export default function MonthlyServices() {
                                     </div>
                                 </div>
 
-                                {service.countdown && (
+                                {service.isHappening ? (
                                     <div className="countdown-badge">
                                         <span className="pulse-dot"></span>
 
-                                        {
-                                            service.countdown
-                                        }
+                                        {service.isLive
+                                            ? 'Live now'
+                                            : 'Service happening now'}
                                     </div>
+                                ) : (
+                                    service.countdown && (
+                                        <div className="countdown-badge">
+                                            <span className="pulse-dot"></span>
+
+                                            {
+                                                service.countdown
+                                            }
+                                        </div>
+                                    )
                                 )}
 
                                 {service.calendarLink && (
@@ -710,6 +990,85 @@ export default function MonthlyServices() {
                                     >
                                         📅 Add to Calendar
                                     </a>
+                                )}
+
+                                {service.previousBroadcast && (
+                                    <>
+                                        <p className="video-meta">
+                                            <strong>
+                                                Watch Previous Service
+                                            </strong>
+                                        </p>
+
+                                        {service
+                                            .previousBroadcast
+                                            .theme && (
+                                                <div className="countdown-badge">
+                                                    {
+                                                        service
+                                                            .previousBroadcast
+                                                            .theme
+                                                    }
+                                                </div>
+                                            )}
+
+                                        <a
+                                            href={
+                                                service
+                                                    .previousBroadcast
+                                                    .videoUrl
+                                            }
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="youtube-preview-link"
+                                        >
+                                            <div className="video-thumbnail-container">
+                                                <img
+                                                    src={
+                                                        service
+                                                            .previousBroadcast
+                                                            .thumbnailUrl
+                                                    }
+                                                    alt={
+                                                        service
+                                                            .previousBroadcast
+                                                            .title
+                                                    }
+                                                    className="video-thumbnail"
+                                                />
+
+                                                <div className="play-overlay">
+                                                    <div className="play-button">
+                                                        ▶
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="video-info">
+                                                <p className="video-title">
+                                                    {
+                                                        service
+                                                            .previousBroadcast
+                                                            .title
+                                                    }
+                                                </p>
+
+                                                {service
+                                                    .previousBroadcast
+                                                    .description && (
+                                                        <p className="video-meta">
+                                                            <span>
+                                                                {
+                                                                    service
+                                                                        .previousBroadcast
+                                                                        .description
+                                                                }
+                                                            </span>
+                                                        </p>
+                                                    )}
+                                            </div>
+                                        </a>
+                                    </>
                                 )}
                             </div>
                         )
