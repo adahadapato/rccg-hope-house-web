@@ -19,7 +19,8 @@ import VerifyEmail from './admin/pages/VerifyEmail';
 import HomePage from './pages/HomePage';
 import AdminSettings from './admin/pages/AdminSettings';
 import Devotionals from './admin/pages/Devotionals';
-
+import ContactMessages from './admin/pages/ContactMessages';
+import PrayerRequest from './admin/pages/PrayerRequest';
 
 import {
     clearAdminSession,
@@ -181,6 +182,7 @@ function App() {
             return (
                 <ThemesOfTheYear />
             );
+
         case '/admin/annual-prayers':
             return (
                 <AnnualPrayers />
@@ -200,6 +202,16 @@ function App() {
 
         case '/admin/devotionals':
             return <Devotionals />;
+
+        case '/admin/contacts':
+            return (
+                <ContactMessages />
+            );
+
+        case '/admin/prayer-requests':
+            return (
+                <PrayerRequest />
+            );
 
         default:
             return (

@@ -103,9 +103,11 @@ const navItems: NavigationItem[] = [
         children: [
             {
                 label: 'Prayer Requests',
+                path: '/admin/prayer-requests',
             },
             {
                 label: 'Contacts',
+                path: '/admin/contacts',
             },
         ],
     },
@@ -177,7 +179,10 @@ function AdminSidebar({
                         )
                 )
             )
-            .map(item => item.label);
+            .map(
+                item =>
+                    item.label
+            );
 
     const [
         openGroups,
@@ -185,7 +190,6 @@ function AdminSidebar({
     ] = useState<string[]>(
         initiallyOpenGroups
     );
-
 
     function navigate(
         path?: string
@@ -204,16 +208,20 @@ function AdminSidebar({
     function toggleGroup(
         label: string
     ) {
-        setOpenGroups(current =>
-            current.includes(label)
-                ? current.filter(
-                    item =>
-                        item !== label
+        setOpenGroups(
+            current =>
+                current.includes(
+                    label
                 )
-                : [
-                    ...current,
-                    label,
-                ]
+                    ? current.filter(
+                        item =>
+                            item !==
+                            label
+                    )
+                    : [
+                        ...current,
+                        label,
+                    ]
         );
     }
 

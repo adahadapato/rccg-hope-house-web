@@ -47,6 +47,7 @@ interface ChurchService {
     displayOrder: number;
     icon: string | null;
     showInMonthlyServices: boolean;
+    isBroadcastEnabled: boolean;
 }
 
 interface ServiceBroadcast {
@@ -100,19 +101,6 @@ interface ConfirmationState {
     action: (() => Promise<void>) | null;
 }
 
-const serviceCategories = [
-    'WednesdayPrayer',
-    'SundaySchool',
-    'WorshipService',
-    'ThanksgivingService',
-    'LastFridayVigil',
-    'Evangelism',
-    'HouseFellowship',
-    'SpecialEvent',
-    'HolyCommunion',
-    'HolyGhostService',
-];
-
 const daysOfWeek = [
     'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday',
 ];
@@ -123,7 +111,7 @@ const recurrencePatterns: RecurrencePattern[] = [
 
 const emptyServiceForm: ServiceFormState = {
     name: '',
-    category: 'WorshipService',
+    category: '',
     dayOfWeek: 'Sunday',
     startTime: '',
     endTime: '',
@@ -202,6 +190,16 @@ function Services() {
         [services]
     );
 
+    const serviceCategories = useMemo(
+        () => Array.from(new Set(sortedServices.map(service => service.category))).sort(),
+        [sortedServices]
+    );
+
+    const broadcastEnabledServices = useMemo(
+        () => sortedServices.filter(service => service.isActive && service.isBroadcastEnabled),
+        [sortedServices]
+    );
+
     const monthlyServices = useMemo(
         () => sortedServices.filter(service => service.isActive && service.showInMonthlyServices),
         [sortedServices]
@@ -213,6 +211,11 @@ function Services() {
 
     const serviceName = useCallback(
         (id: string) => services.find(service => service.id === id)?.name ?? 'Unknown service',
+        [services]
+    );
+
+    const churchService = useCallback(
+        (id: string) => services.find(service => service.id === id),
         [services]
     );
 
@@ -305,7 +308,11 @@ function Services() {
 
     function openNewService() {
         setEditingService(null);
-        setServiceForm({ ...emptyServiceForm, displayOrder: services.length.toString() });
+        setServiceForm({
+            ...emptyServiceForm,
+            category: serviceCategories[0] ?? '',
+            displayOrder: services.length.toString(),
+        });
         setServiceFormOpen(true);
         setActionError(null);
     }
@@ -363,6 +370,7 @@ function Services() {
                 displayOrder: Number(serviceForm.displayOrder) || 0,
                 icon: serviceForm.icon.trim() || null,
                 showInMonthlyServices: serviceForm.showInMonthlyServices,
+                isBroadcastEnabled: editingService?.isBroadcastEnabled ?? false,
             };
 
             const response = await apiFetch(
@@ -403,6 +411,33 @@ function Services() {
         });
     }
 
+    function requestBroadcastToggle(service: ChurchService) {
+        const enabling = !service.isBroadcastEnabled;
+
+        setConfirmation({
+            open: true,
+            title: enabling ? 'Broadcast service?' : 'Unbroadcast service?',
+            message: enabling
+                ? `Broadcast "${service.name}"? Its latest broadcast will be eligible to appear in the public broadcast feed.`
+                : `Unbroadcast "${service.name}"? Its broadcast history will be retained, but it will no longer appear in the public broadcast feed.`,
+            confirmText: enabling ? 'Broadcast' : 'Unbroadcast',
+            variant: enabling ? 'success' : 'warning',
+            action: async () => {
+                const response = await apiFetch(
+                    `/api/services/admin/${service.id}/toggle-broadcast`,
+                    { method: 'POST' }
+                );
+
+                if (!response.ok) {
+                    await actionFailure(response, 'Unable to change broadcast status.');
+                }
+
+                setServices(await fetchServices());
+                showSuccess(enabling ? 'Service is now broadcast-enabled.' : 'Service has been unbroadcast.');
+            },
+        });
+    }
+
     function requestDeleteService(service: ChurchService) {
         setConfirmation({
             open: true,
@@ -420,7 +455,7 @@ function Services() {
     }
 
     function openNewBroadcast() {
-        const preferredService = monthlyServices[0] ?? sortedServices.find(service => service.isActive);
+        const preferredService = broadcastEnabledServices[0];
         setEditingBroadcast(null);
         setBroadcastForm({ ...emptyBroadcastForm, churchServiceId: preferredService?.id ?? '' });
         setBroadcastFormOpen(true);
@@ -652,25 +687,37 @@ function Services() {
                                         <table className="services-table">
                                             <thead><tr><th>Service</th><th>Month</th><th>Broadcast</th><th>Theme</th><th>Status</th><th>Video</th><th>Actions</th></tr></thead>
                                             <tbody>
-                                                {broadcasts.map(broadcast => (
-                                                    <tr key={broadcast.id}>
-                                                        <td><strong>{serviceName(broadcast.churchServiceId)}</strong><span className="services-table-secondary">{humanise(broadcast.category)}</span></td>
-                                                        <td>{formatMonth(broadcast.serviceMonth)}</td>
-                                                        <td><strong>{broadcast.title}</strong>{broadcast.description && <span className="services-table-secondary services-description-preview">{broadcast.description}</span>}</td>
-                                                        <td>{broadcast.theme || '—'}</td>
-                                                        <td><span className={`services-badge ${broadcast.isLive ? 'services-badge-live' : 'services-badge-neutral'}`}>{broadcast.isLive ? 'Live' : 'Recorded'}</span></td>
-                                                        <td><a className="services-video-link" href={broadcast.videoUrl} target="_blank" rel="noreferrer">▶ Watch</a></td>
-                                                        <td>
-                                                            <AdminActionButtons
-                                                                itemName={broadcast.title}
-                                                                onEdit={() => openEditBroadcast(broadcast)}
-                                                                onDelete={() => requestDeleteBroadcast(broadcast)}
-                                                                editTitle="Edit broadcast"
-                                                                deleteTitle="Delete broadcast"
-                                                            />
-                                                        </td>
-                                                    </tr>
-                                                ))}
+                                                {broadcasts.map(broadcast => {
+                                                    const linkedService = churchService(broadcast.churchServiceId);
+
+                                                    return (
+                                                        <tr key={broadcast.id}>
+                                                            <td><strong>{serviceName(broadcast.churchServiceId)}</strong><span className="services-table-secondary">{humanise(broadcast.category)}</span></td>
+                                                            <td>{formatMonth(broadcast.serviceMonth)}</td>
+                                                            <td><strong>{broadcast.title}</strong>{broadcast.description && <span className="services-table-secondary services-description-preview">{broadcast.description}</span>}</td>
+                                                            <td>{broadcast.theme || '—'}</td>
+                                                            <td><span className={`services-badge ${broadcast.isLive ? 'services-badge-live' : 'services-badge-neutral'}`}>{broadcast.isLive ? 'Live' : 'Recorded'}</span></td>
+                                                            <td><a className="services-video-link" href={broadcast.videoUrl} target="_blank" rel="noreferrer">▶ Watch</a></td>
+                                                            <td>
+                                                                <AdminActionButtons
+                                                                    itemName={broadcast.title}
+                                                                    isPublic={linkedService?.isBroadcastEnabled ?? false}
+                                                                    onEdit={() => openEditBroadcast(broadcast)}
+                                                                    onVisibilityToggle={
+                                                                        linkedService
+                                                                            ? () => requestBroadcastToggle(linkedService)
+                                                                            : undefined
+                                                                    }
+                                                                    onDelete={() => requestDeleteBroadcast(broadcast)}
+                                                                    editTitle="Edit broadcast"
+                                                                    makePublicTitle="Broadcast service"
+                                                                    makePrivateTitle="Unbroadcast service"
+                                                                    deleteTitle="Delete broadcast"
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })}
                                             </tbody>
                                         </table>
                                     </div>
@@ -687,7 +734,7 @@ function Services() {
                             <form onSubmit={submitService}>
                                 <div className="services-form-grid">
                                     <label className="services-field services-field-wide"><span>Service Name *</span><input required value={serviceForm.name} onChange={e => setServiceForm(c => ({ ...c, name: e.target.value }))} /></label>
-                                    <label className="services-field"><span>Category *</span><select value={serviceForm.category} onChange={e => setServiceForm(c => ({ ...c, category: e.target.value }))}>{serviceCategories.map(v => <option key={v} value={v}>{humanise(v)}</option>)}</select></label>
+                                    <label className="services-field"><span>Category *</span><select required value={serviceForm.category} onChange={e => setServiceForm(c => ({ ...c, category: e.target.value }))}><option value="">Select a category</option>{serviceCategories.map(v => <option key={v} value={v}>{humanise(v)}</option>)}</select></label>
                                     <label className="services-field"><span>Day *</span><select value={serviceForm.dayOfWeek} onChange={e => setServiceForm(c => ({ ...c, dayOfWeek: e.target.value }))}>{daysOfWeek.map(v => <option key={v} value={v}>{v}</option>)}</select></label>
                                     <label className="services-field"><span>Start Time</span><input type="time" value={serviceForm.startTime} onChange={e => setServiceForm(c => ({ ...c, startTime: e.target.value }))} /></label>
                                     <label className="services-field"><span>End Time</span><input type="time" value={serviceForm.endTime} onChange={e => setServiceForm(c => ({ ...c, endTime: e.target.value }))} /></label>
@@ -716,7 +763,7 @@ function Services() {
                             <div className="services-modal-header"><div><span>Monthly Services</span><h2 id="broadcast-form-title">{editingBroadcast ? 'Edit Broadcast' : 'Add Broadcast'}</h2></div><button type="button" onClick={closeBroadcastForm} disabled={saving} aria-label="Close">×</button></div>
                             <form onSubmit={submitBroadcast}>
                                 <div className="services-form-grid">
-                                    <label className="services-field services-field-wide"><span>Service *</span><select required disabled={Boolean(editingBroadcast)} value={broadcastForm.churchServiceId} onChange={e => setBroadcastForm(c => ({ ...c, churchServiceId: e.target.value }))}><option value="">Select a service</option>{sortedServices.map(service => <option key={service.id} value={service.id}>{service.name}{!service.isActive ? ' (Inactive)' : ''}</option>)}</select>{editingBroadcast && <small>Service cannot be reassigned when editing an existing broadcast.</small>}</label>
+                                    <label className="services-field services-field-wide"><span>Service *</span><select required disabled={Boolean(editingBroadcast)} value={broadcastForm.churchServiceId} onChange={e => setBroadcastForm(c => ({ ...c, churchServiceId: e.target.value }))}><option value="">Select a service</option>{(editingBroadcast ? sortedServices.filter(service => service.id === broadcastForm.churchServiceId) : broadcastEnabledServices).map(service => <option key={service.id} value={service.id}>{service.name}{!service.isActive ? ' (Inactive)' : ''}</option>)}</select>{editingBroadcast && <small>Service cannot be reassigned when editing an existing broadcast.</small>}</label>
                                     <label className="services-field services-field-wide"><span>Title *</span><input required value={broadcastForm.title} onChange={e => setBroadcastForm(c => ({ ...c, title: e.target.value }))} /></label>
                                     <label className="services-field services-field-wide"><span>YouTube URL or Video ID *</span><input required value={broadcastForm.youtubeUrl} onChange={e => setBroadcastForm(c => ({ ...c, youtubeUrl: e.target.value }))} /></label>
                                     <label className="services-field"><span>Service Month *</span><input type="month" required disabled={Boolean(editingBroadcast)} value={broadcastForm.serviceMonth} onChange={e => setBroadcastForm(c => ({ ...c, serviceMonth: e.target.value }))} /></label>

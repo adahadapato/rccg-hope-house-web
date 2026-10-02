@@ -3,6 +3,12 @@
 interface AdminActionButtonsProps {
     itemName: string;
 
+    /* View */
+    onView?: () => void;
+
+    /* Reply */
+    onReply?: () => void;
+
     /* Activate / Deactivate */
     isActive?: boolean;
     onToggle?: () => void;
@@ -19,11 +25,17 @@ interface AdminActionButtonsProps {
     isPublic?: boolean;
     onVisibilityToggle?: () => void;
 
+    /* Email verification */
+    onVerifyEmail?: () => void;
+    verifyEmailLoading?: boolean;
+
     /* Standard actions */
     onEdit?: () => void;
     onDelete?: () => void;
 
     /* Titles */
+    viewTitle?: string;
+    replyTitle?: string;
     editTitle?: string;
 
     activateTitle?: string;
@@ -38,9 +50,100 @@ interface AdminActionButtonsProps {
     makePublicTitle?: string;
     makePrivateTitle?: string;
 
+    verifyEmailTitle?: string;
+
     deleteTitle?: string;
 
     disabled?: boolean;
+}
+
+
+/* ============================================================
+   VIEW
+   Eye = open/view the complete item
+   ============================================================ */
+
+function ViewIcon() {
+    return (
+        <svg
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            className="admin-action-svg"
+        >
+            <path
+                d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.9"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+
+            <circle
+                cx="12"
+                cy="12"
+                r="3"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.9"
+            />
+        </svg>
+    );
+}
+
+
+/* ============================================================
+   REPLY
+   Envelope with reply arrow
+   ============================================================ */
+
+function ReplyIcon() {
+    return (
+        <svg
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            className="admin-action-svg"
+        >
+            <rect
+                x="3"
+                y="6"
+                width="18"
+                height="13"
+                rx="2"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+
+            <path
+                d="M4 8l8 6 8-6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+
+            <path
+                d="M9 4 5.5 7.5 9 11"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+
+            <path
+                d="M6 7.5h5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+            />
+        </svg>
+    );
 }
 
 
@@ -377,6 +480,60 @@ function MakePrivateIcon() {
 
 
 /* ============================================================
+   VERIFY EMAIL
+   Envelope with verification tick
+   ============================================================ */
+
+function VerifyEmailIcon() {
+    return (
+        <svg
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            className="admin-action-svg"
+        >
+            <rect
+                x="3"
+                y="5"
+                width="18"
+                height="14"
+                rx="2"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+
+            <path
+                d="M4 7l8 6 8-6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+
+            <circle
+                cx="18"
+                cy="17"
+                r="4"
+                fill="currentColor"
+            />
+
+            <path
+                d="M16.4 17l1.05 1.05L19.8 15.7"
+                fill="none"
+                stroke="#ffffff"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+        </svg>
+    );
+}
+
+
+/* ============================================================
    DELETE
    ============================================================ */
 
@@ -432,6 +589,9 @@ function DeleteIcon() {
 export default function AdminActionButtons({
     itemName,
 
+    onView,
+    onReply,
+
     isActive,
     onToggle,
 
@@ -444,9 +604,14 @@ export default function AdminActionButtons({
     isPublic,
     onVisibilityToggle,
 
+    onVerifyEmail,
+    verifyEmailLoading = false,
+
     onEdit,
     onDelete,
 
+    viewTitle = 'View',
+    replyTitle = 'Reply',
     editTitle = 'Edit',
 
     activateTitle = 'Activate',
@@ -461,12 +626,44 @@ export default function AdminActionButtons({
     makePublicTitle = 'Make public',
     makePrivateTitle = 'Make private',
 
+    verifyEmailTitle = 'Send verification email',
+
     deleteTitle = 'Delete',
 
     disabled = false,
 }: AdminActionButtonsProps) {
     return (
         <div className="admin-action-buttons">
+
+            {/* VIEW */}
+            {onView && (
+                <button
+                    type="button"
+                    className="admin-action-icon admin-action-view"
+                    onClick={onView}
+                    disabled={disabled}
+                    aria-label={`${viewTitle} ${itemName}`}
+                    title={viewTitle}
+                >
+                    <ViewIcon />
+                </button>
+            )}
+
+
+            {/* REPLY */}
+            {onReply && (
+                <button
+                    type="button"
+                    className="admin-action-icon admin-action-reply"
+                    onClick={onReply}
+                    disabled={disabled}
+                    aria-label={`${replyTitle} ${itemName}`}
+                    title={replyTitle}
+                >
+                    <ReplyIcon />
+                </button>
+            )}
+
 
             {/* EDIT */}
             {onEdit && (
@@ -489,8 +686,8 @@ export default function AdminActionButtons({
                     <button
                         type="button"
                         className={`admin-action-icon ${isActive
-                                ? 'admin-action-warning'
-                                : 'admin-action-success'
+                            ? 'admin-action-warning'
+                            : 'admin-action-success'
                             }`}
                         onClick={onToggle}
                         disabled={disabled}
@@ -520,8 +717,8 @@ export default function AdminActionButtons({
                     <button
                         type="button"
                         className={`admin-action-icon ${isFeatured
-                                ? 'admin-action-featured'
-                                : 'admin-action-feature'
+                            ? 'admin-action-featured'
+                            : 'admin-action-feature'
                             }`}
                         onClick={onFeatureToggle}
                         disabled={disabled}
@@ -551,8 +748,8 @@ export default function AdminActionButtons({
                     <button
                         type="button"
                         className={`admin-action-icon ${isPinned
-                                ? 'admin-action-pinned'
-                                : 'admin-action-pin'
+                            ? 'admin-action-pinned'
+                            : 'admin-action-pin'
                             }`}
                         onClick={onPinToggle}
                         disabled={disabled}
@@ -582,8 +779,8 @@ export default function AdminActionButtons({
                     <button
                         type="button"
                         className={`admin-action-icon ${isPublic
-                                ? 'admin-action-private'
-                                : 'admin-action-public'
+                            ? 'admin-action-private'
+                            : 'admin-action-public'
                             }`}
                         onClick={onVisibilityToggle}
                         disabled={disabled}
@@ -605,6 +802,28 @@ export default function AdminActionButtons({
                         )}
                     </button>
                 )}
+
+
+            {/* VERIFY EMAIL */}
+            {onVerifyEmail && (
+                <button
+                    type="button"
+                    className="admin-action-icon admin-action-success"
+                    onClick={onVerifyEmail}
+                    disabled={
+                        disabled ||
+                        verifyEmailLoading
+                    }
+                    aria-label={`${verifyEmailTitle} ${itemName}`}
+                    title={
+                        verifyEmailLoading
+                            ? 'Sending verification email...'
+                            : verifyEmailTitle
+                    }
+                >
+                    <VerifyEmailIcon />
+                </button>
+            )}
 
 
             {/* DELETE */}

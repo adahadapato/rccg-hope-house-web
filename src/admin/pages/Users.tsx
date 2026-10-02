@@ -14,6 +14,7 @@ import {
 } from '@/api/api';
 import ApiErrorState from '@/components/sections/ApiErrorState';
 import ConfirmDialog from '@/components/sections/ConfirmDialog';
+import AdminActionButtons from '../components/AdminActionButtons';
 import AdminLayout from '../components/AdminLayout';
 
 import '../styles/admin.css';
@@ -199,6 +200,11 @@ function Users() {
         saving,
         setSaving,
     ] = useState(false);
+
+    const [
+        sendingVerificationUserId,
+        setSendingVerificationUserId,
+    ] = useState<string | null>(null);
 
     const [
         confirming,
@@ -762,6 +768,67 @@ function Users() {
         }
     }
 
+    async function sendVerificationEmail(
+        user: AdminUser
+    ) {
+        if (
+            user.emailConfirmed ||
+            sendingVerificationUserId !== null
+        ) {
+            return;
+        }
+
+        setSendingVerificationUserId(
+            user.id
+        );
+
+        setActionError(null);
+
+        try {
+            const response =
+                await apiFetch(
+                    `/api/admin/users/${user.id}/send-verification-email`,
+                    {
+                        method: 'POST',
+                    }
+                );
+
+            if (!response.ok) {
+                await actionFailure(
+                    response,
+                    'Unable to send verification email.'
+                );
+            }
+
+            const result =
+                (await response.json()) as {
+                    sent: boolean;
+                    errorMessage: string | null;
+                };
+
+            if (!result.sent) {
+                throw new Error(
+                    result.errorMessage ||
+                    'The verification email could not be sent.'
+                );
+            }
+
+            showSuccess(
+                `Verification email sent to ${user.email}.`
+            );
+        } catch (error) {
+            setActionError(
+                error instanceof Error
+                    ? error.message
+                    : 'Unable to send verification email.'
+            );
+        } finally {
+            setSendingVerificationUserId(
+                null
+            );
+        }
+    }
+
     function requestStatusChange(
         user: AdminUser
     ) {
@@ -1295,16 +1362,31 @@ function Users() {
                                                         </td>
 
                                                         <td>
-                                                            <span
-                                                                className={`users-badge ${user.emailConfirmed
-                                                                    ? 'users-badge-success'
-                                                                    : 'users-badge-warning'
-                                                                    }`}
-                                                            >
-                                                                {user.emailConfirmed
-                                                                    ? 'Verified'
-                                                                    : 'Unverified'}
-                                                            </span>
+                                                            {user.emailConfirmed ? (
+                                                                <span className="users-badge users-badge-success">
+                                                                    Verified
+                                                                </span>
+                                                            ) : (
+                                                                <AdminActionButtons
+                                                                    itemName={user.email}
+                                                                    onVerifyEmail={() =>
+                                                                        void sendVerificationEmail(
+                                                                            user
+                                                                        )
+                                                                    }
+                                                                    verifyEmailLoading={
+                                                                        sendingVerificationUserId ===
+                                                                        user.id
+                                                                    }
+                                                                    disabled={
+                                                                        sendingVerificationUserId !==
+                                                                        null &&
+                                                                        sendingVerificationUserId !==
+                                                                        user.id
+                                                                    }
+                                                                    verifyEmailTitle="Send verification email"
+                                                                />
+                                                            )}
                                                         </td>
 
                                                         <td>
@@ -1355,70 +1437,35 @@ function Users() {
                                                         </td>
 
                                                         <td>
-                                                            <div className="users-actions">
-                                                                <button
-                                                                    type="button"
-                                                                    className="users-action-icon"
-                                                                    onClick={() =>
-                                                                        openEditUser(
-                                                                            user
-                                                                        )
-                                                                    }
-                                                                    aria-label={`Edit ${getDisplayName(
+                                                            <AdminActionButtons
+                                                                itemName={
+                                                                    getDisplayName(
                                                                         user
-                                                                    )}`}
-                                                                    title="Edit user"
-                                                                >
-                                                                    ✎
-                                                                </button>
-
-                                                                <button
-                                                                    type="button"
-                                                                    className={`users-action-icon ${user.isActive
-                                                                        ? 'warning'
-                                                                        : 'success'
-                                                                        }`}
-                                                                    onClick={() =>
-                                                                        requestStatusChange(
-                                                                            user
-                                                                        )
-                                                                    }
-                                                                    aria-label={
-                                                                        user.isActive
-                                                                            ? `Deactivate ${getDisplayName(
-                                                                                user
-                                                                            )}`
-                                                                            : `Activate ${getDisplayName(
-                                                                                user
-                                                                            )}`
-                                                                    }
-                                                                    title={
-                                                                        user.isActive
-                                                                            ? 'Deactivate user'
-                                                                            : 'Activate user'
-                                                                    }
-                                                                >
-                                                                    {user.isActive
-                                                                        ? '⏸'
-                                                                        : '▶'}
-                                                                </button>
-
-                                                                <button
-                                                                    type="button"
-                                                                    className="users-action-icon danger"
-                                                                    onClick={() =>
-                                                                        requestDeleteUser(
-                                                                            user
-                                                                        )
-                                                                    }
-                                                                    aria-label={`Delete ${getDisplayName(
+                                                                    )
+                                                                }
+                                                                isActive={
+                                                                    user.isActive
+                                                                }
+                                                                onEdit={() =>
+                                                                    openEditUser(
                                                                         user
-                                                                    )}`}
-                                                                    title="Delete user"
-                                                                >
-                                                                    🗑
-                                                                </button>
-                                                            </div>
+                                                                    )
+                                                                }
+                                                                onToggle={() =>
+                                                                    requestStatusChange(
+                                                                        user
+                                                                    )
+                                                                }
+                                                                onDelete={() =>
+                                                                    requestDeleteUser(
+                                                                        user
+                                                                    )
+                                                                }
+                                                                editTitle="Edit user"
+                                                                activateTitle="Activate user"
+                                                                deactivateTitle="Deactivate user"
+                                                                deleteTitle="Delete user"
+                                                            />
                                                         </td>
                                                     </tr>
                                                 )

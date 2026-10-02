@@ -2,11 +2,14 @@
    SHARED ADMIN ACTION BUTTONS
 
    Actions:
+   - View
+   - Reply
    - Edit
    - Activate / Deactivate
    - Feature / Unfeature
    - Pin / Unpin
    - Make Public / Make Private
+   - Verify Email
    - Delete
    ============================================================ */
 
@@ -66,6 +69,56 @@
     flex: 0 0 auto;
     pointer-events: none;
 }
+
+
+/* ============================================================
+   VIEW
+   Blue eye
+   ============================================================ */
+
+.admin-action-icon.admin-action-view {
+    border-color: #84caff;
+    background: #eff8ff;
+    color: #175cd3;
+}
+
+
+    .admin-action-icon.admin-action-view:hover:not(:disabled) {
+        border-color: #53b1fd;
+        background: #d1e9ff;
+        color: #1849a9;
+    }
+
+
+    .admin-action-icon.admin-action-view:focus-visible {
+        outline: 3px solid rgba(23, 92, 211, 0.18);
+        outline-offset: 2px;
+    }
+
+
+/* ============================================================
+   REPLY
+   Purple envelope/reply
+   ============================================================ */
+
+.admin-action-icon.admin-action-reply {
+    border-color: #c3b5fd;
+    background: #f4f3ff;
+    color: #6938ef;
+}
+
+
+    .admin-action-icon.admin-action-reply:hover:not(:disabled) {
+        border-color: #9b8afb;
+        background: #ebe9fe;
+        color: #5925dc;
+    }
+
+
+    .admin-action-icon.admin-action-reply:focus-visible {
+        outline: 3px solid rgba(105, 56, 239, 0.18);
+        outline-offset: 2px;
+    }
 
 
 /* ============================================================

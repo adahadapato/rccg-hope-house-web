@@ -1,0 +1,608 @@
+/* ============================================================
+   PRAYER REQUEST ADMIN
+   ============================================================ */
+
+.prayer-admin-page {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.prayer-admin-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 2rem;
+}
+
+    .prayer-admin-header h1 {
+        margin: 0.3rem 0 0.45rem;
+    }
+
+    .prayer-admin-header p {
+        max-width: 720px;
+        margin: 0;
+        color: #667085;
+        line-height: 1.6;
+    }
+
+.prayer-header-pending {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex: 0 0 auto;
+    min-width: 150px;
+    padding: 0.9rem 1rem;
+    border: 1px solid #f5c26b;
+    border-radius: 10px;
+    background: #fffaeb;
+}
+
+    .prayer-header-pending > span {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #fef0c7;
+        color: #b54708;
+        font-size: 1.05rem;
+        font-weight: 700;
+    }
+
+    .prayer-header-pending div {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .prayer-header-pending strong {
+        color: #7a2e0e;
+    }
+
+    .prayer-header-pending small {
+        color: #93370d;
+    }
+
+
+/* ============================================================
+   SUMMARY
+   ============================================================ */
+
+.prayer-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.prayer-summary-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-height: 92px;
+    padding: 1rem 1.1rem;
+    border: 1px solid #eaecf0;
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.prayer-summary-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: #f2f4f7;
+    color: #475467;
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.prayer-summary-card > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.prayer-summary-card strong {
+    color: #101828;
+    font-size: 1.45rem;
+    line-height: 1.2;
+}
+
+.prayer-summary-card small {
+    color: #667085;
+    font-size: 0.85rem;
+}
+
+.prayer-summary-card.pending .prayer-summary-icon {
+    background: #fffaeb;
+    color: #b54708;
+}
+
+.prayer-summary-card.in-progress .prayer-summary-icon {
+    background: #eff8ff;
+    color: #175cd3;
+}
+
+.prayer-summary-card.resolved .prayer-summary-icon {
+    background: #ecfdf3;
+    color: #027a48;
+}
+
+
+/* ============================================================
+   MANAGEMENT PANEL
+   ============================================================ */
+
+.prayer-management-panel {
+    overflow: hidden;
+}
+
+.prayer-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1.25rem;
+    border-bottom: 1px solid #eaecf0;
+}
+
+    .prayer-toolbar h2 {
+        margin: 0 0 0.25rem;
+        color: #101828;
+    }
+
+    .prayer-toolbar p {
+        margin: 0;
+        color: #667085;
+        font-size: 0.9rem;
+    }
+
+.prayer-toolbar-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.prayer-search,
+.prayer-filter {
+    min-height: 42px;
+    border: 1px solid #d0d5dd;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #101828;
+    font: inherit;
+}
+
+.prayer-search {
+    width: 270px;
+    padding: 0 0.85rem;
+}
+
+.prayer-filter {
+    min-width: 155px;
+    padding: 0 2rem 0 0.75rem;
+}
+
+    .prayer-search:focus,
+    .prayer-filter:focus {
+        border-color: #98a2b3;
+        outline: 3px solid rgba(71, 84, 103, 0.1);
+    }
+
+
+/* ============================================================
+   TABLE
+   ============================================================ */
+
+.prayer-table {
+    min-width: 1000px;
+}
+
+    .prayer-table tbody tr {
+        transition: background-color 0.15s ease;
+    }
+
+        .prayer-table tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .prayer-table tbody tr.prayer-row-pending {
+            background: #fffdf5;
+        }
+
+            .prayer-table tbody tr.prayer-row-pending:hover {
+                background: #fffaeb;
+            }
+
+.prayer-row-pending td:first-child {
+    box-shadow: inset 3px 0 0 #f79009;
+}
+
+
+/* ============================================================
+   REQUESTER
+   ============================================================ */
+
+.prayer-requester-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    min-width: 220px;
+}
+
+.prayer-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #f2f4f7;
+    color: #344054;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.prayer-row-pending .prayer-avatar {
+    background: #fef0c7;
+    color: #93370d;
+}
+
+.prayer-requester-cell > div:last-child {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
+.prayer-requester-cell strong {
+    color: #101828;
+}
+
+.prayer-requester-cell small {
+    max-width: 220px;
+    overflow: hidden;
+    color: #667085;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* ============================================================
+   REQUEST PREVIEW
+   ============================================================ */
+
+.prayer-content-preview {
+    max-width: 400px;
+    margin: 0;
+    color: #475467;
+    line-height: 1.45;
+}
+
+.prayer-row-pending .prayer-content-preview {
+    color: #344054;
+    font-weight: 500;
+}
+
+.prayer-date {
+    display: inline-block;
+    min-width: 125px;
+    color: #667085;
+    font-size: 0.84rem;
+}
+
+
+/* ============================================================
+   STATUS
+   ============================================================ */
+
+.prayer-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 90px;
+    padding: 0.3rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.prayer-status-pending {
+    border: 1px solid #f5c26b;
+    background: #fffaeb;
+    color: #b54708;
+}
+
+.prayer-status-in-progress {
+    border: 1px solid #b2ddff;
+    background: #eff8ff;
+    color: #175cd3;
+}
+
+.prayer-status-resolved {
+    border: 1px solid #abefc6;
+    background: #ecfdf3;
+    color: #027a48;
+}
+
+
+/* ============================================================
+   MODALS
+   ============================================================ */
+
+.prayer-view-modal,
+.prayer-manage-modal {
+    width: min(760px, calc(100vw - 2rem));
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+}
+
+.prayer-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.35rem 1.5rem;
+    border-bottom: 1px solid #eaecf0;
+}
+
+    .prayer-modal-header h2 {
+        margin: 0.25rem 0 0.3rem;
+        color: #101828;
+    }
+
+    .prayer-modal-header p {
+        margin: 0;
+        color: #667085;
+        font-size: 0.9rem;
+    }
+
+.prayer-modal-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: #667085;
+    font-size: 1.7rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+    .prayer-modal-close:hover:not(:disabled) {
+        background: #f2f4f7;
+        color: #101828;
+    }
+
+    .prayer-modal-close:disabled {
+        cursor: not-allowed;
+        opacity: 0.45;
+    }
+
+
+/* ============================================================
+   VIEW PRAYER REQUEST
+   ============================================================ */
+
+.prayer-view-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: 1.5rem;
+}
+
+.prayer-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.8rem;
+}
+
+.prayer-detail-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 0;
+    padding: 0.85rem 0.95rem;
+    border: 1px solid #eaecf0;
+    border-radius: 9px;
+    background: #f9fafb;
+}
+
+    .prayer-detail-card span {
+        color: #667085;
+        font-size: 0.76rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    .prayer-detail-card strong {
+        overflow-wrap: anywhere;
+        color: #101828;
+        font-size: 0.92rem;
+    }
+
+.prayer-full-request,
+.prayer-pastoral-note,
+.prayer-manage-request {
+    padding: 1rem;
+    border: 1px solid #e4e7ec;
+    border-radius: 10px;
+    background: #ffffff;
+}
+
+.prayer-pastoral-note {
+    background: #f9fafb;
+}
+
+    .prayer-full-request > span,
+    .prayer-pastoral-note > span,
+    .prayer-manage-request > span {
+        display: block;
+        margin-bottom: 0.65rem;
+        color: #667085;
+        font-size: 0.76rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .prayer-full-request p,
+    .prayer-pastoral-note p,
+    .prayer-manage-request p {
+        margin: 0;
+        color: #344054;
+        line-height: 1.7;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+
+/* ============================================================
+   MANAGE PRAYER REQUEST
+   ============================================================ */
+
+.prayer-manage-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.5rem;
+}
+
+    .prayer-manage-body .admin-form-group {
+        margin: 0;
+    }
+
+    .prayer-manage-body select {
+        width: 100%;
+        min-height: 44px;
+        padding: 0 0.8rem;
+        border: 1px solid #d0d5dd;
+        border-radius: 8px;
+        background: #ffffff;
+        color: #101828;
+        font: inherit;
+    }
+
+        .prayer-manage-body select:focus {
+            border-color: #98a2b3;
+            outline: 3px solid rgba(71, 84, 103, 0.1);
+        }
+
+    .prayer-manage-body textarea {
+        min-height: 170px;
+        resize: vertical;
+    }
+
+.prayer-manage-request {
+    background: #f9fafb;
+}
+
+    .prayer-manage-request p {
+        max-height: 180px;
+        overflow-y: auto;
+        font-size: 0.9rem;
+    }
+
+.prayer-note-help {
+    margin: -0.25rem 0 0;
+    color: #667085;
+    font-size: 0.8rem;
+    line-height: 1.5;
+}
+
+
+/* ============================================================
+   MODAL ACTIONS
+   ============================================================ */
+
+.prayer-modal-actions {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #eaecf0;
+    background: #ffffff;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1100px) {
+
+    .prayer-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .prayer-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .prayer-toolbar-controls {
+        width: 100%;
+    }
+
+    .prayer-search {
+        flex: 1;
+        width: auto;
+    }
+}
+
+
+@media (max-width: 700px) {
+
+    .prayer-admin-header {
+        flex-direction: column;
+    }
+
+    .prayer-header-pending {
+        width: 100%;
+    }
+
+    .prayer-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .prayer-toolbar-controls {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .prayer-search,
+    .prayer-filter {
+        width: 100%;
+    }
+
+    .prayer-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .prayer-modal-header,
+    .prayer-view-body,
+    .prayer-manage-body {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .prayer-modal-actions {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}

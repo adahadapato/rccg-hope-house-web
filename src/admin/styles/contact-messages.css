@@ -1,0 +1,605 @@
+/* ============================================================
+   CONTACT MESSAGES ADMIN
+   ============================================================ */
+
+.contacts-admin-page {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.contacts-admin-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 2rem;
+}
+
+    .contacts-admin-header h1 {
+        margin: 0.3rem 0 0.45rem;
+    }
+
+    .contacts-admin-header p {
+        max-width: 720px;
+        margin: 0;
+        color: #667085;
+        line-height: 1.6;
+    }
+
+.contacts-header-unread {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex: 0 0 auto;
+    min-width: 150px;
+    padding: 0.9rem 1rem;
+    border: 1px solid #f5c26b;
+    border-radius: 10px;
+    background: #fffaeb;
+}
+
+    .contacts-header-unread > span {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #fef0c7;
+        color: #b54708;
+        font-size: 1.05rem;
+        font-weight: 700;
+    }
+
+    .contacts-header-unread div {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .contacts-header-unread strong {
+        color: #7a2e0e;
+    }
+
+    .contacts-header-unread small {
+        color: #93370d;
+    }
+
+
+/* ============================================================
+   SUMMARY
+   ============================================================ */
+
+.contact-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.contact-summary-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-height: 92px;
+    padding: 1rem 1.1rem;
+    border: 1px solid #eaecf0;
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.contact-summary-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: #f2f4f7;
+    color: #475467;
+    font-size: 1.15rem;
+}
+
+.contact-summary-card > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.contact-summary-card strong {
+    color: #101828;
+    font-size: 1.45rem;
+    line-height: 1.2;
+}
+
+.contact-summary-card small {
+    color: #667085;
+    font-size: 0.85rem;
+}
+
+.contact-summary-card.unread .contact-summary-icon {
+    background: #fffaeb;
+    color: #b54708;
+}
+
+.contact-summary-card.read .contact-summary-icon {
+    background: #eff8ff;
+    color: #175cd3;
+}
+
+.contact-summary-card.replied .contact-summary-icon {
+    background: #ecfdf3;
+    color: #027a48;
+}
+
+
+/* ============================================================
+   MANAGEMENT PANEL
+   ============================================================ */
+
+.contact-management-panel {
+    overflow: hidden;
+}
+
+.contact-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1.25rem;
+    border-bottom: 1px solid #eaecf0;
+}
+
+    .contact-toolbar h2 {
+        margin: 0 0 0.25rem;
+        color: #101828;
+    }
+
+    .contact-toolbar p {
+        margin: 0;
+        color: #667085;
+        font-size: 0.9rem;
+    }
+
+.contact-toolbar-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.contact-search,
+.contact-filter {
+    min-height: 42px;
+    border: 1px solid #d0d5dd;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #101828;
+    font: inherit;
+}
+
+.contact-search {
+    width: 250px;
+    padding: 0 0.85rem;
+}
+
+.contact-filter {
+    min-width: 150px;
+    padding: 0 2rem 0 0.75rem;
+}
+
+    .contact-search:focus,
+    .contact-filter:focus {
+        border-color: #98a2b3;
+        outline: 3px solid rgba(71, 84, 103, 0.1);
+    }
+
+
+/* ============================================================
+   TABLE
+   ============================================================ */
+
+.contact-table {
+    min-width: 1050px;
+}
+
+    .contact-table tbody tr {
+        transition: background-color 0.15s ease;
+    }
+
+        .contact-table tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .contact-table tbody tr.contact-row-unread {
+            background: #fffdf5;
+        }
+
+            .contact-table tbody tr.contact-row-unread:hover {
+                background: #fffaeb;
+            }
+
+.contact-row-unread td:first-child {
+    box-shadow: inset 3px 0 0 #f79009;
+}
+
+
+/* ============================================================
+   SENDER
+   ============================================================ */
+
+.contact-sender-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    min-width: 215px;
+}
+
+.contact-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #f2f4f7;
+    color: #344054;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.contact-row-unread .contact-avatar {
+    background: #fef0c7;
+    color: #93370d;
+}
+
+.contact-sender-cell > div:last-child {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
+.contact-sender-cell strong {
+    color: #101828;
+}
+
+.contact-sender-cell small {
+    max-width: 220px;
+    overflow: hidden;
+    color: #667085;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* ============================================================
+   REASON
+   ============================================================ */
+
+.contact-reason {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.3rem 0.55rem;
+    border: 1px solid #e4e7ec;
+    border-radius: 999px;
+    background: #f9fafb;
+    color: #475467;
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+
+/* ============================================================
+   MESSAGE PREVIEW
+   ============================================================ */
+
+.contact-message-preview {
+    max-width: 330px;
+    margin: 0;
+    color: #475467;
+    line-height: 1.45;
+}
+
+.contact-row-unread .contact-message-preview {
+    color: #344054;
+    font-weight: 500;
+}
+
+.contact-date {
+    display: inline-block;
+    min-width: 125px;
+    color: #667085;
+    font-size: 0.84rem;
+}
+
+
+/* ============================================================
+   STATUS
+   ============================================================ */
+
+.contact-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 74px;
+    padding: 0.3rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.contact-status-unread {
+    border: 1px solid #f5c26b;
+    background: #fffaeb;
+    color: #b54708;
+}
+
+.contact-status-read {
+    border: 1px solid #b2ddff;
+    background: #eff8ff;
+    color: #175cd3;
+}
+
+.contact-status-replied {
+    border: 1px solid #abefc6;
+    background: #ecfdf3;
+    color: #027a48;
+}
+
+
+/* ============================================================
+   MODALS
+   ============================================================ */
+
+.contact-view-modal,
+.contact-reply-modal {
+    width: min(760px, calc(100vw - 2rem));
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+}
+
+.contact-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.35rem 1.5rem;
+    border-bottom: 1px solid #eaecf0;
+}
+
+    .contact-modal-header h2 {
+        margin: 0.25rem 0 0.3rem;
+        color: #101828;
+    }
+
+    .contact-modal-header p {
+        margin: 0;
+        color: #667085;
+        font-size: 0.9rem;
+    }
+
+.contact-modal-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: #667085;
+    font-size: 1.7rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+    .contact-modal-close:hover:not(:disabled) {
+        background: #f2f4f7;
+        color: #101828;
+    }
+
+    .contact-modal-close:disabled {
+        cursor: not-allowed;
+        opacity: 0.45;
+    }
+
+
+/* ============================================================
+   VIEW MESSAGE
+   ============================================================ */
+
+.contact-view-body {
+    padding: 1.5rem;
+}
+
+.contact-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.8rem;
+    margin-bottom: 1.25rem;
+}
+
+.contact-detail-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 0;
+    padding: 0.85rem 0.95rem;
+    border: 1px solid #eaecf0;
+    border-radius: 9px;
+    background: #f9fafb;
+}
+
+    .contact-detail-card span {
+        color: #667085;
+        font-size: 0.76rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    .contact-detail-card strong {
+        overflow-wrap: anywhere;
+        color: #101828;
+        font-size: 0.92rem;
+    }
+
+.contact-full-message {
+    padding: 1rem;
+    border: 1px solid #e4e7ec;
+    border-radius: 10px;
+    background: #ffffff;
+}
+
+    .contact-full-message > span,
+    .contact-original-message > span {
+        display: block;
+        margin-bottom: 0.65rem;
+        color: #667085;
+        font-size: 0.76rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .contact-full-message p,
+    .contact-original-message p {
+        margin: 0;
+        color: #344054;
+        line-height: 1.7;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+.contact-marking-read {
+    margin: 0.8rem 0 0;
+    color: #667085;
+    font-size: 0.82rem;
+}
+
+
+/* ============================================================
+   REPLY
+   ============================================================ */
+
+.contact-reply-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.5rem;
+}
+
+    .contact-reply-body .admin-form-group {
+        margin: 0;
+    }
+
+    .contact-reply-body input[readonly] {
+        background: #f9fafb;
+        color: #667085;
+    }
+
+    .contact-reply-body textarea {
+        resize: vertical;
+        min-height: 180px;
+    }
+
+.contact-original-message {
+    padding: 1rem;
+    border: 1px solid #e4e7ec;
+    border-radius: 9px;
+    background: #f9fafb;
+}
+
+    .contact-original-message p {
+        max-height: 180px;
+        overflow-y: auto;
+        font-size: 0.88rem;
+    }
+
+
+/* ============================================================
+   MODAL ACTIONS
+   ============================================================ */
+
+.contact-modal-actions {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #eaecf0;
+    background: #ffffff;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1100px) {
+
+    .contact-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .contact-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .contact-toolbar-controls {
+        width: 100%;
+    }
+
+    .contact-search {
+        flex: 1;
+        width: auto;
+    }
+}
+
+
+@media (max-width: 700px) {
+
+    .contacts-admin-header {
+        flex-direction: column;
+    }
+
+    .contacts-header-unread {
+        width: 100%;
+    }
+
+    .contact-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .contact-toolbar-controls {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .contact-search,
+    .contact-filter {
+        width: 100%;
+    }
+
+    .contact-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .contact-modal-header,
+    .contact-view-body,
+    .contact-reply-body {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .contact-modal-actions {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
