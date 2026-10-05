@@ -627,9 +627,20 @@ export default function MonthlyServices() {
     const displayServices = useMemo(() => {
         return services
             .filter(
-                (service) =>
-                    service.showInMonthlyServices &&
-                    service.isBroadcastEnabled
+                (service) => {
+                    const publishedBroadcast =
+                        broadcasts.find(
+                            (item) =>
+                                item.churchServiceId ===
+                                service.id
+                        );
+
+                    return (
+                        service.showInMonthlyServices &&
+                        service.isBroadcastEnabled &&
+                        Boolean(publishedBroadcast)
+                    );
+                }
             )
             .sort(
                 (a, b) =>
