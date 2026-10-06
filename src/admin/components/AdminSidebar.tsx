@@ -126,6 +126,7 @@ const navItems: NavigationItem[] = [
             },
             {
                 label: 'Members',
+                path: '/admin/members',
             },
             {
                 label: 'Settings',

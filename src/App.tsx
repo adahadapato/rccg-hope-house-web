@@ -21,6 +21,7 @@ import AdminSettings from './admin/pages/AdminSettings';
 import Devotionals from './admin/pages/Devotionals';
 import ContactMessages from './admin/pages/ContactMessages';
 import PrayerRequest from './admin/pages/PrayerRequest';
+import Members from './admin/pages/Members';
 
 import {
     clearAdminSession,
@@ -196,6 +197,9 @@ function App() {
 
         case '/admin/events':
             return <Events />;
+
+        case '/admin/members':
+            return <Members />;
 
         case '/admin/adminsettings':
             return <AdminSettings />;
