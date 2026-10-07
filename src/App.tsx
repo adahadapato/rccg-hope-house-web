@@ -17,16 +17,18 @@ import Users from './admin/pages/Users';
 import Roles from './admin/pages/Roles';
 import VerifyEmail from './admin/pages/VerifyEmail';
 import HomePage from './pages/HomePage';
-import AdminSettings from './admin/pages/AdminSettings';
+import AccountSettings from './admin/pages/AccountSettings';
 import Devotionals from './admin/pages/Devotionals';
 import ContactMessages from './admin/pages/ContactMessages';
 import PrayerRequest from './admin/pages/PrayerRequest';
 import Members from './admin/pages/Members';
+import ChurchSettings from './admin/pages/ChurchSettings';
 
 import {
     clearAdminSession,
     validateAdminSession,
 } from '@/api/api';
+//import AccountSettings from './admin/pages/AccountSettings';
 
 type AdminAuthState =
     | 'checking'
@@ -201,8 +203,8 @@ function App() {
         case '/admin/members':
             return <Members />;
 
-        case '/admin/adminsettings':
-            return <AdminSettings />;
+        case '/admin/accountsettings':
+            return <AccountSettings />;
 
         case '/admin/devotionals':
             return <Devotionals />;
@@ -215,6 +217,11 @@ function App() {
         case '/admin/prayer-requests':
             return (
                 <PrayerRequest />
+            );
+
+        case '/admin/churchsettings':
+            return (
+                <ChurchSettings />
             );
 
         default:

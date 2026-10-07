@@ -1,0 +1,562 @@
+.church-settings {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 0 3rem;
+}
+
+.church-settings-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.church-settings-eyebrow,
+.church-settings-section-label {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: #8a6a25;
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+}
+
+.church-settings-header h1 {
+    margin: 0;
+    color: #1e293b;
+    font-size: clamp(1.8rem, 3vw, 2.35rem);
+    line-height: 1.15;
+}
+
+.church-settings-header p {
+    max-width: 720px;
+    margin: 0.6rem 0 0;
+    color: #64748b;
+    line-height: 1.65;
+}
+
+.church-settings-tabs {
+    display: flex;
+    gap: 0.35rem;
+    margin-bottom: 1.4rem;
+    padding: 0.35rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #f8fafc;
+}
+
+    .church-settings-tabs button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.55rem;
+        min-height: 42px;
+        padding: 0.65rem 1rem;
+        border: 0;
+        border-radius: 9px;
+        background: transparent;
+        color: #64748b;
+        font: inherit;
+        font-size: 0.9rem;
+        font-weight: 750;
+        cursor: pointer;
+        transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+        .church-settings-tabs button:hover {
+            color: #334155;
+            background: #ffffff;
+        }
+
+        .church-settings-tabs button.active {
+            background: #ffffff;
+            color: #8a6a25;
+            box-shadow: 0 1px 4px rgba(15, 23, 42, 0.1);
+        }
+
+.church-settings-tab-count {
+    display: inline-grid;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 0.4rem;
+    place-items: center;
+    border-radius: 999px;
+    background: #eee5d1;
+    color: #6d521c;
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
+.church-settings-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.4rem;
+    align-items: start;
+}
+
+.church-settings-card {
+    min-width: 0;
+    padding: 1.6rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.045);
+}
+
+.church-settings-summary-card {
+    grid-column: 1 / -1;
+}
+
+.church-settings-card-heading {
+    margin-bottom: 1.4rem;
+}
+
+.church-settings-card-heading-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+    /*
+ * Prevent the Add Contact button from shrinking and wrapping
+ * onto multiple lines on desktop/tablet layouts.
+ */
+    .church-settings-card-heading-row > .admin-primary-button {
+        flex: 0 0 auto;
+        width: auto;
+        min-width: 150px;
+        white-space: nowrap;
+    }
+
+.church-settings-card-heading h2 {
+    margin: 0;
+    color: #1e293b;
+    font-size: 1.2rem;
+}
+
+.church-settings-card-heading p {
+    margin: 0.45rem 0 0;
+    color: #64748b;
+    font-size: 0.93rem;
+    line-height: 1.55;
+}
+
+.church-settings-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    margin-bottom: 1.25rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid;
+    border-radius: 12px;
+}
+
+    .church-settings-alert > div {
+        flex: 1;
+    }
+
+    .church-settings-alert strong,
+    .church-settings-alert p {
+        display: block;
+    }
+
+    .church-settings-alert p {
+        margin: 0.2rem 0 0;
+        line-height: 1.45;
+    }
+
+    .church-settings-alert > button {
+        flex: 0 0 auto;
+        border: 0;
+        background: transparent;
+        color: inherit;
+        font-size: 1.35rem;
+        cursor: pointer;
+    }
+
+.church-settings-alert-icon {
+    display: grid;
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    place-items: center;
+    border-radius: 50%;
+    font-weight: 900;
+}
+
+.church-settings-alert-error {
+    border-color: #fecaca;
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+.church-settings-alert-success {
+    border-color: #bbf7d0;
+    background: #f0fdf4;
+    color: #166534;
+}
+
+.church-settings-loading {
+    display: flex;
+    min-height: 220px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 1rem;
+    color: #64748b;
+}
+
+.church-settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.church-settings-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.church-settings-field {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+    .church-settings-field > span {
+        color: #334155;
+        font-size: 0.88rem;
+        font-weight: 700;
+    }
+
+    .church-settings-field input,
+    .church-settings-field select,
+    .church-settings-field textarea {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 0.72rem 0.85rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 9px;
+        outline: none;
+        background: #ffffff;
+        color: #0f172a;
+        font: inherit;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .church-settings-field input,
+    .church-settings-field select {
+        min-height: 44px;
+    }
+
+    .church-settings-field textarea {
+        min-height: 90px;
+        resize: vertical;
+        line-height: 1.55;
+    }
+
+        .church-settings-field input:focus,
+        .church-settings-field select:focus,
+        .church-settings-field textarea:focus {
+            border-color: #a98537;
+            box-shadow: 0 0 0 3px rgba(169, 133, 55, 0.12);
+        }
+
+    .church-settings-field small {
+        color: #64748b;
+        font-size: 0.82rem;
+        line-height: 1.5;
+    }
+
+.church-settings-form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.7rem;
+    margin-top: 0.25rem;
+}
+
+.church-settings-secondary-button,
+.church-settings-delete-button {
+    min-height: 40px;
+    padding: 0.65rem 1rem;
+    border-radius: 8px;
+    font: inherit;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+
+.church-settings-secondary-button {
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #334155;
+}
+
+    .church-settings-secondary-button:hover:not(:disabled) {
+        border-color: #94a3b8;
+        background: #f8fafc;
+    }
+
+.church-settings-delete-button {
+    border: 1px solid #fecaca;
+    background: #ffffff;
+    color: #b91c1c;
+}
+
+    .church-settings-delete-button:hover:not(:disabled) {
+        border-color: #fca5a5;
+        background: #fef2f2;
+    }
+
+    .church-settings-secondary-button:disabled,
+    .church-settings-delete-button:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+    }
+
+.church-settings-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.9rem;
+}
+
+    .church-settings-summary > div {
+        padding: 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        background: #f8fafc;
+    }
+
+    .church-settings-summary span {
+        display: block;
+        margin-bottom: 0.3rem;
+        color: #64748b;
+        font-size: 0.8rem;
+    }
+
+    .church-settings-summary strong {
+        color: #1e293b;
+        font-size: 1.2rem;
+    }
+
+.church-settings-contact-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.65fr) minmax(300px, 0.85fr);
+    gap: 1.4rem;
+    align-items: start;
+}
+
+.church-settings-contact-form-card {
+    position: sticky;
+    top: 1.25rem;
+}
+
+.church-contact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.church-contact-item {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.church-contact-type-icon {
+    display: grid;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    place-items: center;
+    border-radius: 10px;
+    background: #f4eddd;
+    color: #75591f;
+    font-size: 1rem;
+    font-weight: 900;
+}
+
+.church-contact-details {
+    min-width: 0;
+}
+
+.church-contact-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+    .church-contact-heading strong {
+        color: #1e293b;
+    }
+
+    .church-contact-heading > span {
+        padding: 0.2rem 0.45rem;
+        border-radius: 999px;
+        background: #f1f5f9;
+        color: #64748b;
+        font-size: 0.7rem;
+        font-weight: 700;
+    }
+
+.church-contact-label {
+    display: block;
+    margin-top: 0.25rem;
+    color: #475569;
+    font-size: 0.84rem;
+}
+
+.church-contact-value {
+    display: block;
+    margin-top: 0.35rem;
+    color: #64748b;
+    font-size: 0.84rem;
+    overflow-wrap: anywhere;
+}
+
+a.church-contact-value {
+    color: #8a6a25;
+    text-decoration: none;
+}
+
+    a.church-contact-value:hover {
+        text-decoration: underline;
+    }
+
+.church-contact-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.church-settings-empty {
+    padding: 2rem 1rem;
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+    background: #f8fafc;
+    text-align: center;
+}
+
+    .church-settings-empty strong {
+        display: block;
+        color: #334155;
+    }
+
+    .church-settings-empty p {
+        max-width: 520px;
+        margin: 0.45rem auto 0;
+        color: #64748b;
+        font-size: 0.9rem;
+        line-height: 1.55;
+    }
+
+@media (max-width: 980px) {
+    .church-settings-contact-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .church-settings-contact-form-card {
+        position: static;
+    }
+}
+
+@media (max-width: 900px) {
+    .church-settings-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .church-settings-summary-card {
+        grid-column: auto;
+    }
+}
+
+@media (max-width: 640px) {
+    .church-settings-header,
+    .church-settings-card-heading-row {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+        .church-settings-card-heading-row > .admin-primary-button {
+            width: 100%;
+            min-width: 0;
+            white-space: nowrap;
+        }
+
+    .church-settings-tabs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+        .church-settings-tabs button {
+            width: 100%;
+            padding-inline: 0.6rem;
+        }
+
+    .church-settings-card {
+        padding: 1.2rem;
+        border-radius: 12px;
+    }
+
+    .church-settings-form-grid,
+    .church-settings-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .church-contact-item {
+        grid-template-columns: auto minmax(0, 1fr);
+        align-items: start;
+    }
+
+    .church-contact-actions {
+        grid-column: 1 / -1;
+        padding-left: 60px;
+    }
+
+    .church-settings-form-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+        .church-settings-form-actions button {
+            width: 100%;
+        }
+}
+
+@media (max-width: 460px) {
+    .church-settings-tabs {
+        grid-template-columns: 1fr;
+    }
+
+    .church-contact-item {
+        grid-template-columns: 1fr;
+    }
+
+    .church-contact-type-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .church-contact-actions {
+        grid-column: auto;
+        padding-left: 0;
+    }
+
+        .church-contact-actions button {
+            flex: 1;
+        }
+}

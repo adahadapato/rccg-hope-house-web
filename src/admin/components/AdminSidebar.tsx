@@ -129,8 +129,12 @@ const navItems: NavigationItem[] = [
                 path: '/admin/members',
             },
             {
-                label: 'Settings',
-                path: '/admin/adminsettings',
+                label: 'Church Settings',
+                path: '/admin/churchsettings',
+            },
+            {
+                label: 'Account Settings',
+                path: '/admin/accountsettings',
             },
         ],
     },

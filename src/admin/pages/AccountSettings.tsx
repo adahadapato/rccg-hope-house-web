@@ -20,7 +20,7 @@ import ConfirmDialog from '@/components/sections/ConfirmDialog';
 import AdminLayout from '../components/AdminLayout';
 
 import '../styles/admin.css';
-import '../styles/admin-settings.css';
+import '../styles/account-settings.css';
 
 interface AccountProfile {
     id: string;
@@ -161,7 +161,7 @@ function resolveImageUrl(
     return `${baseUrl}${normalizedPath}`;
 }
 
-function AdminSettings() {
+function AccountSettings() {
     const [
         profile,
         setProfile,
@@ -2127,4 +2127,4 @@ function AdminSettings() {
     );
 }
 
-export default AdminSettings;
+export default AccountSettings;

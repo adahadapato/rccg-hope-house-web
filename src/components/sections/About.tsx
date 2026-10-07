@@ -3,6 +3,11 @@
 export default function About() {
     const { churchInfo, loading } = useChurchInfo();
 
+    const whatsappGroup =
+        churchInfo?.contactMethods.find(
+            method => method.type === 'WhatsAppGroup'
+        );
+
     return (
         <section
             id="about"
@@ -86,9 +91,17 @@ export default function About() {
                             </div>
                         </div>
 
-                        <button className="btn-primary btn-large">
-                            Join Our Community
-                        </button>
+                        {whatsappGroup && (
+                            <a
+                                href={whatsappGroup.value}
+                                className="btn-primary btn-large"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                {whatsappGroup.label ||
+                                    'Join Our WhatsApp Group'}
+                            </a>
+                        )}
                     </div>
 
                 </div>
