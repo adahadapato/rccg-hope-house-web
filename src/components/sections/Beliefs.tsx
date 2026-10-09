@@ -6,7 +6,13 @@ export default function Beliefs() {
     const beliefs = [
         { id: 0, icon: "📖", title: "The Holy Bible", excerpt: "The inspired, revealed Word of God and foundation of our faith.", full: "That the Holy Bible is the written and revealed will of God. We believe that the entire Scripture, both Old and New Testament are written by the inspiration of the Holy Spirit. All the Christian teachings and the Christian attitude of the Children of God are such as are established in the Holy Bible. As revealed unto us by the Bible, we believe that there is only one God, who is the Creator of both the visible and invisible. He exists in three Persons: God the Father, God the Son and God the Holy Spirit." },
         { id: 1, icon: "✝️", title: "Jesus Christ", excerpt: "The Son of God, Saviour of the world, born of a virgin.", full: "Jesus Christ is the Son of God; Who took away our sins, and the Saviour of the world. We also believe that Jesus is God and was born by Mary the Virgin. He is God revealed in the flesh. Through Him all things were created. We believe in His death on the Cross, and resurrection, by which He brought redemption." },
-        { id: 2, icon: "🕊️", title: "The Holy Spirit", excerpt: "Infilling, divine power, and spiritual gifts for believers.", full: "We also believe in the infilling and power of the Holy Spirit. The holy spirit enables us to use spiritual gifts, including speaking in tongues. He guides us into all truth, convicts of sin, and empowers us for witness and service.", image: "https://images.unsplash.com/photo-1589987281416-2c9e8f8a5c6e?w=400&auto=format&fit=crop&q=80" },
+        {
+            id: 2,
+            icon: "🕊️",
+            title: "The Holy Spirit",
+            excerpt: "Infilling, divine power, and spiritual gifts for believers.",
+            full: "We also believe in the infilling and power of the Holy Spirit. The holy spirit enables us to use spiritual gifts, including speaking in tongues. He guides us into all truth, convicts of sin, and empowers us for witness and service."
+        },
         { id: 3, icon: "👑", title: "Second Coming", excerpt: "Eternal life, purpose, and the promised return of Christ.", full: "In the second coming of Jesus Christ will be in physical form and will be visible to all. We believe in Heaven & Hell. The Bible teaches us that there is eternal punishment as well as eternal life. We also believe that God wants us to live a life full of purpose, abundance, health and transformation." }
     ];
 

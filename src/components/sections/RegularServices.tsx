@@ -1,6 +1,7 @@
 ﻿
 
 import { useChurchServices, formatTimeRange } from '../../hooks/useChurchServices';
+import { useChurchInfo} from '../../hooks/useChurchInfo';
 
 // Maps each known service name to which visual group it belongs in.
 // The UI grouping does not correspond 1:1 to ServiceCategory.
@@ -16,6 +17,7 @@ const GROUP_MAP: Record<string, 'sunday' | 'wednesday' | 'monthly'> = {
 export default function RegularServices() {
     // true = Hope House/local services
     const { services, loading } = useChurchServices(true);
+    const { churchInfo } = useChurchInfo();
 
     const byGroup = (group: 'sunday' | 'wednesday' | 'monthly') =>
         services.filter(s => GROUP_MAP[s.name] === group);
@@ -387,8 +389,8 @@ export default function RegularServices() {
 
 
                                         {/* =================================
-    EVANGELISM
-   ================================= */}
+                                                EVANGELISM
+                                        ================================= */}
 
                                         {s.name === 'Evangelism' && (
                                             <>
@@ -635,28 +637,64 @@ export default function RegularServices() {
                         CHURCH ADDRESS
                        ================================= */}
 
-                    <div className="additional-card">
 
+
+                    <div className="additional-card">
                         <img
                             src="/icon-location.png"
-                            alt=""
+                            alt="Location"
                             className="additional-icon"
                         />
 
                         <div className="additional-content">
-
-                            <h4>
-                                Church Address
-                            </h4>
+                            <h4>Church Address</h4>
 
                             <p>
-                                230 Burnt Oak Broadway, Edgware.
-                                <br />
-                                HA8 0AP
+                                {churchInfo?.addressLine1 || 'Address unavailable'}
+
+                                {churchInfo?.addressLine2 && (
+                                    <>
+                                        <br />
+                                        {churchInfo.addressLine2}
+                                    </>
+                                )}
+
+                                {(churchInfo?.city || churchInfo?.postCode) && (
+                                    <>
+                                        <br />
+                                        {[churchInfo?.city, churchInfo?.postCode]
+                                            .filter(Boolean)
+                                            .join(', ')}
+                                    </>
+                                )}
                             </p>
 
+                            {/* Google Maps directions */}
+                            {churchInfo?.addressLine1 && (
+                                <a
+                                    href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+                                        [
+                                            churchInfo.addressLine1,
+                                            churchInfo.addressLine2,
+                                            churchInfo.city,
+                                            churchInfo.postCode,
+                                            churchInfo.country,
+                                        ]
+                                            .filter(Boolean)
+                                            .join(', ')
+                                    )}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="church-map-link"
+                                >
+                                    📍 Get Directions
+                                    <span aria-hidden="true"> ↗</span>
+                                </a>
+                            )}
                         </div>
                     </div>
+
+
 
                 </div>
 
