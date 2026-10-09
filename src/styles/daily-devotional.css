@@ -806,3 +806,356 @@
         font-size: 0.72rem;
     }
 }
+
+
+/* =========================================================
+   REFINED DEVOTIONAL READING & DETAILS
+   Scoped styles avoid affecting unrelated website buttons.
+   ========================================================= */
+
+.devotional-highlight .devotional-memory-highlight {
+    appearance: none;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.7rem;
+    padding: 1.2rem 1.35rem;
+    border: 1px solid rgba(255,255,255,.32);
+    border-radius: 1rem;
+    background: rgba(255,255,255,.12);
+    color: #fff;
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(10,32,87,.1);
+    transition: background .2s ease, transform .2s ease, border-color .2s ease;
+}
+
+    .devotional-highlight .devotional-memory-highlight:hover {
+        background: rgba(255,255,255,.2);
+        border-color: rgba(255,255,255,.65);
+        transform: translateY(-2px);
+    }
+
+.devotional-memory-eyebrow {
+    font-size: .78rem;
+    font-weight: 750;
+    letter-spacing: .075em;
+    text-transform: uppercase;
+    color: #e2eaff;
+}
+
+.devotional-memory-reference {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(1.25rem, 2vw, 1.65rem);
+    font-weight: 700;
+    line-height: 1.25;
+    color: #fff;
+}
+
+.devotional-memory-action {
+    font-size: .85rem;
+    font-weight: 650;
+    color: #fde68a;
+}
+
+.devotional-memory-highlight:focus-visible,
+.devotional-reading-link:focus-visible,
+.devotional-source-section a:focus-visible {
+    outline: 3px solid #f59e0b;
+    outline-offset: 3px;
+}
+
+.modal-content-scroll .devotional-reading-section {
+    margin-bottom: 1.4rem;
+}
+
+    .modal-content-scroll .devotional-reading-section h3 {
+        margin-bottom: .85rem;
+    }
+
+.modal-content-scroll .devotional-reading-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: .5rem 1.2rem;
+    width: 100%;
+    margin: 0 0 .65rem;
+    padding: 1rem 1.2rem;
+    border: 1px solid #e3e9f2;
+    border-left: 4px solid #e08526;
+    border-radius: .85rem;
+    background: #fffaf4;
+    text-align: left;
+    font: inherit;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1e3a8a;
+    cursor: pointer;
+    box-shadow: 0 3px 12px rgba(30,58,138,.035);
+    transition: background .2s, border-color .2s, transform .2s;
+}
+
+    .modal-content-scroll .devotional-reading-link:hover {
+        background: #fff1de;
+        border-color: #edc292;
+        transform: translateY(-1px);
+    }
+
+.devotional-reading-link-action {
+    font-size: .83rem;
+    font-weight: 650;
+    color: #b96817;
+    white-space: nowrap;
+}
+
+.modal-content-scroll .devotional-detail-card {
+    padding: 1.4rem 1.55rem;
+    border: 1px solid #e5eaf2;
+    border-radius: 1rem;
+    background: #f9fbff;
+    margin-bottom: 1.2rem;
+}
+
+    .modal-content-scroll .devotional-detail-card h3 {
+        margin: 0 0 .65rem;
+        font-size: 1.22rem;
+    }
+
+    .modal-content-scroll .devotional-detail-card p {
+        margin: 0;
+        color: #334155;
+        font-size: 1.06rem;
+        line-height: 1.75;
+    }
+
+.modal-content-scroll .devotional-hymn-card {
+    border-left: 4px solid #7661bb;
+    background: #faf9ff;
+}
+
+.modal-content-scroll .devotional-author-card {
+    border-left: 4px solid #3b82f6;
+}
+
+.modal-content-scroll .devotional-source-section {
+    margin: 0 0 2rem;
+}
+
+.devotional-source-section a {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .65rem .9rem;
+    border: 1px solid #dbe4f1;
+    border-radius: .65rem;
+    color: #1e3a8a;
+    background: #f8fafc;
+    font-size: .9rem;
+    font-weight: 650;
+    text-decoration: none;
+}
+
+    .devotional-source-section a:hover {
+        background: #eef4ff;
+        text-decoration: underline;
+    }
+
+@media (max-width: 600px) {
+    .modal-content-scroll .devotional-reading-link {
+        padding: .85rem 1rem;
+        font-size: 1rem;
+    }
+
+    .modal-content-scroll .devotional-detail-card {
+        padding: 1.1rem;
+    }
+}
+
+
+/* =========================================================
+   FEATURE SHOWCASE — refined theme, reading and thought cards
+   Scoped to the public devotional showcase only.
+   ========================================================= */
+.daily-devotional-section .devotional-showcase {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    border-radius: 1.65rem;
+    border: 1px solid #e7edf6;
+    box-shadow: 0 20px 65px rgba(19, 45, 91, .11);
+}
+
+.daily-devotional-section .devotional-highlight {
+    justify-content: flex-start;
+    gap: 1.7rem;
+    padding: clamp(2rem, 4vw, 3.4rem);
+    background: linear-gradient(145deg, #18377c 0%, #2555ac 58%, #326dc9 100%);
+}
+
+    .daily-devotional-section .devotional-highlight::before {
+        width: 280px;
+        height: 280px;
+        top: -135px;
+        right: -110px;
+        background: rgba(255,255,255,.055);
+        pointer-events: none;
+    }
+
+.daily-devotional-section .highlight-date {
+    width: fit-content;
+    padding: .5rem .85rem;
+    border: 1px solid rgba(255,255,255,.22);
+    border-radius: 999px;
+    background: rgba(255,255,255,.09);
+    font-size: .95rem;
+    font-weight: 700;
+    color: #fff;
+    opacity: 1;
+}
+
+.daily-devotional-section .highlight-theme {
+    position: relative;
+    z-index: 1;
+}
+
+.daily-devotional-section .theme-label {
+    margin-bottom: .8rem;
+    color: #f5c477;
+    opacity: 1;
+    font-size: .78rem;
+    font-weight: 800;
+    letter-spacing: .14em;
+}
+
+.daily-devotional-section .theme-text {
+    max-width: 16ch;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(2.15rem, 3.4vw, 3.25rem);
+    font-weight: 800;
+    line-height: 1.13;
+    letter-spacing: -.025em;
+    color: #ffdf8a;
+    overflow-wrap: break-word;
+}
+
+.daily-devotional-section .devotional-highlight .highlight-scripture {
+    appearance: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .55rem;
+    width: 100%;
+    padding: 1.15rem 1.3rem;
+    border: 1px solid rgba(255,255,255,.28);
+    border-radius: 1rem;
+    background: rgba(255,255,255,.12);
+    box-shadow: 0 8px 20px rgba(9,27,69,.09);
+    color: #fff;
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+    transition: background .2s, transform .2s, border-color .2s;
+}
+
+    .daily-devotional-section .devotional-highlight .highlight-scripture:hover,
+    .daily-devotional-section .devotional-highlight .highlight-scripture:focus-visible {
+        background: rgba(255,255,255,.19);
+        border-color: rgba(255,255,255,.6);
+        transform: translateY(-2px);
+    }
+
+.daily-devotional-section .devotional-highlight .scripture-label {
+    margin: 0;
+    color: #dce9ff;
+    font-size: .76rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    opacity: 1;
+}
+
+.daily-devotional-section .devotional-highlight .scripture-text {
+    margin: 0;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(1.3rem, 2vw, 1.7rem);
+    font-weight: 700;
+    font-style: normal;
+    line-height: 1.3;
+    color: #fff;
+}
+
+.daily-devotional-section .devotional-highlight .highlight-scripture:hover .scripture-text {
+    color: #ffdf8a;
+    text-decoration: none;
+}
+
+.daily-devotional-section .devotional-highlight .devotional-memory-highlight {
+    background: rgba(9, 30, 77, .18);
+}
+
+.daily-devotional-section .devotional-content {
+    justify-content: center;
+    gap: 2.4rem;
+    padding: clamp(2rem, 4.2vw, 4rem);
+    background: radial-gradient(circle at 100% 0%, #f4f8ff 0%, #fff 45%);
+}
+
+.daily-devotional-section .thought-block {
+    padding: 1.6rem 1.75rem;
+    border: 1px solid #e4ebf6;
+    border-left: 4px solid #e08526;
+    border-radius: 1rem;
+    background: #fbfcff;
+}
+
+    .daily-devotional-section .thought-block h4 {
+        margin: 0 0 1.1rem;
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: clamp(1.35rem, 2vw, 1.7rem);
+        line-height: 1.3;
+        color: #1e3a8a;
+    }
+
+    .daily-devotional-section .thought-block p {
+        font-size: clamp(1.02rem, 1.5vw, 1.15rem);
+        line-height: 1.85;
+        color: #344256;
+    }
+
+.daily-devotional-section .btn-read-devotional {
+    margin-top: 0;
+    padding: 1rem 1.5rem;
+    border-radius: .85rem;
+    font-size: 1rem;
+}
+
+.daily-devotional-section .highlight-scripture:focus-visible,
+.daily-devotional-section .devotional-memory-highlight:focus-visible {
+    outline: 3px solid #ffdf8a;
+    outline-offset: 3px;
+}
+
+@media (max-width: 1024px) {
+    .daily-devotional-section .devotional-showcase {
+        grid-template-columns: 1fr;
+    }
+
+    .daily-devotional-section .theme-text {
+        max-width: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .daily-devotional-section .devotional-highlight,
+    .daily-devotional-section .devotional-content {
+        padding: 1.5rem;
+    }
+
+    .daily-devotional-section .thought-block {
+        padding: 1.2rem;
+    }
+
+    .daily-devotional-section .theme-text {
+        font-size: 2rem;
+    }
+}

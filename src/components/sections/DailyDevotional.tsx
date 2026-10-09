@@ -1,6 +1,7 @@
 ﻿import {
     useEffect,
     useState,
+    useRef,
 } from 'react';
 
 import {
@@ -23,6 +24,17 @@ interface Devotional {
     commentaryPoints: string[];
     prayerPoints: string[];
     declaration: string;
+    memoryVerseReference?: string;
+    memoryVersePassageId?: string;
+    bibleInOneYearReference?: string;
+    bibleInOneYearPassageIds?: string[];
+    hymnNumber?: string | null;
+    hymnTitle?: string | null;
+    hymnLyrics?: string | null;
+    additionalReading?: string;
+    keyPoint?: string;
+    author?: string;
+    sourceUrl?: string;
     isPublished: boolean;
     publishedAt: string | null;
 }
@@ -173,6 +185,11 @@ export default function DailyDevotional() {
         setBibleError,
     ] = useState('');
 
+    // Selected passage can be the main reading, memory verse or annual reading.
+    const [selectedPassage, setSelectedPassage] = useState<{ id: string; label: string } | null>(null);
+    const [loadedPassageReference, setLoadedPassageReference] = useState('');
+    const passageRequestSequence = useRef(0);
+
     // =========================================================
     // LOAD DAILY DEVOTIONAL
     //
@@ -316,7 +333,8 @@ export default function DailyDevotional() {
     // =========================================================
 
     const fetchBibleText = async (
-        translation: BibleTranslation
+        translation: BibleTranslation,
+        passageId?: string
     ) => {
         if (!devotional) {
             return;
@@ -329,6 +347,9 @@ export default function DailyDevotional() {
                     translation
             );
 
+        const targetId = passageId ?? selectedPassage?.id ?? devotional.passageId;
+        const sequence = ++passageRequestSequence.current;
+
         // NKJV remains visible in the interface but is disabled
         // until it becomes available through our API.Bible account.
 
@@ -340,6 +361,7 @@ export default function DailyDevotional() {
         setBibleError('');
         setBibleText('');
         setBibleCopyright('');
+        setLoadedPassageReference('');
         setActiveTranslation(
             translation
         );
@@ -364,7 +386,7 @@ export default function DailyDevotional() {
                     bibleId:
                         bible.code,
                     passageId:
-                        devotional.passageId,
+                        targetId,
                 });
 
             // -------------------------------------------------
@@ -389,9 +411,11 @@ export default function DailyDevotional() {
             // 4. Store scripture and copyright separately.
             // -------------------------------------------------
 
+            if (sequence !== passageRequestSequence.current) return;
             setBibleText(
                 passage.content
             );
+            setLoadedPassageReference(passage.reference);
 
             setBibleCopyright(
                 passage.copyright
@@ -402,14 +426,22 @@ export default function DailyDevotional() {
                 error
             );
 
-            setBibleError(
+            if (sequence === passageRequestSequence.current) setBibleError(
                 'Unable to load scripture. Please check your connection and try again.'
             );
         } finally {
-            setIsLoadingBible(
+            if (sequence === passageRequestSequence.current) setIsLoadingBible(
                 false
             );
         }
+    };
+
+    const openBiblePassage = (id: string, label: string) => {
+        if (!id) return;
+        setSelectedPassage({ id, label });
+        setActiveTab('bible');
+        setIsModalOpen(true);
+        void fetchBibleText(activeTranslation, id);
     };
 
     // =========================================================
@@ -563,25 +595,10 @@ export default function DailyDevotional() {
 
                             {/* Clickable Scripture */}
 
-                            <div
+                            <button
+                                type="button"
                                 className="highlight-scripture clickable"
-                                onClick={() => {
-                                    setIsModalOpen(
-                                        true
-                                    );
-
-                                    setActiveTab(
-                                        'bible'
-                                    );
-
-                                    if (
-                                        !bibleText
-                                    ) {
-                                        void fetchBibleText(
-                                            'KJV'
-                                        );
-                                    }
-                                }}
+                                onClick={() => openBiblePassage(devotional.passageId, devotional.scriptureReference)}
                             >
                                 <span className="scripture-label">
                                     📜 Click to Read Scripture
@@ -593,8 +610,16 @@ export default function DailyDevotional() {
                                     }
                                 </p>
 
-                            </div>
+                            </button>
 
+                            {devotional.memoryVerseReference && devotional.memoryVersePassageId && (
+                                <button type="button" className="devotional-memory-highlight"
+                                    onClick={() => openBiblePassage(devotional.memoryVersePassageId!, devotional.memoryVerseReference!)}>
+                                    <span className="devotional-memory-eyebrow">📖 Memory Verse</span>
+                                    <span className="devotional-memory-reference">{devotional.memoryVerseReference}</span>
+                                    <span className="devotional-memory-action">Read verse <span aria-hidden="true">↗</span></span>
+                                </button>
+                            )}
                         </div>
 
 
@@ -714,9 +739,9 @@ export default function DailyDevotional() {
                             <button
                                 type="button"
                                 className={`tab-btn ${activeTab ===
-                                        'devotional'
-                                        ? 'active'
-                                        : ''
+                                    'devotional'
+                                    ? 'active'
+                                    : ''
                                     }`}
                                 onClick={() =>
                                     setActiveTab(
@@ -731,23 +756,11 @@ export default function DailyDevotional() {
                             <button
                                 type="button"
                                 className={`tab-btn ${activeTab ===
-                                        'bible'
-                                        ? 'active'
-                                        : ''
+                                    'bible'
+                                    ? 'active'
+                                    : ''
                                     }`}
-                                onClick={() => {
-                                    setActiveTab(
-                                        'bible'
-                                    );
-
-                                    if (
-                                        !bibleText
-                                    ) {
-                                        void fetchBibleText(
-                                            activeTranslation
-                                        );
-                                    }
-                                }}
+                                onClick={() => openBiblePassage(selectedPassage?.id ?? devotional.passageId, selectedPassage?.label ?? devotional.scriptureReference)}
                             >
                                 Bible Reading
                             </button>
@@ -784,19 +797,7 @@ export default function DailyDevotional() {
 
                                             <p
                                                 className="modal-scripture-ref"
-                                                onClick={() => {
-                                                    setActiveTab(
-                                                        'bible'
-                                                    );
-
-                                                    if (
-                                                        !bibleText
-                                                    ) {
-                                                        void fetchBibleText(
-                                                            activeTranslation
-                                                        );
-                                                    }
-                                                }}
+                                                onClick={() => openBiblePassage(devotional.passageId, devotional.scriptureReference)}
                                             >
                                                 {
                                                     devotional.scriptureReference
@@ -811,6 +812,45 @@ export default function DailyDevotional() {
 
                                         </div>
 
+
+                                        {devotional.memoryVerseReference && devotional.memoryVersePassageId && (
+                                            <div className="modal-section devotional-reading-section">
+                                                <h3>📖 Memory Verse</h3>
+                                                <button type="button" className="devotional-reading-link"
+                                                    onClick={() => openBiblePassage(devotional.memoryVersePassageId!, devotional.memoryVerseReference!)}>
+                                                    <span>{devotional.memoryVerseReference}</span><span className="devotional-reading-link-action">Read verse ↗</span>
+                                                </button>
+                                            </div>
+                                        )}
+                                        {!!devotional.bibleInOneYearPassageIds?.length && (
+                                            <div className="modal-section devotional-reading-section">
+                                                <h3>📚 Bible in One Year</h3>
+                                                {devotional.bibleInOneYearPassageIds.map((id, index) => (
+                                                    <button key={`${id}-${index}`} type="button" className="devotional-reading-link"
+                                                        onClick={() => openBiblePassage(id, id.replaceAll('.', ' '))}>
+                                                        <span>{id.replaceAll('.', ' ')}</span><span className="devotional-reading-link-action">Read chapter ↗</span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                        {(devotional.hymnTitle || devotional.hymnNumber) && (
+                                            <div className="modal-section devotional-detail-card devotional-hymn-card">
+                                                <h3>🎵 Hymn</h3>
+                                                <p>{devotional.hymnTitle}{devotional.hymnNumber ? ` (No. ${devotional.hymnNumber})` : ''}</p>
+                                                {devotional.hymnLyrics && <p style={{ whiteSpace: 'pre-line' }}>{devotional.hymnLyrics}</p>}
+                                            </div>
+                                        )}
+                                        {devotional.keyPoint && <div className="modal-section">
+                                            <h3>✨ Key Point</h3><p>{devotional.keyPoint}</p>
+                                        </div>}
+                                        {devotional.additionalReading && <div className="modal-section">
+                                            <h3>📚 Additional Reading</h3><p>{devotional.additionalReading}</p>
+                                        </div>}
+                                        {devotional.author && <div className="modal-section devotional-detail-card devotional-author-card">
+                                            <h3>✍️ Author</h3><p>{devotional.author}</p>
+                                        </div>}
+                                        {devotional.sourceUrl && /^https:\/\//i.test(devotional.sourceUrl) &&
+                                            <div className="modal-section devotional-source-section"><a href={devotional.sourceUrl} target="_blank" rel="noopener noreferrer">View original devotional <span aria-hidden="true">↗</span></a></div>}
 
                                         {/* =========================
                                         COMMENTARY
@@ -941,9 +981,9 @@ export default function DailyDevotional() {
                                                             translation.label
                                                         }
                                                         className={`trans-btn ${activeTranslation ===
-                                                                translation.label
-                                                                ? 'active'
-                                                                : ''
+                                                            translation.label
+                                                            ? 'active'
+                                                            : ''
                                                             } ${!translation.enabled
                                                                 ? 'disabled'
                                                                 : ''
@@ -987,9 +1027,7 @@ export default function DailyDevotional() {
                                             <div className="bible-header">
 
                                                 <h3>
-                                                    {
-                                                        devotional.scriptureReference
-                                                    }
+                                                    {loadedPassageReference || selectedPassage?.label || devotional.scriptureReference}
                                                 </h3>
 
                                                 <span className="trans-badge">

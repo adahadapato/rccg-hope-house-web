@@ -32,6 +32,18 @@ interface Devotional {
     commentaryPoints: string[];
     prayerPoints: string[];
     declaration: string;
+    memoryVerseReference?: string;
+    memoryVersePassageId?: string;
+    bibleInOneYearReference?: string;
+    bibleInOneYearPassageIds?: string[];
+    bibleInOneYearReferences?: string[];
+    hymnNumber?: string | null;
+    hymnTitle?: string | null;
+    hymnLyrics?: string | null;
+    additionalReading?: string;
+    keyPoint?: string;
+    author?: string;
+    sourceUrl?: string;
     isPublished: boolean;
     publishedAt: string | null;
 }
@@ -58,6 +70,18 @@ interface DevotionalFormState {
     commentaryPoints: string[];
     prayerPoints: string[];
     declaration: string;
+    memoryVerseReference?: string;
+    memoryVersePassageId?: string;
+    bibleInOneYearReference?: string;
+    bibleInOneYearPassageIds?: string[];
+    bibleInOneYearReferences?: string[];
+    hymnNumber?: string | null;
+    hymnTitle?: string | null;
+    hymnLyrics?: string | null;
+    additionalReading?: string;
+    keyPoint?: string;
+    author?: string;
+    sourceUrl?: string;
 }
 
 interface ConfirmationState {
@@ -119,6 +143,18 @@ function createEmptyForm():
             '',
         ],
         declaration: '',
+        memoryVerseReference: '',
+        memoryVersePassageId: '',
+        bibleInOneYearReference: '',
+        bibleInOneYearPassageIds: [],
+        bibleInOneYearReferences: [],
+        hymnNumber: '',
+        hymnTitle: '',
+        hymnLyrics: '',
+        additionalReading: '',
+        keyPoint: '',
+        author: '',
+        sourceUrl: '',
     };
 }
 
@@ -183,6 +219,88 @@ function getDateStatus(
     return 'past';
 }
 
+/** Selects a validated reference using the existing Bible catalogue. */
+function BibleReferencePicker({
+    books, value, onChange, label, allowChapter = false,
+}: {
+    books: BibleBookReference[];
+    value: string;
+    onChange: (reference: string) => void;
+    label: string;
+    allowChapter?: boolean;
+}) {
+    const parsed = useMemo(() => {
+        const match = value.match(/^(.+?)\s+(\d+)(?::(\d+)(?:[-–—](\d+))?)?$/);
+        const book = books.find(b => b.name.toLowerCase() === match?.[1]?.toLowerCase());
+        return {
+            bookCode: book?.code ?? '',
+            chapter: match ? Number(match[2]) : 1,
+            start: match?.[3] ? Number(match[3]) : 1,
+            end: match?.[4] ? Number(match[4]) : match?.[3] ? Number(match[3]) : 1,
+            chapterOnly: Boolean(match && !match[3]),
+        };
+    }, [value, books]);
+    const book = books.find(b => b.code === parsed.bookCode);
+    const chapter = Math.min(Math.max(parsed.chapter, 1), book?.chapterVerseCounts.length ?? 1);
+    const verseCount = book?.chapterVerseCounts[chapter - 1] ?? 1;
+    const build = (code: string, ch: number, start: number, end: number, chapterOnly: boolean) => {
+        const selected = books.find(b => b.code === code);
+        if (!selected) { onChange(''); return; }
+        const safeChapter = Math.min(Math.max(ch, 1), selected.chapterVerseCounts.length);
+        const maxVerse = selected.chapterVerseCounts[safeChapter - 1];
+        const first = Math.min(Math.max(start, 1), maxVerse);
+        const last = Math.min(Math.max(end, first), maxVerse);
+        onChange(chapterOnly ? `${selected.name} ${safeChapter}` :
+            `${selected.name} ${safeChapter}:${first}${last > first ? `-${last}` : ''}`);
+    };
+    return (
+        <div className="devotionals-field devotionals-field-wide">
+            <span>{label}</span>
+            <div className="devotionals-form-grid">
+                <label className="devotionals-field">
+                    <span>Bible Book</span>
+                    <select value={parsed.bookCode} onChange={e => build(e.target.value, 1, 1, 1, allowChapter)}>
+                        <option value="">Select Bible book</option>
+                        {books.map(b => <option key={b.code} value={b.code}>{b.name}</option>)}
+                    </select>
+                </label>
+                <label className="devotionals-field">
+                    <span>Chapter</span>
+                    <select disabled={!book} value={chapter} onChange={e => build(parsed.bookCode, Number(e.target.value), 1, 1, parsed.chapterOnly)}>
+                        {Array.from({ length: book?.chapterVerseCounts.length ?? 0 }, (_, i) => i + 1)
+                            .map(n => <option key={n} value={n}>{n}</option>)}
+                    </select>
+                </label>
+                {allowChapter && <label className="devotionals-field">
+                    <span>Reading Type</span>
+                    <select disabled={!book} value={parsed.chapterOnly ? 'chapter' : 'verses'}
+                        onChange={e => build(parsed.bookCode, chapter, 1, 1, e.target.value === 'chapter')}>
+                        <option value="chapter">Whole chapter</option>
+                        <option value="verses">Selected verses</option>
+                    </select>
+                </label>}
+                {!parsed.chapterOnly && <>
+                    <label className="devotionals-field"><span>Start Verse</span>
+                        <select disabled={!book} value={Math.min(parsed.start, verseCount)}
+                            onChange={e => build(parsed.bookCode, chapter, Number(e.target.value), Math.max(Number(e.target.value), parsed.end), false)}>
+                            {Array.from({ length: verseCount }, (_, i) => i + 1).map(n => <option key={n} value={n}>{n}</option>)}
+                        </select>
+                    </label>
+                    <label className="devotionals-field"><span>End Verse</span>
+                        <select disabled={!book} value={Math.max(Math.min(parsed.end, verseCount), parsed.start)}
+                            onChange={e => build(parsed.bookCode, chapter, parsed.start, Number(e.target.value), false)}>
+                            {Array.from({ length: verseCount }, (_, i) => i + 1).filter(n => n >= parsed.start)
+                                .map(n => <option key={n} value={n}>{n}</option>)}
+                        </select>
+                    </label>
+                </>}
+            </div>
+            <small>{value || 'Optional — select a Bible reference.'}</small>
+            {value && <button type="button" className="devotionals-secondary-button" onClick={() => onChange('')}>Clear</button>}
+        </div>
+    );
+}
+
 function Devotionals() {
     const [
         devotionals,
@@ -203,6 +321,11 @@ function Devotionals() {
     const [
         saving,
         setSaving,
+    ] = useState(false);
+
+    const [
+        synchronizingDevotionals,
+        setSynchronizingDevotionals,
     ] = useState(false);
 
     const [
@@ -269,6 +392,8 @@ function Devotionals() {
         startVerse: 1,
         endVerse: 1,
     });
+
+    const [annualSelection, setAnnualSelection] = useState('');
 
     const [
         confirmation,
@@ -438,7 +563,7 @@ function Devotionals() {
             []
         );
 
-   useEffect(() => {
+    useEffect(() => {
         const controller =
             new AbortController();
 
@@ -602,6 +727,58 @@ function Devotionals() {
         );
     }
 
+    /**
+     * Manually requests Open Heavens synchronization and reloads the list.
+     * The backend decides which devotional dates are missing and prevents duplicates.
+     */
+    async function synchronizeDevotionals() {
+        if (synchronizingDevotionals) {
+            return;
+        }
+
+        setSynchronizingDevotionals(true);
+        setActionError(null);
+        setSuccessMessage(null);
+
+        try {
+            const response = await apiFetch(
+                '/api/devotionals/admin/synchronize',
+                { method: 'POST' }
+            );
+
+            if (!response.ok) {
+                await actionFailure(
+                    response,
+                    'Unable to synchronize Open Heavens devotionals.'
+                );
+            }
+
+            const result = await response.json() as {
+                devotionalDate: string;
+                status: string;
+                message: string;
+            };
+
+            await refreshDevotionals();
+
+            if (result.status === 'Published' || result.status === 'Created') {
+                showSuccess(result.message || 'Devotional synchronization completed.');
+            } else if (result.status === 'AlreadyPublished' || result.status === 'AlreadyExists') {
+                showSuccess(result.message || 'The devotional already exists.');
+            } else {
+                setActionError(result.message || `Devotional synchronization returned: ${result.status}`);
+            }
+        } catch (error) {
+            setActionError(
+                error instanceof Error
+                    ? error.message
+                    : 'Unable to synchronize Open Heavens devotionals.'
+            );
+        } finally {
+            setSynchronizingDevotionals(false);
+        }
+    }
+
     function openNewDevotional() {
         setEditingDevotional(
             null
@@ -618,6 +795,7 @@ function Devotionals() {
             endVerse: 1,
         });
 
+        setAnnualSelection('');
         setFormOpen(true);
         setActionError(null);
     }
@@ -666,6 +844,19 @@ function Devotionals() {
                     ],
             declaration:
                 devotional.declaration,
+            memoryVerseReference: devotional.memoryVerseReference ?? '',
+            memoryVersePassageId: devotional.memoryVersePassageId ?? '',
+            bibleInOneYearReference: devotional.bibleInOneYearReference ?? '',
+            bibleInOneYearPassageIds: devotional.bibleInOneYearPassageIds ?? [],
+            bibleInOneYearReferences: (devotional.bibleInOneYearReference ?? '')
+                .split(',').map(r => r.trim()).filter(Boolean),
+            hymnNumber: devotional.hymnNumber ?? '',
+            hymnTitle: devotional.hymnTitle ?? '',
+            hymnLyrics: devotional.hymnLyrics ?? '',
+            additionalReading: devotional.additionalReading ?? '',
+            keyPoint: devotional.keyPoint ?? '',
+            author: devotional.author ?? '',
+            sourceUrl: devotional.sourceUrl ?? '',
         });
 
         const passageMatch =
@@ -1029,9 +1220,17 @@ function Devotionals() {
                 commentaryPoints,
                 prayerPoints,
                 declaration:
-                    form
-                        .declaration
-                        .trim(),
+                    form.declaration.trim(),
+                memoryVerseReference: form.memoryVerseReference ?? '',
+                bibleInOneYearReference: (form.bibleInOneYearReferences ?? []).join(', '),
+                bibleInOneYearReferences: form.bibleInOneYearReferences ?? [],
+                hymnNumber: form.hymnNumber || null,
+                hymnTitle: form.hymnTitle || null,
+                hymnLyrics: form.hymnLyrics || null,
+                additionalReading: form.additionalReading ?? '',
+                keyPoint: form.keyPoint ?? '',
+                author: form.author ?? '',
+                sourceUrl: form.sourceUrl ?? '',
             };
 
             if (
@@ -1284,19 +1483,43 @@ function Devotionals() {
                     {!loadError &&
                         !loading && (
 
-                            <button
-                                type="button"
-                                className="admin-primary-button"
-                                onClick={
-                                    openNewDevotional
-                                }
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    gap: '0.75rem',
+                                    flexWrap: 'wrap',
+                                    justifyContent: 'flex-end',
+                                }}
                             >
-                                <span>
-                                    ＋
-                                </span>
+                                <button
+                                    type="button"
+                                    className="services-secondary-button"
+                                    style={{
+                                        background: '#fff',
+                                        border: '1px solid #d8dce8',
+                                        borderRadius: '8px',
+                                        padding: '0.7rem 1.1rem',
+                                        fontWeight: 600,
+                                        cursor: synchronizingDevotionals ? 'wait' : 'pointer',
+                                    }}
+                                    onClick={() => void synchronizeDevotionals()}
+                                    disabled={synchronizingDevotionals}
+                                >
+                                    {synchronizingDevotionals
+                                        ? 'Getting Devotionals...'
+                                        : 'Get Devotionals'}
+                                </button>
 
-                                Add Devotional
-                            </button>
+                                <button
+                                    type="button"
+                                    className="admin-primary-button"
+                                    onClick={openNewDevotional}
+                                    disabled={synchronizingDevotionals}
+                                >
+                                    <span>＋</span>
+                                    Add Devotional
+                                </button>
+                            </div>
 
                         )}
 
@@ -2045,6 +2268,81 @@ function Devotionals() {
 
                                     </div>
 
+
+                                    <BibleReferencePicker
+                                        books={bibleBooks}
+                                        label="Memory Verse (optional)"
+                                        value={form.memoryVerseReference ?? ''}
+                                        onChange={reference => setForm(current => ({ ...current, memoryVerseReference: reference }))}
+                                    />
+
+                                    <div className="devotionals-field devotionals-field-wide">
+                                        <span>Bible in One Year (optional — add multiple readings)</span>
+                                        <BibleReferencePicker
+                                            books={bibleBooks}
+                                            label="Select reading"
+                                            allowChapter
+                                            value={annualSelection}
+                                            onChange={setAnnualSelection}
+                                        />
+                                        <button type="button" className="devotionals-add-point-button"
+                                            disabled={!annualSelection}
+                                            onClick={() => {
+                                                setForm(current => ({
+                                                    ...current,
+                                                    bibleInOneYearReferences: [...(current.bibleInOneYearReferences ?? []), annualSelection],
+                                                }));
+                                                setAnnualSelection('');
+                                            }}>＋ Add Reading</button>
+                                        {(form.bibleInOneYearReferences ?? []).map((reading, index) => (
+                                            <div key={`${reading}-${index}`} className="devotionals-point-row">
+                                                <span>{reading}</span>
+                                                <button type="button" className="devotionals-remove-point"
+                                                    aria-label={`Remove ${reading}`}
+                                                    onClick={() => setForm(current => ({
+                                                        ...current,
+                                                        bibleInOneYearReferences: (current.bibleInOneYearReferences ?? [])
+                                                            .filter((_, i) => i !== index),
+                                                    }))}>×</button>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <label className="devotionals-field">
+                                        <span>Hymn Title (optional)</span>
+                                        <input value={form.hymnTitle ?? ''} maxLength={300}
+                                            onChange={e => setForm(current => ({ ...current, hymnTitle: e.target.value }))} />
+                                    </label>
+                                    <label className="devotionals-field">
+                                        <span>Hymn Number (optional)</span>
+                                        <input value={form.hymnNumber ?? ''} maxLength={50}
+                                            onChange={e => setForm(current => ({ ...current, hymnNumber: e.target.value }))} />
+                                    </label>
+                                    <label className="devotionals-field devotionals-field-wide">
+                                        <span>Hymn Lyrics (optional)</span>
+                                        <textarea rows={3} value={form.hymnLyrics ?? ''}
+                                            onChange={e => setForm(current => ({ ...current, hymnLyrics: e.target.value }))} />
+                                    </label>
+                                    <label className="devotionals-field devotionals-field-wide">
+                                        <span>Key Point (optional)</span>
+                                        <textarea rows={3} maxLength={2000} value={form.keyPoint ?? ''}
+                                            onChange={e => setForm(current => ({ ...current, keyPoint: e.target.value }))} />
+                                    </label>
+                                    <label className="devotionals-field devotionals-field-wide">
+                                        <span>Additional Reading (optional)</span>
+                                        <textarea rows={3} value={form.additionalReading ?? ''}
+                                            onChange={e => setForm(current => ({ ...current, additionalReading: e.target.value }))} />
+                                    </label>
+                                    <label className="devotionals-field">
+                                        <span>Author (optional)</span>
+                                        <input maxLength={200} value={form.author ?? ''}
+                                            onChange={e => setForm(current => ({ ...current, author: e.target.value }))} />
+                                    </label>
+                                    <label className="devotionals-field">
+                                        <span>Source URL (optional)</span>
+                                        <input type="url" maxLength={2000} value={form.sourceUrl ?? ''}
+                                            onChange={e => setForm(current => ({ ...current, sourceUrl: e.target.value }))} />
+                                    </label>
 
                                     <label className="devotionals-field devotionals-field-wide">
 
