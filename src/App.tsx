@@ -23,6 +23,7 @@ import ContactMessages from './admin/pages/ContactMessages';
 import PrayerRequest from './admin/pages/PrayerRequest';
 import Members from './admin/pages/Members';
 import ChurchSettings from './admin/pages/ChurchSettings';
+import CookieConsent from './components/CookieConsent';
 
 import {
     clearAdminSession,
@@ -110,7 +111,12 @@ function App() {
     }
 
     if (!isAdminRoute) {
-        return <HomePage />;
+        return (
+            <>
+                <HomePage />
+                <CookieConsent />
+            </>
+        );
     }
 
     // ==================== Admin Authentication ====================
