@@ -30,7 +30,7 @@ export default function Beliefs() {
                         <div key={belief.id} className={`belief-card-modern ${activeBelief === belief.id ? 'active' : ''}`} onClick={() => setActiveBelief(activeBelief === belief.id ? null : belief.id)}>
                             <div className="belief-header">
                                 <span className="belief-icon">
-                                    {belief.image ? <img src={belief.image} alt={belief.title} loading="lazy" className="belief-icon-image" /> : belief.icon}
+                                    {belief.icon}
                                 </span>
                                 <h3 className="belief-title">{belief.title}</h3>
                                 <button className="belief-toggle" aria-label="Toggle details"><span className="toggle-icon">+</span></button>
