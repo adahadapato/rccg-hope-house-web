@@ -1,0 +1,11 @@
+
+# RCCG Hope House
+# https://rccghopehouse.org.uk
+
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /verify-email
+
+Sitemap: https://rccghopehouse.org.uk/sitemap.xml
