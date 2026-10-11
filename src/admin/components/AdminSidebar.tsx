@@ -2,8 +2,7 @@
     useState,
 } from 'react';
 
-interface AdminSidebarProps {
-    mobileOpen: boolean;
+interface AdminSidebarProps {mobileOpen: boolean;
     onMobileClose: () => void;
 }
 
@@ -110,6 +109,12 @@ const navItems: NavigationItem[] = [
                 path: '/admin/contacts',
             },
         ],
+    },
+
+    {
+        icon: '✧',
+        label: 'Smart SEO',
+        path: '/admin/seo',
     },
 
     {

@@ -1,7 +1,4 @@
-import {
-    useEffect,
-    useState,
-} from 'react';
+import { useEffect, useState } from 'react';
 
 import AdminDashboard from './admin/pages/AdminDashboard';
 import AnnualPrayers from './admin/pages/AnnualPrayers';
@@ -23,92 +20,43 @@ import ContactMessages from './admin/pages/ContactMessages';
 import PrayerRequest from './admin/pages/PrayerRequest';
 import Members from './admin/pages/Members';
 import ChurchSettings from './admin/pages/ChurchSettings';
+import SmartSeo from './admin/pages/SmartSeo';
 import CookieConsent from './components/CookieConsent';
 
-import {
-    clearAdminSession,
-    validateAdminSession,
-} from '@/api/api';
-//import AccountSettings from './admin/pages/AccountSettings';
+import { clearAdminSession, validateAdminSession } from '@/api/api';
 
-type AdminAuthState =
-    | 'checking'
-    | 'authorised'
-    | 'unauthorised';
+type AdminAuthState = 'checking' | 'authorised' | 'unauthorised';
 
 function App() {
-    const currentPath =
-        window.location.pathname.replace(
-            /\/+$/,
-            ''
-        ) || '/';
+    const currentPath = window.location.pathname.replace(/\/+$/, '') || '/';
+    const isVerifyEmailRoute = currentPath === '/verify-email';
+    const isAdminRoute = currentPath === '/admin' || currentPath.startsWith('/admin/');
 
-    const isVerifyEmailRoute =
-        currentPath ===
-        '/verify-email';
-
-    const isAdminRoute =
-        currentPath === '/admin' ||
-        currentPath.startsWith(
-            '/admin/'
-        );
-
-    const [
-        adminAuthState,
-        setAdminAuthState,
-    ] = useState<AdminAuthState>(
-        isAdminRoute
-            ? 'checking'
-            : 'unauthorised'
+    const [adminAuthState, setAdminAuthState] = useState<AdminAuthState>(
+        isAdminRoute ? 'checking' : 'unauthorised'
     );
 
     useEffect(() => {
-        if (!isAdminRoute) {
-            return;
-        }
-
+        if (!isAdminRoute) return;
         let cancelled = false;
 
-        const verifyAdministrator =
-            async () => {
-                const valid =
-                    await validateAdminSession();
-
-                if (cancelled) {
-                    return;
-                }
-
-                if (valid) {
-                    setAdminAuthState(
-                        'authorised'
-                    );
-
-                    return;
-                }
-
-                clearAdminSession();
-
-                setAdminAuthState(
-                    'unauthorised'
-                );
-
-                window.location.replace(
-                    '/'
-                );
-            };
+        const verifyAdministrator = async () => {
+            const valid = await validateAdminSession();
+            if (cancelled) return;
+            if (valid) {
+                setAdminAuthState('authorised');
+                return;
+            }
+            clearAdminSession();
+            setAdminAuthState('unauthorised');
+            window.location.replace('/');
+        };
 
         void verifyAdministrator();
-
-        return () => {
-            cancelled = true;
-        };
+        return () => { cancelled = true; };
     }, [isAdminRoute]);
 
-    // ==================== Public Routes ====================
-
-    if (isVerifyEmailRoute) {
-        return <VerifyEmail />;
-    }
+    if (isVerifyEmailRoute) return <VerifyEmail />;
 
     if (!isAdminRoute) {
         return (
@@ -119,121 +67,38 @@ function App() {
         );
     }
 
-    // ==================== Admin Authentication ====================
-
-    if (
-        adminAuthState !==
-        'authorised'
-    ) {
+    if (adminAuthState !== 'authorised') {
         return (
-            <div
-                style={{
-                    minHeight:
-                        '100vh',
-                    display: 'grid',
-                    placeItems:
-                        'center',
-                    padding: '2rem',
-                    textAlign:
-                        'center',
-                }}
-            >
+            <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: '2rem', textAlign: 'center' }}>
                 <div>
-                    <strong>
-                        Verifying
-                        administrator
-                        access...
-                    </strong>
-
-                    <p>
-                        Please wait.
-                    </p>
+                    <strong>Verifying administrator access...</strong>
+                    <p>Please wait.</p>
                 </div>
             </div>
         );
     }
 
-    // ==================== Admin Routes ====================
-
     switch (currentPath) {
-        case '/admin':
-            return (
-                <AdminDashboard />
-            );
-
-        case '/admin/services':
-            return <Services />;
-
-        case '/admin/gallery':
-            return (
-                <GalleryImage />
-            );
-
-        case '/admin/gallery/categories':
-            return (
-                <GalleryCategory />
-            );
-
-        case '/admin/prophecies':
-            return (
-                <Prophecies />
-            );
-
-        case '/admin/prophecies/categories':
-            return (
-                <ProphecyCategories />
-            );
-
-        case '/admin/sermons':
-            return <Sermons />;
-
-        case '/admin/themes':
-            return (
-                <ThemesOfTheYear />
-            );
-
-        case '/admin/annual-prayers':
-            return (
-                <AnnualPrayers />
-            );
-
-        case '/admin/users':
-            return <Users />;
-
-        case '/admin/roles':
-            return <Roles />;
-
-        case '/admin/events':
-            return <Events />;
-
-        case '/admin/members':
-            return <Members />;
-
-        case '/admin/accountsettings':
-            return <AccountSettings />;
-
-        case '/admin/devotionals':
-            return <Devotionals />;
-
-        case '/admin/contacts':
-            return (
-                <ContactMessages />
-            );
-
-        case '/admin/prayer-requests':
-            return (
-                <PrayerRequest />
-            );
-
-        case '/admin/churchsettings':
-            return (
-                <ChurchSettings />
-            );
-
-        default:
-            return (
-                <AdminDashboard />
-            );
+        case '/admin': return <AdminDashboard />;
+        case '/admin/services': return <Services />;
+        case '/admin/gallery': return <GalleryImage />;
+        case '/admin/gallery/categories': return <GalleryCategory />;
+        case '/admin/prophecies': return <Prophecies />;
+        case '/admin/prophecies/categories': return <ProphecyCategories />;
+        case '/admin/sermons': return <Sermons />;
+        case '/admin/themes': return <ThemesOfTheYear />;
+        case '/admin/annual-prayers': return <AnnualPrayers />;
+        case '/admin/users': return <Users />;
+        case '/admin/roles': return <Roles />;
+        case '/admin/events': return <Events />;
+        case '/admin/members': return <Members />;
+        case '/admin/accountsettings': return <AccountSettings />;
+        case '/admin/devotionals': return <Devotionals />;
+        case '/admin/contacts': return <ContactMessages />;
+        case '/admin/prayer-requests': return <PrayerRequest />;
+        case '/admin/churchsettings': return <ChurchSettings />;
+        case '/admin/seo': return <SmartSeo />;
+        default: return <AdminDashboard />;
     }
 }
 

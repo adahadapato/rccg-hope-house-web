@@ -2,6 +2,10 @@ const API_BASE_URL = (
     import.meta.env.VITE_API_BASE_URL ?? ''
 ).replace(/\/$/, '');
 
+export const WEBSITE_BASE_URL = (
+    import.meta.env.VITE_WEBSITE_BASE_URL ?? ''
+).trim().replace(/\/+$/, '');
+
 export interface AuthTokensResponse {
     accessToken: string;
     refreshToken: string;

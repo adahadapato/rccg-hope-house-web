@@ -12,7 +12,7 @@
     text-align: center;
     color: white;
     padding: 8rem 1.5rem 4rem;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .hero-overlay {
@@ -607,5 +607,87 @@
     .service-time,
     .zoom-detail {
         font-size: 0.95rem;
+    }
+}
+
+
+/* =========================================
+   WHATSAPP COMMUNITY POPOVER
+   ========================================= */
+.hero-whatsapp-wrapper {
+    position: relative;
+    display: inline-flex;
+}
+
+.hero-whatsapp-button {
+    background: #21884b;
+    color: #fff;
+    border: 0;
+    border-radius: 8px;
+    padding: 15px 22px;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+    .hero-whatsapp-button:hover,
+    .hero-whatsapp-button:focus-visible {
+        background: #166c39;
+    }
+
+.hero-whatsapp-popover {
+    position: absolute;
+    top: calc(100% + 9px);
+    right: 0;
+    width: min(310px, 90vw);
+    padding: 18px;
+    border-radius: 12px;
+    background: #fff;
+    color: #26332b;
+    text-align: left;
+    z-index: 30;
+    box-shadow: 0 12px 35px rgba(0,0,0,.24);
+}
+
+    .hero-whatsapp-popover p {
+        margin: 9px 0;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+.hero-whatsapp-approval {
+    color: #58645d;
+}
+
+.hero-whatsapp-request {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #21884b;
+    color: #fff;
+    border: 0;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+    text-decoration: none;
+    margin-top: 10px;
+}
+
+    .hero-whatsapp-request:hover,
+    .hero-whatsapp-request:focus-visible {
+        background: #166c39;
+        color: #fff;
+    }
+
+@media (max-width: 600px) {
+    .hero-whatsapp-wrapper {
+        width: 100%;
+    }
+
+    .hero-whatsapp-popover {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
     }
 }

@@ -1,4 +1,6 @@
-﻿import {
+﻿import { useEffect, useRef, useState } from 'react';
+import { useChurchInfo } from '../../hooks/useChurchInfo';
+import {
     useChurchServices,
     formatTimeRange,
 } from '../../hooks/useChurchServices';
@@ -34,6 +36,33 @@ export default function Hero() {
 
     const zoomPasscode =
         onlineService?.zoomPasscode ?? '';
+
+    // Reuse the same church contact data as Contact.tsx.
+    const { churchInfo } = useChurchInfo();
+    const whatsappGroups = (churchInfo?.contactMethods ?? [])
+        .filter(method => method.type === 'WhatsAppGroup')
+        .sort((left, right) => left.displayOrder - right.displayOrder);
+
+    const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false);
+    const whatsAppContainerRef = useRef<HTMLDivElement>(null);
+
+    /** Closes the popover when clicking outside or pressing Escape. */
+    useEffect(() => {
+        const onPointerDown = (event: PointerEvent) => {
+            if (!whatsAppContainerRef.current?.contains(event.target as Node)) {
+                setIsWhatsAppOpen(false);
+            }
+        };
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') setIsWhatsAppOpen(false);
+        };
+        document.addEventListener('pointerdown', onPointerDown);
+        document.addEventListener('keydown', onKeyDown);
+        return () => {
+            document.removeEventListener('pointerdown', onPointerDown);
+            document.removeEventListener('keydown', onKeyDown);
+        };
+    }, []);
 
     /**
      * Scrolls smoothly to a section on the public homepage.
@@ -161,6 +190,56 @@ export default function Hero() {
 
                         Watch Live Service
                     </button>
+
+                    {/* WhatsApp links are loaded from the church contact API. */}
+                    {whatsappGroups.length > 0 && (
+                        <div
+                            className="hero-whatsapp-wrapper"
+                            ref={whatsAppContainerRef}
+                            onMouseEnter={() => setIsWhatsAppOpen(true)}
+                            onMouseLeave={() => setIsWhatsAppOpen(false)}
+                        >
+                            <button
+                                type="button"
+                                className="hero-whatsapp-button btn-large"
+                                aria-expanded={isWhatsAppOpen}
+                                aria-controls="hero-whatsapp-popover"
+                                onClick={() => setIsWhatsAppOpen(open => !open)}
+                            >
+                                Join WhatsApp ▾
+                            </button>
+
+                            {isWhatsAppOpen && (
+                                <div
+                                    id="hero-whatsapp-popover"
+                                    className="hero-whatsapp-popover"
+                                    role="region"
+                                    aria-label="WhatsApp community information"
+                                >
+                                    <strong>Stay Connected With Us</strong>
+                                    <p>
+                                        Receive church updates, prayer reminders
+                                        and announcements.
+                                    </p>
+                                    <p className="hero-whatsapp-approval">
+                                        New members are welcomed and verified by
+                                        church administrators.
+                                    </p>
+                                    {whatsappGroups.map(whatsapp => (
+                                        <a
+                                            key={whatsapp.id}
+                                            className="hero-whatsapp-request"
+                                            href={whatsapp.value}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            {whatsapp.label ?? 'Join Our WhatsApp Group'}
+                                        </a>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
 
                 </div>
 
