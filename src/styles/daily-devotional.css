@@ -1159,3 +1159,42 @@
         font-size: 2rem;
     }
 }
+
+
+/* =========================================================
+   RESPONSIVE DEVOTIONAL THEME — DESKTOP, TABLET & MOBILE
+
+   Prevent a single word (e.g. BREAKTHROUGH) from splitting
+   across lines. Scale the heading against the actual width
+   of its panel rather than the browser viewport.
+   ========================================================= */
+
+.daily-devotional-section .highlight-theme {
+    min-width: 0;
+    container-type: inline-size;
+    container-name: devotional-theme;
+}
+
+    .daily-devotional-section .highlight-theme .theme-text {
+        max-width: 100%;
+        margin: 0;
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: clamp(1.125rem, 4vw, 2.25rem); /* fallback */
+        font-size: clamp(1.125rem, 7cqw, 2.25rem);
+        font-weight: 800;
+        line-height: 1.18;
+        letter-spacing: -0.035em;
+        text-wrap: balance;
+        white-space: normal;
+        overflow-wrap: normal;
+        word-break: normal;
+        hyphens: none;
+        color: #ffdf8a;
+    }
+
+@media (max-width: 600px) {
+    .daily-devotional-section .highlight-theme .theme-text {
+        font-size: clamp(1.125rem, 7cqw, 2rem);
+        line-height: 1.2;
+    }
+}
