@@ -12,6 +12,22 @@ html {
     scroll-behavior: smooth;
 }
 
+/* Safety net: never let one over-wide element (a long word, a wide form
+   field, a decorative shape) make the page wider than a phone screen.
+   Otherwise the browser lays out the whole page wider, and anything pinned
+   to the right edge (the menu button, the news banner) is pushed off-screen.
+   "clip" (unlike "hidden") does not create a scroll container, so sticky
+   elements and normal page scrolling keep working. */
+#root {
+    overflow-x: hidden;
+}
+
+@supports (overflow-x: clip) {
+    #root {
+        overflow-x: clip;
+    }
+}
+
 body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     color: #1f2937;
