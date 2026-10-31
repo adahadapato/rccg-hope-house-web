@@ -975,8 +975,11 @@ function AdminDashboard() {
                         <button
                             type="button"
                             className="quick-action purple"
-                            disabled
-                            title="News & Updates is coming soon"
+                            onClick={() =>
+                                navigate(
+                                    '/admin/news'
+                                )
+                            }
                         >
                             <span className="quick-action-icon">
                                 ▤
@@ -988,7 +991,7 @@ function AdminDashboard() {
                                 </strong>
 
                                 <small>
-                                    Coming soon
+                                    Post an announcement or poster
                                 </small>
                             </span>
 

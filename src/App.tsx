@@ -8,6 +8,7 @@ import Prophecies from './admin/pages/Prophecies';
 import ProphecyCategories from './admin/pages/ProphecyCategories';
 import Sermons from './admin/pages/Sermons';
 import Events from './admin/pages/AdminEvents';
+import AdminNews from './admin/pages/AdminNews';
 import Services from './admin/pages/Services';
 import ThemesOfTheYear from './admin/pages/ThemesOfTheYear';
 import Users from './admin/pages/Users';
@@ -21,7 +22,9 @@ import PrayerRequest from './admin/pages/PrayerRequest';
 import Members from './admin/pages/Members';
 import ChurchSettings from './admin/pages/ChurchSettings';
 import SmartSeo from './admin/pages/SmartSeo';
+import Celebrations from './admin/pages/Celebrations';
 import CookieConsent from './components/CookieConsent';
+import CelebrationInvitationResponse from './pages/CelebrationInvitationResponse';
 
 import { clearAdminSession, validateAdminSession } from '@/api/api';
 
@@ -58,6 +61,10 @@ function App() {
 
     if (isVerifyEmailRoute) return <VerifyEmail />;
 
+    if (currentPath === '/celebrations/respond') {
+        return <CelebrationInvitationResponse />;
+    }
+
     if (!isAdminRoute) {
         return (
             <>
@@ -91,7 +98,9 @@ function App() {
         case '/admin/users': return <Users />;
         case '/admin/roles': return <Roles />;
         case '/admin/events': return <Events />;
+        case '/admin/news': return <AdminNews />;
         case '/admin/members': return <Members />;
+        case '/admin/celebrations': return <Celebrations />;
         case '/admin/accountsettings': return <AccountSettings />;
         case '/admin/devotionals': return <Devotionals />;
         case '/admin/contacts': return <ContactMessages />;

@@ -1,0 +1,475 @@
+﻿/* RCCG Hope House — celebrations administration */
+.celebrations-admin {
+    --cel-green: #17643b;
+    --cel-dark: #104b2c;
+    --cel-border: #dce6df;
+    --cel-muted: #56675e;
+    color: #20382b;
+    min-width: 0
+}
+
+    .celebrations-admin * {
+        box-sizing: border-box
+    }
+
+.celebrations-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 24px
+}
+
+.celebrations-eyebrow {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--cel-green)
+}
+
+.celebrations-header h1 {
+    font-size: clamp(26px,3vw,36px);
+    line-height: 1.2;
+    margin: 5px 0 8px;
+    color: var(--cel-dark)
+}
+
+.celebrations-header p, .celebrations-panel-heading p {
+    margin: 0;
+    color: var(--cel-muted);
+    font-size: 15px
+}
+
+.celebrations-panel {
+    background: #fff;
+    border: 1px solid var(--cel-border);
+    border-radius: 16px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(18,67,40,.035)
+}
+
+.celebrations-filters {
+    padding: 20px
+}
+
+.celebrations-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-bottom: 20px
+}
+
+    .celebrations-tabs button {
+        background: #f2f7f3;
+        color: #284735;
+        border: 1px solid #d5e4d9;
+        border-radius: 9px;
+        padding: 10px 13px;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 650;
+        cursor: pointer
+    }
+
+        .celebrations-tabs button.active {
+            background: var(--cel-green);
+            color: #fff;
+            border-color: var(--cel-green)
+        }
+
+        .celebrations-tabs button:hover:not(.active) {
+            background: #e5f0e9
+        }
+
+.celebrations-filter-fields {
+    display: grid;
+    grid-template-columns: repeat(3,minmax(0,1fr));
+    gap: 14px
+}
+
+    .celebrations-filter-fields label, .celebrations-field {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        color: #304c3a;
+        font-size: 14px;
+        font-weight: 700
+    }
+
+        .celebrations-filter-fields input, .celebrations-field input, .celebrations-field select {
+            width: 100%;
+            min-width: 0;
+            border: 1px solid #bfcec3;
+            border-radius: 9px;
+            padding: 11px 12px;
+            font: inherit;
+            font-size: 15px;
+            background: #fff;
+            color: #20382b;
+            min-height: 46px
+        }
+
+.celebrations-filter-note {
+    font-size: 13px;
+    color: var(--cel-muted);
+    margin: 14px 0 0;
+    line-height: 1.6
+}
+
+.celebrations-panel-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 22px;
+    border-bottom: 1px solid var(--cel-border)
+}
+
+    .celebrations-panel-heading h2 {
+        font-size: 20px;
+        color: var(--cel-dark);
+        margin: 0 0 4px
+    }
+
+.celebrations-secondary-button {
+    background: #fff;
+    color: var(--cel-dark);
+    border: 1px solid #9db8a5;
+    border-radius: 9px;
+    padding: 10px 16px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer
+}
+
+    .celebrations-secondary-button:hover {
+        background: #eff6f1
+    }
+
+.celebrations-empty {
+    min-height: 160px;
+    padding: 38px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 10px
+}
+
+    .celebrations-empty strong {
+        font-size: 18px;
+        color: var(--cel-dark)
+    }
+
+    .celebrations-empty p {
+        color: var(--cel-muted);
+        margin: 0
+    }
+
+.celebrations-table-wrap {
+    width: 100%;
+    overflow-x: auto
+}
+
+.celebrations-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 990px;
+    font-size: 14px;
+    text-align: left
+}
+
+    .celebrations-table th {
+        padding: 14px 17px;
+        background: #f4f8f5;
+        color: #385242;
+        font-size: 12px;
+        letter-spacing: .035em;
+        text-transform: uppercase;
+        white-space: nowrap
+    }
+
+    .celebrations-table td {
+        padding: 17px;
+        border-top: 1px solid #edf1ee;
+        vertical-align: top
+    }
+
+        .celebrations-table td strong {
+            display: block;
+            color: #263e2e
+        }
+
+    .celebrations-table tbody tr:hover {
+        background: #fbfdfb
+    }
+
+.celebrations-subtext {
+    display: block;
+    font-size: 12px;
+    color: var(--cel-muted);
+    margin-top: 5px;
+    line-height: 1.5
+}
+
+.celebrations-status {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 20px;
+    background: #edf1f5;
+    color: #344c61;
+    font-size: 12px;
+    font-weight: 750;
+    white-space: nowrap
+}
+
+.celebrations-status-pending, .celebrations-status-awaitingmemberresponse {
+    background: #eef3fa;
+    color: #254e76
+}
+
+.celebrations-status-approvedbymember, .celebrations-status-readytopublish, .celebrations-status-published {
+    background: #e4f3e8;
+    color: #15532d
+}
+
+.celebrations-status-declined, .celebrations-status-withdrawn {
+    background: #faeded;
+    color: #852b2b
+}
+
+.celebrations-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    min-width: 170px
+}
+
+    .celebrations-actions button {
+        padding: 8px 10px;
+        border: 1px solid #bdd0c2;
+        border-radius: 8px;
+        background: #f7faf8;
+        color: #164f2d;
+        font: inherit;
+        font-size: 12px;
+        font-weight: 750;
+        cursor: pointer
+    }
+
+        .celebrations-actions button:hover:not(:disabled) {
+            background: #e7f2ea
+        }
+
+    .celebrations-actions .celebrations-action-primary {
+        background: var(--cel-green);
+        border-color: var(--cel-green);
+        color: #fff
+    }
+
+    .celebrations-actions .celebrations-action-danger {
+        border-color: #e9c4c4;
+        color: #9b3030;
+        background: #fff8f8
+    }
+
+    .celebrations-actions button:disabled, .celebrations-secondary-button:disabled {
+        opacity: .55;
+        cursor: not-allowed
+    }
+
+.celebrations-alert {
+    padding: 13px 16px;
+    margin: 0 0 17px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 14px;
+    line-height: 1.6
+}
+
+    .celebrations-alert button {
+        background: transparent;
+        border: 0;
+        color: inherit;
+        font-size: 19px;
+        cursor: pointer
+    }
+
+.celebrations-alert-error {
+    background: #fff2f2;
+    border: 1px solid #edc4c4;
+    color: #8c2424
+}
+
+.celebrations-alert-success {
+    background: #e9f6ed;
+    border: 1px solid #b7ddc1;
+    color: #15532d
+}
+
+.celebrations-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(13,30,21,.6);
+    padding: 20px;
+    overflow-y: auto
+}
+
+.celebrations-modal {
+    width: min(100%,650px);
+    max-height: min(92vh,900px);
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 17px;
+    box-shadow: 0 25px 75px rgba(0,0,0,.23);
+    padding: 0 25px 25px
+}
+
+.celebrations-modal-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 24px 0 18px;
+    border-bottom: 1px solid var(--cel-border);
+    margin-bottom: 23px
+}
+
+    .celebrations-modal-header span {
+        font-size: 12px;
+        color: var(--cel-green);
+        font-weight: 750;
+        letter-spacing: .05em;
+        text-transform: uppercase
+    }
+
+    .celebrations-modal-header h2 {
+        font-size: 23px;
+        color: var(--cel-dark);
+        margin: 4px 0 0
+    }
+
+    .celebrations-modal-header > button {
+        font-size: 28px;
+        border: 0;
+        background: transparent;
+        color: #52675a;
+        cursor: pointer
+    }
+
+.celebrations-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 20px 16px
+}
+
+.celebrations-form-note {
+    margin: 18px 0 0;
+    background: #f0f6f2;
+    border-left: 3px solid var(--cel-green);
+    border-radius: 0 8px 8px 0;
+    padding: 12px 14px;
+    font-size: 14px;
+    line-height: 1.65;
+    color: #345341
+}
+
+.celebrations-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 24px
+}
+
+.celebrations-admin button:focus-visible, .celebrations-admin input:focus-visible, .celebrations-admin select:focus-visible {
+    outline: 3px solid #426b98;
+    outline-offset: 2px
+}
+
+@media(max-width:850px) {
+    .celebrations-filter-fields {
+        grid-template-columns: repeat(2,minmax(0,1fr))
+    }
+
+    .celebrations-search {
+        grid-column: 1/-1
+    }
+}
+
+@media(max-width:540px) {
+    .celebrations-header {
+        align-items: flex-start
+    }
+
+        .celebrations-header .admin-primary-button {
+            width: 100%
+        }
+
+    .celebrations-filters {
+        padding: 15px
+    }
+
+    .celebrations-tabs {
+        gap: 7px
+    }
+
+        .celebrations-tabs button {
+            font-size: 13px;
+            padding: 9px 10px
+        }
+
+    .celebrations-filter-fields, .celebrations-form-grid {
+        grid-template-columns: 1fr
+    }
+
+    .celebrations-search {
+        grid-column: auto
+    }
+
+    .celebrations-panel-heading {
+        padding: 16px;
+        flex-wrap: wrap
+    }
+
+    .celebrations-modal-backdrop {
+        padding: 10px;
+        align-items: flex-start
+    }
+
+    .celebrations-modal {
+        max-height: 95vh;
+        padding: 0 17px 20px
+    }
+
+    .celebrations-modal-header h2 {
+        font-size: 21px
+    }
+
+    .celebrations-modal-actions button {
+        flex: 1
+    }
+}
+
+@media(prefers-reduced-motion:reduce) {
+    .celebrations-admin * {
+        scroll-behavior: auto
+    }
+}

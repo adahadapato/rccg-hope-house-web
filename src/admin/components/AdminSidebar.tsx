@@ -54,6 +54,7 @@ const navItems: NavigationItem[] = [
             },
             {
                 label: 'News & Updates',
+                path: '/admin/news',
             },
         ],
     },
@@ -132,6 +133,10 @@ const navItems: NavigationItem[] = [
             {
                 label: 'Members',
                 path: '/admin/members',
+            },
+            {
+                label: 'Celebrations',
+                path: '/admin/celebrations',
             },
             {
                 label: 'Church Settings',

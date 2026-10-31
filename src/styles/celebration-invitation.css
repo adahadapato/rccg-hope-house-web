@@ -1,0 +1,595 @@
+﻿
+/* ==========================================================
+   RCCG HOPE HOUSE
+   CELEBRATION INVITATION RESPONSE PAGE
+   ========================================================== */
+
+.celebration-invitation-page {
+    --ci-primary: #17643b;
+    --ci-primary-dark: #104b2c;
+    --ci-primary-light: #eaf4ed;
+    --ci-accent: #284e77;
+    --ci-text: #23382e;
+    --ci-muted: #53645a;
+    --ci-border: #d8e5dc;
+    --ci-background: #f2f7f3;
+    --ci-white: #ffffff;
+    min-height: 100vh;
+    min-height: 100dvh;
+    width: 100%;
+    color: var(--ci-text);
+    background: var(--ci-background);
+    font-family: inherit;
+    line-height: 1.6;
+}
+
+    .celebration-invitation-page *,
+    .celebration-invitation-page *::before,
+    .celebration-invitation-page *::after {
+        box-sizing: border-box;
+    }
+
+/* ==========================================================
+   BACKGROUND AND LAYOUT
+   ========================================================== */
+
+.celebration-invitation-background {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 20px;
+    background: radial-gradient( circle at 8% 10%, rgba(23, 100, 59, 0.10), transparent 34% ), radial-gradient( circle at 90% 85%, rgba(40, 78, 119, 0.08), transparent 34% ), linear-gradient( 145deg, #f8fbf9 0%, #edf5ef 100% );
+}
+
+.celebration-invitation-shell {
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+/* ==========================================================
+   CHURCH BRAND
+   ========================================================== */
+
+.celebration-invitation-brand {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 13px;
+    margin-bottom: 30px;
+}
+
+.celebration-invitation-brand-icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: var(--ci-primary);
+    color: var(--ci-white);
+}
+
+    .celebration-invitation-brand-icon svg {
+        width: 28px;
+        height: 28px;
+    }
+
+.celebration-invitation-brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+    color: var(--ci-primary-dark);
+}
+
+    .celebration-invitation-brand-text span {
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+    }
+
+    .celebration-invitation-brand-text strong {
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: 0.025em;
+    }
+
+/* ==========================================================
+   MAIN CARD
+   ========================================================== */
+
+.celebration-invitation-card {
+    position: relative;
+    overflow: hidden;
+    background: var(--ci-white);
+    border: 1px solid var(--ci-border);
+    border-radius: 24px;
+    box-shadow: 0 22px 65px rgba(16, 75, 44, 0.09), 0 4px 14px rgba(0, 0, 0, 0.025);
+}
+
+.celebration-invitation-card-accent {
+    height: 7px;
+    width: 100%;
+    background: linear-gradient( 90deg, var(--ci-primary-dark), var(--ci-primary), var(--ci-accent) );
+}
+
+.celebration-invitation-content {
+    padding: 46px 54px 42px;
+    text-align: center;
+}
+
+.celebration-invitation-eyebrow {
+    display: inline-block;
+    margin-bottom: 18px;
+    padding: 7px 15px;
+    background: var(--ci-primary-light);
+    border-radius: 50px;
+    color: var(--ci-primary-dark);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.13em;
+}
+
+.celebration-invitation-emblem {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 78px;
+    height: 78px;
+    margin: 0 auto 22px;
+    border-radius: 50%;
+    background: var(--ci-primary-light);
+    color: var(--ci-primary);
+}
+
+    .celebration-invitation-emblem svg {
+        width: 38px;
+        height: 38px;
+    }
+
+.celebration-invitation-content h1 {
+    margin: 0 0 18px;
+    color: var(--ci-primary-dark);
+    font-size: clamp(28px, 4.5vw, 38px);
+    font-weight: 800;
+    line-height: 1.2;
+    overflow-wrap: break-word;
+}
+
+.celebration-invitation-intro {
+    max-width: 530px;
+    margin: 0 auto 30px;
+    color: var(--ci-muted);
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+/* ==========================================================
+   OCCASION DETAILS
+   ========================================================== */
+
+.celebration-invitation-details {
+    padding: 28px 22px;
+    margin-bottom: 30px;
+    background: linear-gradient( 145deg, #f0f8f2, #e7f2eb );
+    border: 1px solid #d3e6d9;
+    border-radius: 17px;
+}
+
+.celebration-invitation-detail-label {
+    display: block;
+    margin-bottom: 12px;
+    color: var(--ci-primary-dark);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+}
+
+.celebration-invitation-details h2 {
+    margin: 0 0 14px;
+    color: var(--ci-primary-dark);
+    font-size: clamp(23px, 4vw, 30px);
+    font-weight: 800;
+    line-height: 1.3;
+}
+
+.celebration-invitation-date {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 9px;
+    color: var(--ci-text);
+    font-size: 18px;
+    font-weight: 600;
+}
+
+    .celebration-invitation-date svg {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+        color: var(--ci-primary);
+    }
+
+/* ==========================================================
+   CONSENT TEXT
+   ========================================================== */
+
+.celebration-invitation-consent {
+    text-align: left;
+    margin-bottom: 28px;
+}
+
+    .celebration-invitation-consent h3 {
+        margin: 0 0 14px;
+        color: var(--ci-primary-dark);
+        font-size: 22px;
+        font-weight: 800;
+        line-height: 1.35;
+    }
+
+    .celebration-invitation-consent p {
+        margin: 0 0 14px;
+        color: var(--ci-muted);
+        font-size: 16px;
+        line-height: 1.8;
+    }
+
+    .celebration-invitation-consent .celebration-invitation-privacy-note {
+        margin-top: 18px;
+        padding: 15px 17px;
+        background: #f3f6fa;
+        border-left: 4px solid var(--ci-accent);
+        border-radius: 0 9px 9px 0;
+        color: #344e65;
+        font-size: 15px;
+    }
+
+/* ==========================================================
+   BUTTONS
+   ========================================================== */
+
+.celebration-invitation-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 28px;
+}
+
+.celebration-invitation-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 54px;
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 11px;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.4;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.celebration-invitation-button-approve {
+    border: 2px solid var(--ci-primary);
+    background: var(--ci-primary);
+    color: var(--ci-white);
+}
+
+    .celebration-invitation-button-approve:hover:not(:disabled) {
+        background: var(--ci-primary-dark);
+        border-color: var(--ci-primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 7px 16px rgba(23, 100, 59, 0.16);
+    }
+
+.celebration-invitation-button-decline {
+    border: 2px solid var(--ci-primary);
+    background: var(--ci-white);
+    color: var(--ci-primary-dark);
+}
+
+    .celebration-invitation-button-decline:hover:not(:disabled) {
+        background: var(--ci-primary-light);
+        transform: translateY(-2px);
+    }
+
+.celebration-invitation-button:focus-visible,
+.celebration-invitation-home-link:focus-visible {
+    outline: 3px solid var(--ci-accent);
+    outline-offset: 4px;
+}
+
+.celebration-invitation-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ==========================================================
+   LOADING
+   ========================================================== */
+
+.celebration-invitation-status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    padding: 30px 0;
+    color: var(--ci-muted);
+}
+
+.celebration-invitation-spinner {
+    display: block;
+    width: 42px;
+    height: 42px;
+    border: 4px solid var(--ci-border);
+    border-top-color: var(--ci-primary);
+    border-radius: 50%;
+    animation: celebration-invitation-spin 0.8s linear infinite;
+}
+
+@keyframes celebration-invitation-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.celebration-invitation-submitting {
+    margin: 18px 0 0;
+    color: var(--ci-primary-dark);
+    font-size: 15px;
+    font-weight: 600;
+}
+
+/* ==========================================================
+   ALERTS
+   ========================================================== */
+
+.celebration-invitation-alert {
+    padding: 14px 16px;
+    margin: 18px 0;
+    border: 1px solid #e7b5b5;
+    border-radius: 10px;
+    background: #fff3f3;
+    color: #922727;
+    font-size: 15px;
+    text-align: left;
+}
+
+.celebration-invitation-error-state {
+    padding: 20px 0;
+}
+
+.celebration-invitation-error-icon {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 22px;
+    border-radius: 50%;
+    background: #fff0f0;
+    color: #a12d2d;
+    font-size: 32px;
+    font-weight: 800;
+}
+
+.celebration-invitation-error-state h2 {
+    margin: 0 0 14px;
+    color: var(--ci-primary-dark);
+    font-size: 25px;
+}
+
+.celebration-invitation-error-state p {
+    color: var(--ci-muted);
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+/* ==========================================================
+   SUCCESS
+   ========================================================== */
+
+.celebration-invitation-success {
+    padding: 22px 0;
+}
+
+.celebration-invitation-success-icon {
+    display: grid;
+    place-items: center;
+    width: 78px;
+    height: 78px;
+    margin: 0 auto 24px;
+    border-radius: 50%;
+    background: #e5f4e9;
+    color: var(--ci-primary);
+}
+
+    .celebration-invitation-success-icon svg {
+        width: 42px;
+        height: 42px;
+    }
+
+.celebration-invitation-success h2 {
+    margin: 0 0 15px;
+    color: var(--ci-primary-dark);
+    font-size: 25px;
+    line-height: 1.35;
+}
+
+.celebration-invitation-success p {
+    max-width: 480px;
+    margin: 0 auto;
+    color: var(--ci-muted);
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+/* ==========================================================
+   RETURN LINK AND FOOTER
+   ========================================================== */
+
+.celebration-invitation-home-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 30px;
+    padding: 10px 15px;
+    color: var(--ci-primary);
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: 8px;
+}
+
+    .celebration-invitation-home-link:hover {
+        color: var(--ci-primary-dark);
+        background: var(--ci-primary-light);
+    }
+
+.celebration-invitation-footer {
+    padding: 24px 10px 0;
+    text-align: center;
+    color: var(--ci-muted);
+}
+
+    .celebration-invitation-footer p {
+        margin: 4px 0;
+        font-size: 14px;
+    }
+
+/* ==========================================================
+   TABLET
+   ========================================================== */
+
+@media (max-width: 768px) {
+    .celebration-invitation-background {
+        padding: 32px 18px;
+    }
+
+    .celebration-invitation-content {
+        padding: 36px 32px;
+    }
+
+    .celebration-invitation-card {
+        border-radius: 20px;
+    }
+}
+
+/* ==========================================================
+   MOBILE
+   ========================================================== */
+
+@media (max-width: 480px) {
+    .celebration-invitation-background {
+        align-items: flex-start;
+        padding: 22px 12px;
+    }
+
+    .celebration-invitation-brand {
+        margin-bottom: 22px;
+    }
+
+    .celebration-invitation-brand-icon {
+        width: 42px;
+        height: 42px;
+    }
+
+    .celebration-invitation-brand-text strong {
+        font-size: 19px;
+    }
+
+    .celebration-invitation-card {
+        border-radius: 16px;
+    }
+
+    .celebration-invitation-content {
+        padding: 30px 20px;
+    }
+
+    .celebration-invitation-eyebrow {
+        font-size: 11px;
+        letter-spacing: 0.09em;
+    }
+
+    .celebration-invitation-emblem {
+        width: 66px;
+        height: 66px;
+    }
+
+        .celebration-invitation-emblem svg {
+            width: 32px;
+            height: 32px;
+        }
+
+    .celebration-invitation-content h1 {
+        font-size: 28px;
+    }
+
+    .celebration-invitation-intro {
+        font-size: 15px;
+    }
+
+    .celebration-invitation-details {
+        padding: 23px 15px;
+    }
+
+        .celebration-invitation-details h2 {
+            font-size: 24px;
+        }
+
+    .celebration-invitation-date {
+        font-size: 16px;
+    }
+
+    .celebration-invitation-consent h3 {
+        font-size: 20px;
+    }
+
+    .celebration-invitation-consent p {
+        font-size: 15px;
+    }
+
+    .celebration-invitation-actions {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .celebration-invitation-button {
+        min-height: 54px;
+        font-size: 16px;
+    }
+
+    .celebration-invitation-success h2,
+    .celebration-invitation-error-state h2 {
+        font-size: 22px;
+    }
+
+    .celebration-invitation-footer p {
+        font-size: 13px;
+    }
+}
+
+/* ==========================================================
+   REDUCED MOTION
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .celebration-invitation-spinner {
+        animation-duration: 2s;
+    }
+
+    .celebration-invitation-button {
+        transition: none;
+    }
+
+        .celebration-invitation-button:hover {
+            transform: none;
+        }
+}
