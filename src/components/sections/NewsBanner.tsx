@@ -205,6 +205,30 @@ function prefersReducedMotion() {
 }
 
 /* ==========================================================
+   Icons
+   Drawn as SVG so they look the same on every phone
+   (emoji calendars show a fixed date such as "JUL 17").
+   ========================================================== */
+
+function CalendarIcon() {
+    return (
+        <svg className="news-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3.5" y="5" width="17" height="15.5" rx="2.5" fill="none" stroke="currentColor" strokeWidth="2" />
+            <path d="M3.5 10h17M8 3v4M16 3v4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        </svg>
+    );
+}
+
+function PinIcon() {
+    return (
+        <svg className="news-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+            <circle cx="12" cy="10" r="2.3" fill="currentColor" />
+        </svg>
+    );
+}
+
+/* ==========================================================
    Detail modal
    ========================================================== */
 
@@ -287,7 +311,7 @@ function AnnouncementModal({ item, onClose }: AnnouncementModalProps) {
                         <div className="news-event-card">
                             {when && (
                                 <div className="news-event-row">
-                                    <span aria-hidden="true">📅</span>
+                                    <CalendarIcon />
                                     <div>
                                         <strong>{when.date}</strong>
                                         {when.time && <span>{when.time}</span>}
@@ -297,7 +321,7 @@ function AnnouncementModal({ item, onClose }: AnnouncementModalProps) {
 
                             {venueLabel && (
                                 <div className="news-event-row">
-                                    <span aria-hidden="true">📍</span>
+                                    <PinIcon />
                                     <div>
                                         <strong>{item.venueName ?? venueLabel}</strong>
                                         {item.venueAddress && (
@@ -534,7 +558,7 @@ export default function NewsBanner() {
                                 <ul className="news-banner-meta">
                                     {currentWhen && (
                                         <li>
-                                            <span aria-hidden="true">📅</span>
+                                            <CalendarIcon />
                                             <span>
                                                 {currentWhen.date}
                                                 {currentWhen.time && ` · ${currentWhen.time}`}
@@ -543,7 +567,7 @@ export default function NewsBanner() {
                                     )}
                                     {currentVenue && (
                                         <li>
-                                            <span aria-hidden="true">📍</span>
+                                            <PinIcon />
                                             {currentDirections ? (
                                                 <a
                                                     href={currentDirections}

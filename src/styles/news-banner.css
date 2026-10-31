@@ -183,6 +183,11 @@
     gap: 4px;
 }
 
+.news-banner-text h3,
+.news-banner-text p {
+    overflow-wrap: anywhere;
+}
+
 .news-banner-text h3 {
     margin: 2px 0 0;
     font-family: 'Playfair Display', Georgia, serif;
@@ -331,7 +336,7 @@
 
 .news-banner-meta li {
     display: flex;
-    align-items: baseline;
+    align-items: flex-start;
     gap: 6px;
     font-size: 13px;
     font-weight: 600;
@@ -339,9 +344,23 @@
     color: var(--news-navy-soft);
 }
 
-.news-banner-meta li > span:first-child {
+.news-icon {
+    width: 1.05em;
+    height: 1.05em;
     flex-shrink: 0;
-    font-size: 12px;
+    /* Sit on the first line of text, even when the text wraps. */
+    margin-top: 0.12em;
+    color: var(--news-gold);
+}
+
+.news-banner-meta li {
+    min-width: 0;
+}
+
+.news-banner-meta li > span,
+.news-banner-meta li > a {
+    min-width: 0;
+    overflow-wrap: anywhere;
 }
 
 .news-banner-meta a {
@@ -372,9 +391,11 @@
     align-items: flex-start;
 }
 
-.news-event-row > span {
-    font-size: 18px;
-    line-height: 1.4;
+.news-event-row > .news-icon {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    align-self: flex-start;
 }
 
 .news-event-row > div {
@@ -625,7 +646,9 @@
         left: 12px;
         bottom: 84px;
         width: auto;
-        max-width: none;
+        /* Never wider than the actual screen, even if another section
+           on the page is too wide and makes the page scroll sideways. */
+        max-width: calc(100vw - 24px);
     }
 
     .news-pill {
