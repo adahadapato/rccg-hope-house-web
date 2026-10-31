@@ -1108,3 +1108,9 @@ body.gallery-lightbox-open {
 .featured-gallery-card {
     scroll-snap-align: none;
 }
+
+/* Leave room for the fixed header when the menu's
+   "Gallery" link scrolls to the celebrants. */
+.explore-gallery-section {
+    scroll-margin-top: 110px;
+}

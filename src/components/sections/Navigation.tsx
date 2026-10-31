@@ -5,12 +5,19 @@
 
 import AdminLoginModal from './AdminLoginModal';
 import GiveOnlineModal from './GiveOnlineModal';
+import {
+    SHOW_CELEBRANTS_EVENT,
+    useCelebrantsOfMonth,
+    type ShowCelebrantsDetail,
+} from '@/hooks/useCelebrantsOfMonth';
 
 interface MenuItem {
     label: string;
     href: string;
     action?: 'give-online';
     dividerBefore?: boolean;
+    /** Show the "celebrants this month" badge on this link. */
+    highlight?: 'celebrants';
     children?: MenuItem[];
 }
 
@@ -30,6 +37,7 @@ const menuItems: MenuItem[] = [
             {
                 label: 'Gallery',
                 href: '#photo-gallery',
+                highlight: 'celebrants',
                 
             },
             {
@@ -139,6 +147,82 @@ export default function Navigation() {
         isGiveOnlineOpen,
         setIsGiveOnlineOpen,
     ] = useState(false);
+
+    /* =========================================
+       CELEBRANTS OF THE MONTH HIGHLIGHT
+       Turns on automatically when the gallery has
+       celebrant photos dated this month.
+       ========================================= */
+    const celebrants = useCelebrantsOfMonth();
+
+    const showCelebrants =
+        celebrants.count > 0 &&
+        Boolean(celebrants.categoryName);
+
+    const celebrantsLabel =
+        celebrants.count === 1
+            ? '1 celebrant this month'
+            : `${celebrants.count} celebrants this month`;
+
+    const hasHighlightedChild = (
+        item: MenuItem
+    ) =>
+        showCelebrants &&
+        Boolean(
+            item.children?.some(
+                child =>
+                    child.highlight ===
+                    'celebrants'
+            )
+        );
+
+    /*
+     * When celebrants are highlighted, "Gallery" opens
+     * the gallery on the celebrants category.
+     */
+    const openCelebrants = (
+        event: React.MouseEvent<HTMLAnchorElement>,
+        item: MenuItem
+    ) => {
+        if (
+            item.highlight !== 'celebrants' ||
+            !showCelebrants ||
+            !celebrants.categoryName
+        ) {
+            return;
+        }
+
+        event.preventDefault();
+
+        window.dispatchEvent(
+            new CustomEvent<ShowCelebrantsDetail>(
+                SHOW_CELEBRANTS_EVENT,
+                {
+                    detail: {
+                        categoryName:
+                            celebrants.categoryName,
+                    },
+                }
+            )
+        );
+    };
+
+    const renderCelebrantsBadge = (
+        item: MenuItem
+    ) =>
+        item.highlight === 'celebrants' &&
+        showCelebrants ? (
+            <span
+                className="nav-celebrants-badge"
+                title={celebrantsLabel}
+            >
+                <span aria-hidden="true">🎂</span>
+                {celebrants.count}
+                <span className="visually-hidden">
+                    {` – ${celebrantsLabel}`}
+                </span>
+            </span>
+        ) : null;
 
     /* =========================================
        PREVENT BACKGROUND SCROLL
@@ -374,7 +458,12 @@ export default function Navigation() {
                                     }
                                 >
                                     {item.label}
-
+                                    {hasHighlightedChild(item) && (
+                                        <span
+                                            className="nav-highlight-dot"
+                                            aria-hidden="true"
+                                        />
+                                    )}
                                     <svg
                                         className={`dropdown-arrow ${activeDropdown ===
                                                 item.label
@@ -420,7 +509,10 @@ export default function Navigation() {
                                                     ) {
                                                         event.preventDefault();
                                                     }
-
+                                                    openCelebrants(
+                                                        event,
+                                                        child
+                                                    );
                                                     handleMenuItemClick(
                                                         child
                                                     );
@@ -429,6 +521,9 @@ export default function Navigation() {
                                                 {
                                                     child.label
                                                 }
+                                                {renderCelebrantsBadge(
+                                                    child
+                                                )}
                                             </a>
 
                                         )
@@ -494,6 +589,12 @@ export default function Navigation() {
                     <span className="hamburger-line" />
                     <span className="hamburger-line" />
                     <span className="hamburger-line" />
+                    {showCelebrants && !isMenuOpen && (
+                        <span
+                            className="nav-highlight-dot nav-highlight-dot-burger"
+                            aria-hidden="true"
+                        />
+                    )}
                 </button>
 
             </div>
@@ -538,8 +639,13 @@ export default function Navigation() {
                                         {
                                             item.label
                                         }
+                                        {hasHighlightedChild(item) && (
+                                            <span
+                                                className="nav-highlight-dot"
+                                                aria-hidden="true"
+                                            />
+                                        )}
                                     </span>
-
                                     <svg
                                         className={`mobile-arrow ${mobileOpenDropdown ===
                                                 item.label
@@ -592,7 +698,10 @@ export default function Navigation() {
                                                     ) {
                                                         event.preventDefault();
                                                     }
-
+                                                    openCelebrants(
+                                                        event,
+                                                        child
+                                                    );
                                                     handleMobileMenuItemClick(
                                                         child
                                                     );
@@ -601,6 +710,9 @@ export default function Navigation() {
                                                 {
                                                     child.label
                                                 }
+                                                {renderCelebrantsBadge(
+                                                    child
+                                                )}
                                             </a>
 
                                         )

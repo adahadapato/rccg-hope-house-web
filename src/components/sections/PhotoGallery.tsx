@@ -14,6 +14,10 @@ import useGallery, {
 } from '@/hooks/useGallery';
 
 import { apiUrl } from '@/api/api';
+import {
+    SHOW_CELEBRANTS_EVENT,
+    type ShowCelebrantsDetail
+} from '@/hooks/useCelebrantsOfMonth';
 
 const INITIAL_VISIBLE_IMAGES = 9;
 const LOAD_MORE_COUNT = 9;
@@ -160,6 +164,47 @@ export default function PhotoGallery() {
         },
         []
     );
+
+    const exploreSectionRef =
+        useRef<HTMLElement | null>(null);
+
+    /*
+     * The menu's "Gallery" link sends this when celebrants
+     * of the month are highlighted: show that category and
+     * scroll straight to it.
+     */
+    useEffect(() => {
+        const showCelebrants = (event: Event) => {
+            const { categoryName } =
+                (event as CustomEvent<ShowCelebrantsDetail>).detail ?? {};
+
+            if (categoryName) {
+                handleCategoryChange(categoryName);
+            }
+
+            window.requestAnimationFrame(() => {
+                const target =
+                    exploreSectionRef.current ??
+                    document.getElementById('photo-gallery');
+
+                target?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            });
+        };
+
+        window.addEventListener(
+            SHOW_CELEBRANTS_EVENT,
+            showCelebrants
+        );
+
+        return () =>
+            window.removeEventListener(
+                SHOW_CELEBRANTS_EVENT,
+                showCelebrants
+            );
+    }, [handleCategoryChange]);
 
     const featuredTrackRef =
         useRef<HTMLDivElement | null>(null);
@@ -787,7 +832,10 @@ export default function PhotoGallery() {
                                     </section>
                                 )}
 
-                                <section className="explore-gallery-section">
+                                <section
+                                    ref={exploreSectionRef}
+                                    className="explore-gallery-section"
+                                >
                                     <div className="gallery-section-heading">
                                         <span className="gallery-section-eyebrow">
                                             OUR CHURCH FAMILY
