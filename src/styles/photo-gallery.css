@@ -276,6 +276,18 @@
     text-shadow: 0 2px 8px rgba(15, 23, 42, 0.35);
 }
 
+.featured-gallery-description {
+    margin: 0 0 0.4rem;
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 0.88rem;
+    line-height: 1.45;
+    text-shadow: 0 1px 6px rgba(15, 23, 42, 0.45);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
 .featured-gallery-date {
     color: rgba(255, 255, 255, 0.94);
     font-size: 0.85rem;
@@ -464,6 +476,18 @@
     line-height: 1.35;
     margin: 0 0 0.4rem;
     font-weight: 800;
+}
+
+.public-gallery-card-description {
+    margin: 0 0 0.6rem;
+    color: #475569;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .public-gallery-card-date {

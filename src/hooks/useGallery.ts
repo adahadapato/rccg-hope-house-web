@@ -15,6 +15,8 @@ export interface GalleryFeedImage {
     isFeatured: boolean;
     eventDate: string | null;
     displayOrder: number;
+    /** Included in the feed so cards can show a short excerpt. */
+    description?: string | null;
 }
 
 export interface GalleryImageDetail extends GalleryFeedImage {

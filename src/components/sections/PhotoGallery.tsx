@@ -749,6 +749,14 @@ export default function PhotoGallery() {
                                                                         }
                                                                     </h4>
 
+                                                                    {image.description && (
+                                                                        <p className="featured-gallery-description">
+                                                                            {
+                                                                                image.description
+                                                                            }
+                                                                        </p>
+                                                                    )}
+
                                                                     {date && (
                                                                         <span className="featured-gallery-date">
                                                                             {
@@ -1119,6 +1127,12 @@ function GalleryCard({
                 )}
 
                 <h4>{image.title}</h4>
+
+                {image.description && (
+                    <p className="public-gallery-card-description">
+                        {image.description}
+                    </p>
+                )}
 
                 {date && (
                     <span className="public-gallery-card-date">
