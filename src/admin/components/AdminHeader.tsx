@@ -9,6 +9,14 @@ import {
     clearAdminSession,
 } from '@/api/api';
 
+import {
+    BIRTHDAY_WISHES_CHANGED_EVENT,
+    type BirthdayWishStats,
+} from '@/hooks/useBirthdayWishes';
+
+/** How often the bell re-checks for wishes needing review. */
+const PENDING_WISHES_POLL_MS = 2 * 60 * 1000;
+
 interface AccountProfile {
     firstName: string;
     lastName: string;
@@ -98,6 +106,11 @@ function AdminHeader() {
         imageFailed,
         setImageFailed,
     ] = useState(false);
+
+    const [
+        pendingWishes,
+        setPendingWishes,
+    ] = useState(0);
 
     const userMenuRef =
         useRef<HTMLDivElement>(null);
@@ -221,6 +234,70 @@ function AdminHeader() {
     }, []);
 
     /* =========================================
+       BELL: BIRTHDAY WISHES NEEDING REVIEW
+       ========================================= */
+
+    useEffect(() => {
+        let controller: AbortController | null = null;
+
+        const loadPendingWishes = async () => {
+            controller?.abort();
+            controller = new AbortController();
+
+            try {
+                const response =
+                    await apiFetch(
+                        '/api/birthday-wishes/admin/stats',
+                        {
+                            signal:
+                                controller.signal,
+                        }
+                    );
+
+                // e.g. 403 for admins without content access:
+                // leave the bell without a count.
+                if (!response.ok) {
+                    return;
+                }
+
+                const stats =
+                    (await response.json()) as BirthdayWishStats;
+
+                setPendingWishes(
+                    stats.pendingCount ?? 0
+                );
+            } catch {
+                // Aborted or offline: keep the last count.
+            }
+        };
+
+        void loadPendingWishes();
+
+        const timer =
+            window.setInterval(
+                () => void loadPendingWishes(),
+                PENDING_WISHES_POLL_MS
+            );
+
+        const handleChanged = () =>
+            void loadPendingWishes();
+
+        window.addEventListener(
+            BIRTHDAY_WISHES_CHANGED_EVENT,
+            handleChanged
+        );
+
+        return () => {
+            controller?.abort();
+            window.clearInterval(timer);
+            window.removeEventListener(
+                BIRTHDAY_WISHES_CHANGED_EVENT,
+                handleChanged
+            );
+        };
+    }, []);
+
+    /* =========================================
        CLOSE USER MENU WHEN CLICKING OUTSIDE
        ========================================= */
 
@@ -330,10 +407,30 @@ function AdminHeader() {
                 <button
                     type="button"
                     className="admin-notification"
-                    aria-label="Notifications"
+                    aria-label={
+                        pendingWishes > 0
+                            ? `${pendingWishes} birthday wish${pendingWishes === 1 ? '' : 'es'} need review`
+                            : 'No birthday wishes need review'
+                    }
+                    title={
+                        pendingWishes > 0
+                            ? `${pendingWishes} birthday wish${pendingWishes === 1 ? '' : 'es'} need review`
+                            : 'Nothing needs review'
+                    }
+                    onClick={() =>
+                        window.location.assign(
+                            '/admin/birthday-wishes'
+                        )
+                    }
                 >
                     ♧
-                    <span>3</span>
+                    {pendingWishes > 0 && (
+                        <span>
+                            {pendingWishes > 99
+                                ? '99+'
+                                : pendingWishes}
+                        </span>
+                    )}
                 </button>
 
                 {/* ADMIN USER MENU */}

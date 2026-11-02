@@ -23,6 +23,7 @@ import Members from './admin/pages/Members';
 import ChurchSettings from './admin/pages/ChurchSettings';
 import SmartSeo from './admin/pages/SmartSeo';
 import Celebrations from './admin/pages/Celebrations';
+import BirthdayWishes from './admin/pages/BirthdayWishes';
 import CookieConsent from './components/CookieConsent';
 import CelebrationInvitationResponse from './pages/CelebrationInvitationResponse';
 
@@ -90,6 +91,7 @@ function App() {
         case '/admin/services': return <Services />;
         case '/admin/gallery': return <GalleryImage />;
         case '/admin/gallery/categories': return <GalleryCategory />;
+        case '/admin/birthday-wishes': return <BirthdayWishes />;
         case '/admin/prophecies': return <Prophecies />;
         case '/admin/prophecies/categories': return <ProphecyCategories />;
         case '/admin/sermons': return <Sermons />;

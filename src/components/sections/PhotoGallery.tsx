@@ -18,6 +18,11 @@ import {
     SHOW_CELEBRANTS_EVENT,
     type ShowCelebrantsDetail
 } from '@/hooks/useCelebrantsOfMonth';
+import {
+    isCelebrantCategory,
+    useBirthdayWishCounts
+} from '@/hooks/useBirthdayWishes';
+import BirthdayWishes from './BirthdayWishes';
 
 const INITIAL_VISIBLE_IMAGES = 9;
 const LOAD_MORE_COUNT = 9;
@@ -97,6 +102,11 @@ export default function PhotoGallery() {
 
     const [detailError, setDetailError] =
         useState<string | null>(null);
+
+    const {
+        counts: wishCounts,
+        refreshCounts: refreshWishCounts
+    } = useBirthdayWishCounts();
 
     const categories = useMemo(() => {
         const uniqueCategories = Array.from(
@@ -548,6 +558,21 @@ export default function PhotoGallery() {
         const handleKeyDown = (
             event: KeyboardEvent
         ) => {
+            /*
+             * Let visitors type a birthday wish without the
+             * arrow keys changing photo or Escape closing it.
+             */
+            const target =
+                event.target as HTMLElement | null;
+
+            if (
+                target?.closest(
+                    'input, textarea, select, [contenteditable="true"]'
+                )
+            ) {
+                return;
+            }
+
             if (event.key === 'Escape') {
                 closeLightbox();
             } else if (event.key === 'ArrowLeft') {
@@ -617,6 +642,9 @@ export default function PhotoGallery() {
         selectedDetail?.tags ??
         currentSelectedFeedImage?.tags ??
         [];
+
+    const lightboxIsCelebrant =
+        isCelebrantCategory(lightboxCategory);
 
     return (
         <>
@@ -909,6 +937,15 @@ export default function PhotoGallery() {
                                                             image={
                                                                 image
                                                             }
+                                                            wishCount={
+                                                                isCelebrantCategory(
+                                                                    image.categoryName
+                                                                )
+                                                                    ? wishCounts[
+                                                                    image.id
+                                                                    ] ?? 0
+                                                                    : null
+                                                            }
                                                             index={
                                                                 index
                                                             }
@@ -974,7 +1011,10 @@ export default function PhotoGallery() {
                         onClick={closeLightbox}
                     >
                         <div
-                            className="lightbox-content"
+                            className={`lightbox-content ${lightboxIsCelebrant
+                                ? 'lightbox-has-wishes'
+                                : ''
+                                }`}
                             onClick={(event) =>
                                 event.stopPropagation()
                             }
@@ -1111,6 +1151,17 @@ export default function PhotoGallery() {
                                         {detailError}
                                     </p>
                                 )}
+
+                                {lightboxIsCelebrant && (
+                                    <BirthdayWishes
+                                        key={selectedImageId}
+                                        imageId={selectedImageId}
+                                        celebrantName={lightboxTitle}
+                                        onWishPublished={
+                                            refreshWishCounts
+                                        }
+                                    />
+                                )}
                             </div>
                         </div>
                     </div>
@@ -1121,12 +1172,15 @@ export default function PhotoGallery() {
 
 interface GalleryCardProps {
     image: GalleryFeedImage;
+    /** Approved wishes; null when the photo is not a celebrant photo. */
+    wishCount: number | null;
     index: number;
     onOpen: () => void;
 }
 
 function GalleryCard({
     image,
+    wishCount,
     index,
     onOpen
 }: GalleryCardProps) {
@@ -1185,6 +1239,15 @@ function GalleryCard({
                 {date && (
                     <span className="public-gallery-card-date">
                         {date}
+                    </span>
+                )}
+
+                {wishCount !== null && (
+                    <span className="public-gallery-card-wishes">
+                        <span aria-hidden="true">💬</span>
+                        {wishCount === 0
+                            ? 'Send a birthday wish'
+                            : `${wishCount} ${wishCount === 1 ? 'wish' : 'wishes'}`}
                     </span>
                 )}
             </div>

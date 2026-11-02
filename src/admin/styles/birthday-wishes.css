@@ -1,0 +1,253 @@
+/* ============================================================
+   BIRTHDAY WISHES ADMIN
+   ============================================================ */
+
+.wishes-admin-page {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.wishes-admin-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 2rem;
+}
+
+    .wishes-admin-header h1 {
+        margin: 0.3rem 0 0.45rem;
+    }
+
+    .wishes-admin-header p {
+        max-width: 720px;
+        margin: 0;
+        color: #667085;
+        line-height: 1.6;
+    }
+
+.wishes-header-pending {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex: 0 0 auto;
+    min-width: 150px;
+    padding: 0.9rem 1rem;
+    border: 1px solid #f5c26b;
+    border-radius: 10px;
+    background: #fffaeb;
+}
+
+    .wishes-header-pending > span {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #fef0c7;
+        color: #b54708;
+        font-size: 1.05rem;
+        font-weight: 700;
+    }
+
+    .wishes-header-pending div {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .wishes-header-pending strong {
+        color: #7a2e0e;
+    }
+
+    .wishes-header-pending small {
+        color: #93370d;
+    }
+
+/* ========== TABS ========== */
+
+.wishes-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.wishes-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 40px;
+    padding: 0 1rem;
+    border: 1px solid #d9deea;
+    border-radius: 999px;
+    background: #fff;
+    color: #42506b;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+    .wishes-tab span {
+        min-width: 1.4rem;
+        padding: 0.05rem 0.45rem;
+        border-radius: 999px;
+        background: #eef1f6;
+        font-size: 12px;
+        text-align: center;
+    }
+
+    .wishes-tab.active {
+        border-color: var(--admin-blue, #24469a);
+        background: var(--admin-blue, #24469a);
+        color: #fff;
+    }
+
+        .wishes-tab.active span {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+/* ========== LIST ========== */
+
+.wishes-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.wish-card {
+    display: flex;
+    gap: 1rem;
+    border-left: 4px solid #d9deea;
+}
+
+.wish-card-pending {
+    border-left-color: #f79009;
+}
+
+.wish-card-approved {
+    border-left-color: #12b76a;
+}
+
+.wish-card-rejected {
+    border-left-color: #f04438;
+}
+
+.wish-card-photo {
+    flex: 0 0 72px;
+    width: 72px;
+    height: 72px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border-radius: 10px;
+    background: #f5f7fb;
+    font-size: 1.6rem;
+}
+
+    .wish-card-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+.wish-card-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.wish-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.wish-card-photo-title {
+    color: #5f6e8b;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.wish-status {
+    flex-shrink: 0;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.wish-status-pending {
+    background: #fffaeb;
+    color: #b54708;
+}
+
+.wish-status-approved {
+    background: #ecfdf3;
+    color: #027a48;
+}
+
+.wish-status-rejected {
+    background: #fef3f2;
+    color: #b42318;
+}
+
+.wish-card-message {
+    margin: 0.55rem 0;
+    color: #10204a;
+    font-size: 15px;
+    line-height: 1.6;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+.wish-card-author,
+.wish-card-reason {
+    margin: 0.2rem 0 0;
+    color: #69738a;
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+
+.wish-card-reason {
+    padding: 0.45rem 0.65rem;
+    margin-top: 0.55rem;
+    border-radius: 8px;
+    background: #f5f7fb;
+}
+
+.wish-card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.85rem;
+}
+
+    .wish-card-actions .wish-approve {
+        background: #12b76a;
+        border-color: #12b76a;
+    }
+
+    .wish-card-actions .wish-delete {
+        color: #b42318;
+    }
+
+@media (max-width: 720px) {
+    .wishes-admin-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .wish-card {
+        flex-direction: column;
+    }
+
+    .wish-card-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.4rem;
+    }
+
+    .wish-card-actions button {
+        flex: 1 1 auto;
+    }
+}

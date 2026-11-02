@@ -1,0 +1,249 @@
+/* =========================================
+   BIRTHDAY WISHES (gallery lightbox + cards)
+   ========================================= */
+
+/* Celebrant photos have wishes under them, so let the
+   enlarged view scroll and keep the photo a little smaller. */
+.lightbox-content.lightbox-has-wishes {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+}
+
+    .lightbox-content.lightbox-has-wishes .lightbox-image {
+        max-height: 56vh;
+    }
+
+.birthday-wishes {
+    max-width: 640px;
+    margin: 1.5rem auto 1rem;
+    padding: 1.25rem 1.25rem 1rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    text-align: left;
+}
+
+.birthday-wishes-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-bottom: 0.85rem;
+    font-size: 1.15rem;
+}
+
+    .birthday-wishes-heading h4 {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0;
+        color: white;
+        font-size: 1.05rem;
+    }
+
+.birthday-wishes-count {
+    min-width: 1.5rem;
+    padding: 0.1rem 0.5rem;
+    border-radius: 1rem;
+    background: linear-gradient( 135deg, #e08526, #ba6a1e );
+    font-size: 0.75rem;
+    text-align: center;
+}
+
+.birthday-wishes-muted {
+    margin: 0 0 1rem;
+    color: rgba(255, 255, 255, 0.68);
+    font-size: 0.9rem;
+}
+
+.birthday-wishes-list {
+    display: grid;
+    gap: 0.65rem;
+    max-height: 260px;
+    margin: 0 0 1.1rem;
+    padding: 0 0.25rem 0 0;
+    overflow-y: auto;
+    list-style: none;
+    scrollbar-width: thin;
+}
+
+.birthday-wish {
+    padding: 0.75rem 0.9rem;
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+    .birthday-wish p {
+        margin: 0.3rem 0 0;
+        color: rgba(255, 255, 255, 0.88);
+        font-size: 0.9rem;
+        line-height: 1.55;
+        white-space: pre-line;
+        overflow-wrap: anywhere;
+    }
+
+.birthday-wish-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    font-size: 0.82rem;
+}
+
+    .birthday-wish-meta strong {
+        color: #fbbf77;
+        overflow-wrap: anywhere;
+    }
+
+    .birthday-wish-meta span {
+        flex-shrink: 0;
+        color: rgba(255, 255, 255, 0.55);
+    }
+
+.birthday-wish-form {
+    display: grid;
+    gap: 0.7rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.birthday-wish-field {
+    display: grid;
+    gap: 0.3rem;
+}
+
+    .birthday-wish-field span {
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .birthday-wish-field input,
+    .birthday-wish-field textarea {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 0.65rem 0.8rem;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 0.6rem;
+        background: rgba(8, 15, 31, 0.6);
+        color: white;
+        font: inherit;
+        font-size: 0.92rem;
+        resize: vertical;
+    }
+
+        .birthday-wish-field input::placeholder,
+        .birthday-wish-field textarea::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .birthday-wish-field input:focus,
+        .birthday-wish-field textarea:focus {
+            border-color: #e08526;
+            outline: 3px solid rgba(224, 133, 38, 0.25);
+        }
+
+.birthday-wish-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+    .birthday-wish-actions small {
+        color: rgba(255, 255, 255, 0.55);
+        font-size: 0.78rem;
+    }
+
+    .birthday-wish-actions .birthday-wish-limit {
+        color: #fbbf77;
+    }
+
+.birthday-wish-send {
+    padding: 0.65rem 1.4rem;
+    border: none;
+    border-radius: 2rem;
+    background: linear-gradient( 135deg, #e08526, #ba6a1e );
+    color: white;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+    .birthday-wish-send:hover:not(:disabled) {
+        transform: translateY(-1px);
+    }
+
+    .birthday-wish-send:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+.birthday-wish-notice {
+    margin: 0;
+    padding: 0.6rem 0.85rem;
+    border-radius: 0.6rem;
+    font-size: 0.85rem;
+}
+
+    .birthday-wish-notice.success {
+        background: rgba(34, 197, 94, 0.16);
+        color: #bbf7d0;
+    }
+
+    .birthday-wish-notice.info {
+        background: rgba(59, 130, 246, 0.16);
+        color: #bfdbfe;
+    }
+
+    .birthday-wish-notice.error {
+        background: rgba(239, 68, 68, 0.16);
+        color: #fecaca;
+    }
+
+.birthday-wish-privacy {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.75rem;
+}
+
+/* Hidden from people, still in the page for bots. */
+.birthday-wish-honeypot {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+/* Gallery card badge: "💬 3 wishes" */
+.public-gallery-card-wishes {
+    display: flex;
+    width: fit-content;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0.45rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 1rem;
+    background: rgba(224, 133, 38, 0.1);
+    color: #ba6a1e;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+@media (max-width: 640px) {
+    .birthday-wishes {
+        margin: 1rem 0.25rem;
+        padding: 1rem 0.85rem 0.85rem;
+    }
+
+    .birthday-wish-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .birthday-wish-send {
+        width: 100%;
+    }
+}

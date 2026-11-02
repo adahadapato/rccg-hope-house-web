@@ -71,6 +71,10 @@ const navItems: NavigationItem[] = [
                 label: 'Categories',
                 path: '/admin/gallery/categories',
             },
+            {
+                label: 'Birthday Wishes',
+                path: '/admin/birthday-wishes',
+            },
         ],
     },
 
