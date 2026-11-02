@@ -232,7 +232,28 @@
     font-weight: 700;
 }
 
+/* Featured photo badge (on the dark photo caption) */
+.featured-gallery-wishes {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    width: fit-content;
+    margin-top: 0.55rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(4px);
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
 @media (max-width: 640px) {
+    .featured-gallery-wishes {
+        font-size: 0.72rem;
+        padding: 0.25rem 0.6rem;
+    }
+
     .birthday-wishes {
         margin: 1rem 0.25rem;
         padding: 1rem 0.85rem 0.85rem;

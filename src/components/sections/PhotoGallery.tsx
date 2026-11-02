@@ -766,6 +766,15 @@ export default function PhotoGallery() {
                                                                 image.eventDate
                                                             );
 
+                                                        const featuredWishCount =
+                                                            isCelebrantCategory(
+                                                                image.categoryName
+                                                            )
+                                                                ? wishCounts[
+                                                                image.id
+                                                                ] ?? 0
+                                                                : null;
+
                                                         return (
                                                             <button
                                                                 key={`${image.id}-${carouselIndex}`}
@@ -835,6 +844,15 @@ export default function PhotoGallery() {
                                                                             {
                                                                                 date
                                                                             }
+                                                                        </span>
+                                                                    )}
+
+                                                                    {featuredWishCount !== null && (
+                                                                        <span className="featured-gallery-wishes">
+                                                                            <span aria-hidden="true">💬</span>
+                                                                            {featuredWishCount === 0
+                                                                                ? 'Send a birthday wish'
+                                                                                : `${featuredWishCount} ${featuredWishCount === 1 ? 'wish' : 'wishes'}`}
                                                                         </span>
                                                                     )}
                                                                 </div>
