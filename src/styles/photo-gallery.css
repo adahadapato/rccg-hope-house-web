@@ -559,6 +559,10 @@ body.gallery-lightbox-open {
     max-height: 94vh;
     display: flex;
     flex-direction: column;
+    /* Tall photos + long descriptions scroll instead of overlapping. */
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
     animation: gallerySlideUp 0.3s ease;
 }
 
@@ -604,6 +608,8 @@ body.gallery-lightbox-open {
     align-items: center;
     justify-content: center;
     min-height: 280px;
+    /* Never squash the photo area: the photo would spill over the text below. */
+    flex-shrink: 0;
 }
 
 .lightbox-image {
