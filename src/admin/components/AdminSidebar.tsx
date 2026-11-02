@@ -123,6 +123,12 @@ const navItems: NavigationItem[] = [
     },
 
     {
+        icon: '✎',
+        label: 'AI Prompts',
+        path: '/admin/ai-prompts',
+    },
+
+    {
         icon: '⚙',
         label: 'Administration',
         children: [

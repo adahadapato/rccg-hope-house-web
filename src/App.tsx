@@ -24,6 +24,7 @@ import ChurchSettings from './admin/pages/ChurchSettings';
 import SmartSeo from './admin/pages/SmartSeo';
 import Celebrations from './admin/pages/Celebrations';
 import BirthdayWishes from './admin/pages/BirthdayWishes';
+import AiPrompts from './admin/pages/AiPrompts';
 import CookieConsent from './components/CookieConsent';
 import CelebrationInvitationResponse from './pages/CelebrationInvitationResponse';
 
@@ -109,6 +110,7 @@ function App() {
         case '/admin/prayer-requests': return <PrayerRequest />;
         case '/admin/churchsettings': return <ChurchSettings />;
         case '/admin/seo': return <SmartSeo />;
+        case '/admin/ai-prompts': return <AiPrompts />;
         default: return <AdminDashboard />;
     }
 }
