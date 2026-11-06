@@ -920,8 +920,9 @@ export default function AdminNews() {
                                         <div className="news-form-section events-field-wide">
                                             <strong>Event details</strong>
                                             <small>
-                                                Optional. Shown in the banner instead of
-                                                dates, with a map and directions.
+                                                Optional. Shown in the banner with a live countdown
+                                                (“31 days to go”), a map and directions. For an
+                                                all-day or multi-day event, set the times to 00:00.
                                             </small>
                                         </div>
 

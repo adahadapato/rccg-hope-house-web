@@ -118,17 +118,111 @@ function describeEventWhen(
 
     const startDay = start.toLocaleDateString('en-GB', dayOptions);
 
+    // A start time of 00:00 means "all day": show dates only.
+    const allDay = isMidnight(start) && (!end || isMidnight(end) || isEndOfDay(end));
+
     if (end && !isSameDay(start, end)) {
         return {
             date: `${startDay} – ${end.toLocaleDateString('en-GB', dayOptions)}`,
-            time: `${formatTime(start)} – ${formatTime(end)}`,
+            time: allDay ? null : `${formatTime(start)} – ${formatTime(end)}`,
         };
+    }
+
+    if (allDay) {
+        return { date: startDay, time: null };
     }
 
     return {
         date: startDay,
         time: end ? `${formatTime(start)} – ${formatTime(end)}` : formatTime(start),
     };
+}
+
+function isMidnight(date: Date) {
+    return date.getHours() === 0 && date.getMinutes() === 0;
+}
+
+function isEndOfDay(date: Date) {
+    return date.getHours() === 23 && date.getMinutes() === 59;
+}
+
+/* ==========================================================
+   Countdown
+   ========================================================== */
+
+type CountdownTone = 'soon' | 'today' | 'live';
+
+interface Countdown {
+    label: string;
+    tone: CountdownTone;
+}
+
+const MS_PER_DAY = 86_400_000;
+
+/** Whole calendar days between two dates, in the visitor's time zone. */
+function calendarDaysBetween(from: Date, to: Date) {
+    const a = Date.UTC(from.getFullYear(), from.getMonth(), from.getDate());
+    const b = Date.UTC(to.getFullYear(), to.getMonth(), to.getDate());
+    return Math.round((b - a) / MS_PER_DAY);
+}
+
+/**
+ * "🔥 31 days to go", "Tomorrow!", "Today!", "Happening now".
+ * Worked out from the event dates, so it updates itself every day.
+ * Returns null when there is no event date or the event is over.
+ */
+function describeCountdown(item: AnnouncementFeedItem, nowMs: number): Countdown | null {
+    const start = parseDate(item.eventStartsAt);
+    if (!start) return null;
+
+    const now = new Date(nowMs);
+    const end = parseDate(item.eventEndsAt);
+    const days = calendarDaysBetween(now, start);
+
+    if (days > 1) return { label: `${days} days to go`, tone: 'soon' };
+    if (days === 1) return { label: 'Tomorrow!', tone: 'soon' };
+
+    if (end) {
+        // Multi-day or timed event: live from the start until the end
+        // (an end at 00:00 counts as the whole of that day).
+        const endsAt = isMidnight(end) ? end.getTime() + MS_PER_DAY : end.getTime();
+        if (nowMs > endsAt) return null;
+
+        const started = isMidnight(start) ? days <= 0 : nowMs >= start.getTime();
+        if (started) {
+            const totalDays = calendarDaysBetween(start, end) + 1;
+            const dayNumber = calendarDaysBetween(start, now) + 1;
+            return totalDays > 1
+                ? { label: `Happening now · Day ${dayNumber} of ${totalDays}`, tone: 'live' }
+                : { label: 'Happening now', tone: 'live' };
+        }
+
+        return { label: 'Today!', tone: 'today' };
+    }
+
+    // No end time: it's "today" on the day, then the countdown disappears.
+    return days === 0 ? { label: 'Today!', tone: 'today' } : null;
+}
+
+/** The current time, refreshed every minute so the countdown stays right. */
+function useNow(intervalMs = 60_000) {
+    const [now, setNow] = useState(() => Date.now());
+
+    useEffect(() => {
+        const timer = window.setInterval(() => setNow(Date.now()), intervalMs);
+        return () => window.clearInterval(timer);
+    }, [intervalMs]);
+
+    return now;
+}
+
+function CountdownChip({ countdown }: { countdown: Countdown }) {
+    return (
+        <span className={`news-countdown news-countdown-${countdown.tone}`}>
+            <span aria-hidden="true">{countdown.tone === 'live' ? '●' : '🔥'}</span>
+            {countdown.label}
+        </span>
+    );
 }
 
 /** Short venue label for the banner, e.g. "RCCG Hope House, HA8 0AP". */
@@ -243,6 +337,8 @@ function AnnouncementModal({ item, onClose }: AnnouncementModalProps) {
     const when = describeEventWhen(item, 'long');
     const venueLabel = shortVenue(item);
     const directions = directionsUrl(item);
+    const now = useNow();
+    const countdown = describeCountdown(item, now);
 
     // The Google map is only loaded when the visitor asks for it,
     // so no Google content or cookies load until then.
@@ -301,9 +397,12 @@ function AnnouncementModal({ item, onClose }: AnnouncementModalProps) {
                 )}
 
                 <div className="news-modal-content">
-                    <span className={`news-type-chip news-type-${item.type.toLowerCase()}`}>
-                        {typeIcons[item.type]} {typeLabels[item.type]}
-                    </span>
+                    <div className="news-chip-row">
+                        <span className={`news-type-chip news-type-${item.type.toLowerCase()}`}>
+                            {typeIcons[item.type]} {typeLabels[item.type]}
+                        </span>
+                        {countdown && <CountdownChip countdown={countdown} />}
+                    </div>
 
                     <h2 id="news-modal-title">{item.title}</h2>
 
@@ -410,6 +509,7 @@ export default function NewsBanner() {
     const [mounted, setMounted] = useState(false);
     const [paused, setPaused] = useState(false);
     const [modalItem, setModalItem] = useState<AnnouncementFeedItem | null>(null);
+    const now = useNow();
 
     const signature = useMemo(() => signatureOf(items), [items]);
 
@@ -485,6 +585,7 @@ export default function NewsBanner() {
 
     const thumb = resolveAnnouncementImage(current.thumbnailPath ?? current.imagePath);
     const currentWhen = describeEventWhen(current, 'short');
+    const currentCountdown = describeCountdown(current, now);
     const currentVenue = shortVenue(current);
     const currentDirections = directionsUrl(current);
     const isUrgent = items.some(item => item.type === 'Urgent');
@@ -549,9 +650,14 @@ export default function NewsBanner() {
                         </button>
 
                         <div className="news-banner-text">
-                            <span className={`news-type-chip news-type-${current.type.toLowerCase()}`}>
-                                {typeLabels[current.type]}
-                            </span>
+                            <div className="news-chip-row">
+                                <span className={`news-type-chip news-type-${current.type.toLowerCase()}`}>
+                                    {typeLabels[current.type]}
+                                </span>
+                                {currentCountdown && (
+                                    <CountdownChip countdown={currentCountdown} />
+                                )}
+                            </div>
                             <h3>{current.title}</h3>
                             {current.summary && <p>{current.summary}</p>}
                             {(currentWhen || currentVenue) && (
